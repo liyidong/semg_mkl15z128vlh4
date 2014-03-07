@@ -19,7 +19,7 @@
 **          Pin for I/O                                    : ADC0_DM2/ADC0_SE6a/PTE19/SPI0_MISO/I2C0_SCL/SPI0_MOSI
 **          Pin signal                                     : NOT_RESET
 **          Direction                                      : Output
-**          Initialization                                 : 
+**          Initialization                                 :
 **            Init. direction                              : Output
 **            Init. value                                  : 1
 **            Auto initialization                          : no
@@ -33,7 +33,7 @@
 **
 **     Copyright : 1997 - 2013 Freescale Semiconductor, Inc. All Rights Reserved.
 **     SOURCE DISTRIBUTION PERMISSIBLE as directed in End User License Agreement.
-**     
+**
 **     http      : www.freescale.com
 **     mail      : support@freescale.com
 ** ###################################################################*/
@@ -47,11 +47,11 @@
 **
 **         RTOS drivers using HAL BitIO API are simpler and more
 **         portable to various microprocessors.
-*/         
+*/
 /*!
 **  @addtogroup BitIO_NOT_RESET_module BitIO_NOT_RESET module documentation
 **  @{
-*/         
+*/
 
 /* MODULE BitIO_NOT_RESET. */
 
@@ -60,16 +60,16 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
-typedef struct {
-  LDD_TUserData *UserDataPtr;          /* Pointer to user data */
-} BitIO_NOT_RESET_TDeviceData;         /* Device data structure type */
-
-typedef BitIO_NOT_RESET_TDeviceData *BitIO_NOT_RESET_TDeviceDataPtr ; /* Pointer to the device data structure. */
-
-/* {Default RTOS Adapter} Static object used for simulation of dynamic driver memory allocation */
-static BitIO_NOT_RESET_TDeviceData DeviceDataPrv__DEFAULT_RTOS_ALLOC;
+//typedef struct {
+//  LDD_TUserData *UserDataPtr;          /* Pointer to user data */
+//} BitIO_NOT_RESET_TDeviceData;         /* Device data structure type */
+//
+//typedef BitIO_NOT_RESET_TDeviceData *BitIO_NOT_RESET_TDeviceDataPtr ; /* Pointer to the device data structure. */
+//
+///* {Default RTOS Adapter} Static object used for simulation of dynamic driver memory allocation */
+//static BitIO_NOT_RESET_TDeviceData DeviceDataPrv__DEFAULT_RTOS_ALLOC;
 /*
 ** ===================================================================
 **     Method      :  BitIO_NOT_RESET_Init (component BitIO_LDD)
@@ -82,7 +82,7 @@ static BitIO_NOT_RESET_TDeviceData DeviceDataPrv__DEFAULT_RTOS_ALLOC;
 **         in init. code" is set to "yes" value then the device is also
 **         enabled(see the description of the Enable() method). In this
 **         case the Enable() method is not necessary and needn't to be
-**         generated. 
+**         generated.
 **     @param
 **         UserDataPtr     - Pointer to the user or
 **                           RTOS specific data. This pointer will be
@@ -94,20 +94,20 @@ static BitIO_NOT_RESET_TDeviceData DeviceDataPrv__DEFAULT_RTOS_ALLOC;
 /* ===================================================================*/
 LDD_TDeviceData* BitIO_NOT_RESET_Init(LDD_TUserData *UserDataPtr)
 {
-  /* Allocate device structure */
-  BitIO_NOT_RESET_TDeviceDataPtr DeviceDataPrv;
-  /* {Default RTOS Adapter} Driver memory allocation: Dynamic allocation is simulated by a pointer to the static object */
-  DeviceDataPrv = &DeviceDataPrv__DEFAULT_RTOS_ALLOC;
-
-  DeviceDataPrv->UserDataPtr = UserDataPtr; /* Store the RTOS device structure */
+//  /* Allocate device structure */
+//  BitIO_NOT_RESET_TDeviceDataPtr DeviceDataPrv;
+//  /* {Default RTOS Adapter} Driver memory allocation: Dynamic allocation is simulated by a pointer to the static object */
+//  DeviceDataPrv = &DeviceDataPrv__DEFAULT_RTOS_ALLOC;
+//
+//  DeviceDataPrv->UserDataPtr = UserDataPtr; /* Store the RTOS device structure */
 
   /* Configure pin as output */
   /* GPIOE_PDDR: PDD|=0x00080000 */
-  GPIOE_PDDR |= GPIO_PDDR_PDD(0x00080000);                                   
+  GPIOE_PDDR |= GPIO_PDDR_PDD(0x00080000);
 
   /* Set initialization value */
   /* GPIOE_PDOR: PDO|=0x00080000 */
-  GPIOE_PDOR |= GPIO_PDOR_PDO(0x00080000);                                   
+  GPIOE_PDOR |= GPIO_PDOR_PDO(0x00080000);
 
   /* Initialization of Port Control register */
   /* PORTE_PCR19: ISF=0,MUX=1 */
@@ -116,10 +116,11 @@ LDD_TDeviceData* BitIO_NOT_RESET_Init(LDD_TUserData *UserDataPtr)
                  PORT_PCR_MUX(0x06)
                 )) | (uint32_t)(
                  PORT_PCR_MUX(0x01)
-                ));                                  
+                ));
   /* Registration of the device structure */
-  PE_LDD_RegisterDeviceStructure(PE_LDD_COMPONENT_BitIO_NOT_RESET_ID,DeviceDataPrv);
-  return ((LDD_TDeviceData *)DeviceDataPrv);
+//  PE_LDD_RegisterDeviceStructure(PE_LDD_COMPONENT_BitIO_NOT_RESET_ID,DeviceDataPrv);
+//  return ((LDD_TDeviceData *)DeviceDataPrv);
+  return;
 }
 /*
 ** ===================================================================
@@ -233,7 +234,7 @@ void BitIO_NOT_RESET_SetVal(LDD_TDeviceData *DeviceDataPtr)
 
 #ifdef __cplusplus
 }  /* extern "C" */
-#endif 
+#endif
 
 /*!
 ** @}

@@ -3,9 +3,9 @@
  **     Filename    : Process.h
  **     Project     : semg_mkl15z128vlh4
  **     Processor   : MKL15Z128VLH4
- **     Component   : 
- **     Version     : 
- **     Datasheet   : 
+ **     Component   :
+ **     Version     :
+ **     Datasheet   :
  **     Compiler    : GNU C Compiler
  **     Date/Time   : 2013-Aug 5, 2013, 8:54:36 PM, # CodeGen: 1
  **     Author	    : Dong
@@ -16,7 +16,7 @@
  **     Contents    :
  **         Process         - void Process(void);
  **         SplitRawData    - LDD_TError SplitRawData(TADCDataPtr adcDataPtr);
- **     
+ **
  **     Mail      	: pzdongdong@163.com
  **
  **     Revision    : No.  Name        Data/Time        Content
@@ -24,7 +24,7 @@
 /*!
  * @file Process.h
  * @version 01.00
- * @brief	
+ * @brief
  *		This file contains functions for kinds of data processing.
  */
 /*!
@@ -43,7 +43,7 @@
 
 #ifdef __cplusplus
 extern "C"
-{   
+{
 #endif
 
 /*
@@ -75,11 +75,40 @@ void Process(void);
 /* ===================================================================*/
 LDD_TError SplitRawData(TADCDataPtr adcDataPtr);
 
+/*
+ * ===================================================================
+ *     Method      : SplitRawData(Module Process)
+ */
+/*!
+ *     @brief
+ *          This method copies ADC data from ADC structure to MCU structure.
+ *          The format of data in MCU structure
+       @verbatim
+       --------------------------------
+       | (Chn) | 1ms 2ms 3ms ... 99ms |
+       --------------------------------
+       | (Ch1) | [0] [1] [2] ... [99] |
+       | (Ch2) | [0] [1] [2] ... [99] |
+       | (Ch3) | [0] [1] [2] ... [99] |
+       | (Ch4) | [0] [1] [2] ... [99] |
+       | (Ch5) | [0] [1] [2] ... [99] |
+       | (Ch6) | [0] [1] [2] ... [99] |
+       | (Ch7) | [0] [1] [2] ... [99] |
+       | (Ch8) | [0] [1] [2] ... [99] |
+       --------------------------------
+       @endverbatim
+ *     @param
+ *          void
+ *     @return
+ *          void
+ */
+/* ===================================================================*/
+void CopyADCDataToMCUData();
     /* END Process. */
 
 #ifdef __cplusplus
 } /* extern "C" */
-#endif 
+#endif
 
 #endif
 /* PROCESS_H_ */

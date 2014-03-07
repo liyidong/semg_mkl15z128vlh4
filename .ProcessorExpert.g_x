@@ -51,21 +51,21 @@
       <File Name="Generated_Code/Cpu.h" FileDate="2013-12-12, 21:58:18" FileAge="1386856698191" FileType="45637" CompNumb="6" />
       <File Name="Generated_Code/DMA_CTRL.c" FileDate="2013-09-21, 19:46:42" FileAge="1379764002271" FileType="45637" CompNumb="90" />
       <File Name="Documentation/doxygen/BitIO_DAISY_IN.txt" FileDate="2013-08-03, 15:56:28" FileAge="1375516588596" FileType="45637" CompNumb="22" />
-      <File Name="Generated_Code/SM_SPI1.c" FileDate="2014-02-23, 22:11:25" FileAge="1393164685131" FileType="45637" CompNumb="7" />
+      <File Name="Generated_Code/SM_SPI1.c" FileDate="2014-02-28, 16:10:40" FileAge="1393575040281" FileType="45637" CompNumb="7" />
       <File Name="Generated_Code/Cpu.c" FileDate="2013-12-12, 21:58:18" FileAge="1386856698643" FileType="45637" CompNumb="6" />
       <File Name="Generated_Code/EINT_SYNC_INT.h" FileDate="2013-09-24, 19:03:21" FileAge="1380020601925" FileType="45637" CompNumb="60" />
-      <File Name="Documentation/ProcessorExpert_SIGNALS.txt" FileDate="2014-02-25, 13:35:50" FileAge="1393306550008" FileType="3072" />
+      <File Name="Documentation/ProcessorExpert_SIGNALS.txt" FileDate="2014-03-07, 13:38:52" FileAge="1394170732410" FileType="3072" />
       <File Name="Documentation/doxygen/BitIO_CLKSEL.txt" FileDate="2013-08-03, 15:56:28" FileAge="1375516588581" FileType="45637" CompNumb="23" />
       <File Name="Generated_Code/EINT_SYNC_INT.c" FileDate="2013-09-24, 19:03:21" FileAge="1380020601695" FileType="45637" CompNumb="60" />
       <File Name="Documentation/doxygen/BitIO_UPRDY.txt" FileDate="2013-09-24, 17:58:37" FileAge="1380016717167" FileType="45637" CompNumb="110" />
       <File Name="Documentation/doxygen/DMAT_S_SPI_RX.txt" FileDate="2013-09-20, 16:20:36" FileAge="1379665236462" FileType="45637" CompNumb="106" />
       <File Name="Documentation/doxygen/BitIO_NOT_PWDN.txt" FileDate="2013-08-03, 15:56:28" FileAge="1375516588662" FileType="45637" CompNumb="18" />
       <File Name="Generated_Code/PE_LDD.h" FileDate="2013-12-12, 21:58:18" FileAge="1386856698082" FileType="45637" CompNumb="6" />
-      <File Name="Sources/ProcessorExpert.c" FileDate="2014-02-24, 20:28:18" FileAge="1393244898512" FileType="128" />
+      <File Name="Sources/ProcessorExpert.c" FileDate="2014-03-07, 13:38:06" FileAge="1394170686860" FileType="128" />
       <File Name="Generated_Code/PE_LDD.c" FileDate="2013-12-12, 21:58:18" FileAge="1386856698105" FileType="45637" CompNumb="6" />
       <File Name="Documentation/doxygen/BitIO_START.txt" FileDate="2013-08-03, 15:56:28" FileAge="1375516588602" FileType="45637" CompNumb="21" />
       <File Name="Sources/Events.h" FileDate="2013-12-23, 01:19:10" FileAge="1387732750380" FileType="131328" />
-      <File Name="Sources/Events.c" FileDate="2014-02-25, 13:34:48" FileAge="1393306488025" FileType="131328" />
+      <File Name="Sources/Events.c" FileDate="2014-02-28, 16:10:40" FileAge="1393575040292" FileType="131328" />
       <File Name="Documentation/ProcessorExpert.txt" FileDate="2013-09-24, 17:50:43" FileAge="1380016243873" FileType="3072" />
       <File Name="Generated_Code/BitIO_START.h" FileDate="2013-08-03, 15:58:01" FileAge="1375516681840" FileType="45637" CompNumb="21" />
       <File Name="Generated_Code/BitIO_NOT_PWDN.h" FileDate="2013-08-03, 15:58:01" FileAge="1375516681931" FileType="45637" CompNumb="18" />
@@ -88,5 +88,5 @@
       <File Name="Generated_Code/SysTick.h" FileDate="2013-07-26, 21:49:57" FileAge="1374846597333" FileType="45637" CompNumb="13" />
     </GeneratedByPE>
   </GeneratedFilesList>
-  <CodeGenReference>179</CodeGenReference>
+  <CodeGenReference>183</CodeGenReference>
 </CodeGenerationInfo>

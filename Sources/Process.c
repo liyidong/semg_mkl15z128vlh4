@@ -113,6 +113,51 @@ LDD_TError SplitRawData(TADCDataPtr adcDataPtr)
     return ERR_OK;
 }
 
+/*
+ * ===================================================================
+ *     Method      : SplitRawData(Module Process)
+ */
+/*!
+ *     @brief
+ *          This method copies ADC data from ADC structure to MCU structure.
+ *          The format of data in MCU structure
+       @verbatim
+       --------------------------------
+       | (Chn) | 1ms 2ms 3ms ... 99ms |
+       --------------------------------
+       | (Ch1) | [0] [1] [2] ... [99] |
+       | (Ch2) | [0] [1] [2] ... [99] |
+       | (Ch3) | [0] [1] [2] ... [99] |
+       | (Ch4) | [0] [1] [2] ... [99] |
+       | (Ch5) | [0] [1] [2] ... [99] |
+       | (Ch6) | [0] [1] [2] ... [99] |
+       | (Ch7) | [0] [1] [2] ... [99] |
+       | (Ch8) | [0] [1] [2] ... [99] |
+       --------------------------------
+       @endverbatim
+ *     @param
+ *          void
+ *     @return
+ *          void
+ */
+/* ===================================================================*/
+void CopyADCDataToMCUData()
+{
+    static uint8 ch_dat_cnt = 0;
+
+    tMCUPtr->mcuData.channelData[0][ch_dat_cnt] = tADCPtr[0]->adcData.channelData[0];
+    tMCUPtr->mcuData.channelData[1][ch_dat_cnt] = tADCPtr[0]->adcData.channelData[1];
+    tMCUPtr->mcuData.channelData[2][ch_dat_cnt] = tADCPtr[0]->adcData.channelData[2];
+    tMCUPtr->mcuData.channelData[3][ch_dat_cnt] = tADCPtr[0]->adcData.channelData[3];
+    tMCUPtr->mcuData.channelData[4][ch_dat_cnt] = tADCPtr[0]->adcData.channelData[4];
+    tMCUPtr->mcuData.channelData[5][ch_dat_cnt] = tADCPtr[0]->adcData.channelData[5];
+    tMCUPtr->mcuData.channelData[6][ch_dat_cnt] = tADCPtr[0]->adcData.channelData[6];
+    tMCUPtr->mcuData.channelData[7][ch_dat_cnt] = tADCPtr[0]->adcData.channelData[7];
+
+    ch_dat_cnt++;
+    ch_dat_cnt %= CHANNEL_DATA_COUNT;
+}
+
 /* End Process */
 
 /*!

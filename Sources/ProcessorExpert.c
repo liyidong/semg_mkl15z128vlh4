@@ -98,13 +98,9 @@ int main(void)
     extern TADCPtr tADCPtr[USING_ADC_COUNT];
     extern TMCUPtr tMCUPtr;
     extern TARMPtr tARMPtr;
-    byte cmd;
-    //byte reg;
-    byte regVal[25] = {0};
-    byte regVal2[25] = {0};
+
     //byte dummy[MSG_SIZE];
-    bool flag1 = TRUE;
-    uint16 i;
+    enum {eLEFT, eRIGHT} flag1 = eLEFT;
 
     /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
     PE_low_level_init();
@@ -135,78 +131,12 @@ int main(void)
 //    msg[MSG_SIZE - 1] = 0x01U;
 //    msg2[MSG_SIZE - 1] = 0x20U;
 
-    cmd = ADC_CMD_SDATAC;
-    ADCSendCommand(&cmd);
-    while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted || !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
-    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
-    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
-
-    cmd = ADC_REG_ID;
-    ADCReadRegister(cmd, regVal, 1);
-    while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted || !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
-    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
-    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
-    printf("ID: %#x\n", regVal[2]);
-    for(i = 0; i < 10; i++)
-    {
-        regVal[i] = 0xFF;
-    }
-
-    cmd = ADC_REG_CONFIG3;
-    regVal2[0] = 0x60U;
-    ADCWriteRegister(cmd, regVal2, 1);
-    while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted && !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
-    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
-    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
-    for(i = 0; i < 10; i++)
-    {
-        regVal2[i] = 0xFF;
-    }
-//    DelaySomeMs(100);
-    ADCReadRegister(cmd, regVal2, 1);
-    while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted && !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
-    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
-    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
-    DelaySomeMs(1);
-    printf("CONFIG3: %#x\n", regVal2[2]);
-    for(i = 0; i < 10; i++)
-    {
-        regVal2[i] = 0xFF;
-    }
-
-//
-//    regVal[0] = 0x10U;
-//    regVal[1] = 0x10U;
-//    regVal[2] = 0x10U;
-//    regVal[3] = 0x10U;
-//    regVal[4] = 0x10U;
-//    regVal[5] = 0x10U;
-//    regVal[6] = 0x10U;
-//    regVal[7] = 0x10U;
-//    ADCWriteRegister(ADC_REG_CH1SET, regVal, 8);
-//    for(i = 0; i < 8; i++)
-//    {
-//        regVal[i] = 0x00U;
-//    }
-//    ADCReadRegister(ADC_REG_CH1SET, regVal, 8);
-//    printf("%#x, %#x, %#x, %#x, %#x, %#x, %#x, %#x\n", regVal[0], regVal[1], regVal[2], regVal[3], regVal[4], regVal[5], regVal[6], regVal[7]);
-
-
-    cmd = ADC_CMD_RDATAC;
-    ADCSendCommand(&cmd);
-    while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted || !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
-    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
-    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
-
     EIntNotReadyEnable(EINT_NOT_DRDY);
     EIntSyncInterruptEnable(EINT_SYNC_INT);
 
-    cmd = ADC_CMD_START;
-    ADCSendCommand(&cmd);
-    while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted || !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
-    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
-//    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
+    ADCStartConvertByCommand();
 
+    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = TRUE;
     for(;;)
     {
         /* If data of ADC is ready, read it. */
@@ -220,22 +150,18 @@ int main(void)
             }
             if(tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted)
             {
+                tADCPtr[0]->adcStatus.isDataReady = FALSE;
                 tMCUPtr->mcuStatus.isReceivingADCData = FALSE;
                 SplitRawData(&(tADCPtr[0]->adcData));
+//                printf("%#x\n", tADCPtr[0]->adcData.head);
                 printf("%#x %#x %#x %#x | %#x %#x %#x %#x %#x %#x %#x %#x\n", tADCPtr[0]->adcData.head, tADCPtr[0]->adcData.loffStatP,
                                                                                 tADCPtr[0]->adcData.loffStatN, tADCPtr[0]->adcData.regGPIOData,
                                                                                 tADCPtr[0]->adcData.channelData[0], tADCPtr[0]->adcData.channelData[1],
                                                                                 tADCPtr[0]->adcData.channelData[2], tADCPtr[0]->adcData.channelData[3],
                                                                                 tADCPtr[0]->adcData.channelData[4], tADCPtr[0]->adcData.channelData[5],
                                                                                 tADCPtr[0]->adcData.channelData[6], tADCPtr[0]->adcData.channelData[7]);
-                tADCPtr[0]->adcData.head = 0xFFU;
-                tADCPtr[0]->adcData.loffStatP = 0xFFU;
-                tADCPtr[0]->adcData.loffStatN = 0xFFU;
-                tADCPtr[0]->adcData.regGPIOData = 0xFFU;
-                memset(tADCPtr[0]->adcData.rawData, 0xFFU, sizeof(tADCPtr[0]->adcData.rawData));
-                memset(tADCPtr[0]->adcData.channelData, 0xFF, sizeof(tADCPtr[0]->adcData.channelData));
-
-                tADCPtr[0]->adcStatus.isDataReady = FALSE;
+                CopyADCDataToMCUData();
+                DelaySomeMs(200);
             }
         }
 
@@ -246,17 +172,17 @@ int main(void)
             tARMPtr->armStatus.isRequiringData = FALSE;
             tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
             IOUploadReadyClrVal();
-            if(flag1)
+            if(eLEFT == flag1)
             {
 //                SPI0ReceiveSendData((LDD_DMA_TAddress)msg, (LDD_DMA_TAddress)dummy,
 //                                    (LDD_DMA_TByteCount)MSG_SIZE, (LDD_DMA_TByteCount)MSG_SIZE);
-                flag1 = FALSE;
+                flag1 = eRIGHT;
             }
             else
             {
 //                SPI0ReceiveSendData((LDD_DMA_TAddress)msg2, (LDD_DMA_TAddress)dummy,
 //                                    (LDD_DMA_TByteCount)MSG_SIZE, (LDD_DMA_TByteCount)MSG_SIZE);
-                flag1 = TRUE;
+                flag1 = eLEFT;
             }
         }
     }

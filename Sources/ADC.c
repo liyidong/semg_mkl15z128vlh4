@@ -177,7 +177,74 @@ LDD_TError ADCDisable(void)
 /* ===================================================================*/
 LDD_TError ADCConfigure(void)
 {
-//    LDD_TError err;
+    //LDD_TError err;
+    byte cmd;
+    byte regVal[25] = {0};
+//    byte regVal2[25] = {0};
+    uint16 i;
+
+    cmd = ADC_CMD_SDATAC;
+    ADCSendCommand(&cmd);
+    while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted || !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
+    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
+    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
+
+    cmd = ADC_REG_ID;
+    ADCReadRegister(cmd, regVal, 1);
+    while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted || !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
+    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
+    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
+#if DEBUG
+    printf("| |  -ID: %#x\n", regVal[2]);
+#endif
+    for(i = 0; i < 10; i++)
+    {
+        regVal[i] = 0xFF;
+    }
+
+    cmd = ADC_REG_CONFIG1;
+    regVal[0] = 0x03U;
+    regVal[1] = 0x20U;
+    regVal[2] = 0x40U;
+    regVal[3] = 0x00U;
+    regVal[4] = 0x60U;
+    regVal[5] = 0x60U;
+    regVal[6] = 0x60U;
+    regVal[7] = 0x60U;
+    regVal[8] = 0x60U;
+    regVal[9] = 0x60U;
+    regVal[10] = 0x60U;
+    regVal[11] = 0x60U;
+    ADCWriteRegister(cmd, regVal, 12);
+    while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted && !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
+    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
+    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
+    for(i = 0; i < 10; i++)
+    {
+        regVal[i] = 0xFF;
+    }
+//    DelaySomeMs(100);
+    ADCReadRegister(cmd, regVal, 12);
+    while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted && !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
+    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
+    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
+#if DEBUG
+//    DelaySomeMs(100);
+    //printf("| |  -CONFIG3: %#x\n", regVal[2]);
+    printf("%#x|%#x|%#x|%#x\n%#x|%#x|%#x|%#x|%#x|%#x|%#x|%#x\n", regVal[0], regVal[0], regVal[0], regVal[0],
+                                                                   regVal[0], regVal[0], regVal[0], regVal[0],
+                                                                   regVal[0], regVal[0], regVal[0], regVal[0]);
+#endif
+    for(i = 0; i < 10; i++)
+    {
+        regVal[i] = 0xFF;
+    }
+
+    cmd = ADC_CMD_RDATAC;
+    ADCSendCommand(&cmd);
+    while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted || !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
+    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
+    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
 
     return ERR_OK;
 }
@@ -373,6 +440,9 @@ LDD_TError ADCStartConvertByCommand(void)
     /* Sends START command via SPI1 */
     err = ADCSendCommand(&cmd);
     DelaySomeMs(1);
+    while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted || !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
+    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
+    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
 
     if(err != ERR_OK)
     {
@@ -701,7 +771,7 @@ LDD_TError ADCSendCommand(byte* cmd)
 {
     LDD_TError err;
     uint8 len;
-    byte dummy;
+    byte dummy = {0};
 
     /* Check the command. */
     err = CheckCommand(*cmd);
@@ -753,7 +823,7 @@ LDD_TError ADCReadRegister(byte regAddr, byte* dat, uint8 n)
 {
     uint8 i;
     LDD_TError err;
-    byte strCmd[2];                 /* The read register command is a 2-byte command. */
+    byte strCmd[REGISTER_COUNT + 2] = {0};                 /* The read register command is a 2-byte command. */
     uint8 sendByteCount;
     uint8 receiveByteCount;
 
@@ -848,8 +918,8 @@ LDD_TError ADCReadRegister(byte regAddr, byte* dat, uint8 n)
 LDD_TError ADCWriteRegister(byte regAddr, byte* dat, uint8 n)
 {
     LDD_TError err;
-    byte strCmd[REGISTER_COUNT + 2];                   /* Write register command is a double-byte command. */
-    byte dummy[REGISTER_COUNT + 2];                    /* Receive dummy message. */
+    byte strCmd[REGISTER_COUNT + 2] = {0};                   /* Write register command is a double-byte command. */
+    byte dummy[REGISTER_COUNT + 2] = {0};                    /* Receive dummy message. */
     uint8 i;
 
     /* Check if the register address is valid. */
@@ -928,7 +998,7 @@ LDD_TError ADCWriteRegister(byte regAddr, byte* dat, uint8 n)
 LDD_TError ADCReadContinuousData(byte* dat, uint8 n)
 {
     LDD_TError err;
-    byte dummy[RAW_DATA_SIZE];
+    byte dummy[RAW_DATA_SIZE] = {0};
 
     /* Check if the reception buffer is valid. */
     if(!dat)
@@ -989,7 +1059,7 @@ LDD_TError ADCReadData(byte* dat, uint8 n)
 {
     uint8 i;
     LDD_TError err;
-    byte strCmd[RAW_DATA_SIZE + 1];
+    byte strCmd[RAW_DATA_SIZE + 1] = {0};
 
     /* Check if the reception buffer is valid. */
     if(!dat)
