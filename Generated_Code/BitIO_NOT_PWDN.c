@@ -62,14 +62,6 @@
 extern "C" {
 #endif
 
-//typedef struct {
-//  LDD_TUserData *UserDataPtr;          /* Pointer to user data */
-//} BitIO_NOT_PWDN_TDeviceData;          /* Device data structure type */
-//
-//typedef BitIO_NOT_PWDN_TDeviceData *BitIO_NOT_PWDN_TDeviceDataPtr ; /* Pointer to the device data structure. */
-//
-///* {Default RTOS Adapter} Static object used for simulation of dynamic driver memory allocation */
-//static BitIO_NOT_PWDN_TDeviceData DeviceDataPrv__DEFAULT_RTOS_ALLOC;
 /*
 ** ===================================================================
 **     Method      :  BitIO_NOT_PWDN_Init (component BitIO_LDD)
@@ -94,13 +86,6 @@ extern "C" {
 /* ===================================================================*/
 LDD_TDeviceData* BitIO_NOT_PWDN_Init(LDD_TUserData *UserDataPtr)
 {
-//  /* Allocate device structure */
-//  BitIO_NOT_PWDN_TDeviceDataPtr DeviceDataPrv;
-//  /* {Default RTOS Adapter} Driver memory allocation: Dynamic allocation is simulated by a pointer to the static object */
-//  DeviceDataPrv = &DeviceDataPrv__DEFAULT_RTOS_ALLOC;
-//
-//  DeviceDataPrv->UserDataPtr = UserDataPtr; /* Store the RTOS device structure */
-
   /* Configure pin as output */
   /* GPIOE_PDDR: PDD|=0x00040000 */
   GPIOE_PDDR |= GPIO_PDDR_PDD(0x00040000);
@@ -117,9 +102,7 @@ LDD_TDeviceData* BitIO_NOT_PWDN_Init(LDD_TUserData *UserDataPtr)
                 )) | (uint32_t)(
                  PORT_PCR_MUX(0x01)
                 ));
-  /* Registration of the device structure */
-//  PE_LDD_RegisterDeviceStructure(PE_LDD_COMPONENT_BitIO_NOT_PWDN_ID,DeviceDataPrv);
-//  return ((LDD_TDeviceData *)DeviceDataPrv);
+
   return;
 }
 /*

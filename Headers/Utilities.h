@@ -227,6 +227,7 @@ uint32 GetCurrentMs(void);
 /* ===================================================================*/
 uint32 GetCurrentS(void);
 
+#if DEBUG
 /*
  * ===================================================================
  *     Method      : PrintErrorMessage(Module Utilities)
@@ -240,7 +241,6 @@ uint32 GetCurrentS(void);
  *          void
  */
 /* ===================================================================*/
-#if DEBUG
 void PrintErrorMessage(LDD_TError err);
 #endif
 

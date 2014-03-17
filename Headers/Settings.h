@@ -44,7 +44,7 @@
      * @addtogroup Oth Others
      * @{
      */
-#define DEBUG 1     /*!< Debug mode. */
+#define DEBUG 0     /*!< Debug mode. */
     /*!
      ** @}
      */

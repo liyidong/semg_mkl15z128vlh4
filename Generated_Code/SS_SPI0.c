@@ -14,21 +14,21 @@
 **          Component name                                 : SS_SPI0
 **          Device                                         : SPI0
 **          Interrupt service/event                        : Disabled
-**          Settings                                       : 
+**          Settings                                       :
 **            Input pin                                    : Enabled
 **              Pin                                        : CMP0_IN0/PTC6/LLWU_P10/SPI0_MOSI/EXTRG_IN/SPI0_MISO
 **              Pin signal                                 : SPI0_IN
 **            Output pin                                   : Enabled
 **              Pin                                        : CMP0_IN1/PTC7/SPI0_MISO/SPI0_MOSI
 **              Pin signal                                 : SPI0_OUT
-**            Clock pin                                    : 
+**            Clock pin                                    :
 **              Pin                                        : PTC5/LLWU_P9/SPI0_SCK/LPTMR0_ALT2/CMP0_OUT
 **              Pin signal                                 : SPI0_SCK
-**            Slave select                                 : 
+**            Slave select                                 :
 **              Pin                                        : PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/TPM0_CH3
 **              Pin signal                                 : SPI0_CS
 **              Active level                               : Low
-**            Attribute set                                : 
+**            Attribute set                                :
 **              Width                                      : 8 bits
 **              MSB first                                  : yes
 **              Clock polarity                             : Low
@@ -38,10 +38,10 @@
 **            HW input watermark                           : 1
 **            HW output buffer size                        : Max buffer size
 **            HW output watermark                          : 1
-**          Initialization                                 : 
+**          Initialization                                 :
 **            Enabled in init. code                        : no
 **            Auto initialization                          : no
-**            Event mask                                   : 
+**            Event mask                                   :
 **              OnBlockSent                                : Enabled
 **              OnBlockReceived                            : Enabled
 **              OnError                                    : Disabled
@@ -55,7 +55,7 @@
 **
 **     Copyright : 1997 - 2013 Freescale Semiconductor, Inc. All Rights Reserved.
 **     SOURCE DISTRIBUTION PERMISSIBLE as directed in End User License Agreement.
-**     
+**
 **     http      : www.freescale.com
 **     mail      : support@freescale.com
 ** ###################################################################*/
@@ -65,11 +65,11 @@
 ** @brief
 **         This component "SPISlave_LDD" implements SLAVE part of synchronous
 **         serial master-slave communication.
-*/         
+*/
 /*!
 **  @addtogroup SS_SPI0_module SS_SPI0 module documentation
 **  @{
-*/         
+*/
 
 /* MODULE SS_SPI0. */
 /*lint -save  -e926 -e927 -e928 -e929 Disable MISRA rule (11.4) checking. */
@@ -80,32 +80,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
-
-#define AVAILABLE_EVENTS_MASK (LDD_SPISLAVE_ON_BLOCK_RECEIVED | LDD_SPISLAVE_ON_BLOCK_SENT)
-
-/* These constants contain pins masks */
-#define SS_SPI0_AVAILABLE_PIN_MASK (LDD_SPISLAVE_INPUT_PIN | LDD_SPISLAVE_OUTPUT_PIN | LDD_SPISLAVE_CLK_PIN | LDD_SPISLAVE_SS_PIN)
-
-
-typedef struct {
-  bool EnUser;                         /* Enable/Disable device */
-  LDD_SPISLAVE_TError ErrFlag;         /* Error flags */
-  uint16_t InpRecvDataNum;             /* The counter of received characters */
-  uint8_t *InpDataPtr;                 /* The buffer pointer for received characters */
-  uint16_t InpDataNumReq;              /* The counter of characters to receive by ReceiveBlock() */
-  uint16_t OutSentDataNum;             /* The counter of sent characters */
-  uint8_t *OutDataPtr;                 /* The buffer pointer for data to be transmitted */
-  uint16_t OutDataNumReq;              /* The counter of characters to be send by SendBlock() */
-  LDD_TUserData *UserData;             /* User device data structure */
-} SS_SPI0_TDeviceData;                 /* Device data structure type */
-
-typedef SS_SPI0_TDeviceData* SS_SPI0_TDeviceDataPtr ; /* Pointer to the device data structure. */
-
-/* {Default RTOS Adapter} Static object used for simulation of dynamic driver memory allocation */
-static SS_SPI0_TDeviceData DeviceDataPrv__DEFAULT_RTOS_ALLOC;
-/* Internal method prototypes */
-static void HWEnDi(LDD_TDeviceData *DeviceDataPtr);
+#endif
 
 /*
 ** ===================================================================
@@ -119,7 +94,7 @@ static void HWEnDi(LDD_TDeviceData *DeviceDataPtr);
 **         If the "Enable in init. code" is set to "yes" value then the
 **         device is also enabled(see the description of the Enable()
 **         method). In this case the Enable() method is not necessary
-**         and needn't to be generated. 
+**         and needn't to be generated.
 **         This method can be called only once. Before the second call
 **         of Init() the Deinit() must be called first.
 **     @param
@@ -132,24 +107,8 @@ static void HWEnDi(LDD_TDeviceData *DeviceDataPtr);
 /* ===================================================================*/
 LDD_TDeviceData* SS_SPI0_Init(LDD_TUserData *UserDataPtr)
 {
-  /* Allocate LDD device structure */
-  SS_SPI0_TDeviceDataPtr DeviceDataPrv;
-
-  /* {Default RTOS Adapter} Driver memory allocation: Dynamic allocation is simulated by a pointer to the static object */
-  DeviceDataPrv = &DeviceDataPrv__DEFAULT_RTOS_ALLOC;
-  DeviceDataPrv->UserData = UserDataPtr; /* Store the RTOS device structure */
-  DeviceDataPrv->EnUser = FALSE;       /* Disable device */
-  DeviceDataPrv->ErrFlag = 0x00U;      /* Clear error flags */
-  /* Clear the receive counters and pointer */
-  DeviceDataPrv->InpRecvDataNum = 0x00U; /* Clear the counter of received characters */
-  DeviceDataPrv->InpDataNumReq = 0x00U; /* Clear the counter of characters to receive by ReceiveBlock() */
-  DeviceDataPrv->InpDataPtr = NULL;    /* Clear the buffer pointer for received characters */
-  /* Clear the transmit counters and pointer */
-  DeviceDataPrv->OutSentDataNum = 0x00U; /* Clear the counter of sent characters */
-  DeviceDataPrv->OutDataNumReq = 0x00U; /* Clear the counter of characters to be send by SendBlock() */
-  DeviceDataPrv->OutDataPtr = NULL;    /* Clear the buffer pointer for data to be transmitted */
   /* SIM_SCGC4: SPI0=1 */
-  SIM_SCGC4 |= SIM_SCGC4_SPI0_MASK;                                   
+  SIM_SCGC4 |= SIM_SCGC4_SPI0_MASK;
   /* SPI0_C1: SPIE=0,SPE=0,SPTIE=0,MSTR=0,CPOL=0,CPHA=1,SSOE=0,LSBFE=0 */
   SPI0_C1 = SPI_C1_CPHA_MASK;          /* Clear control register */
   /* PORTC_PCR6: ISF=0,MUX=2 */
@@ -158,37 +117,36 @@ LDD_TDeviceData* SS_SPI0_Init(LDD_TUserData *UserDataPtr)
                 PORT_PCR_MUX(0x05)
                )) | (uint32_t)(
                 PORT_PCR_MUX(0x02)
-               ));                                  
+               ));
   /* PORTC_PCR7: ISF=0,MUX=2 */
   PORTC_PCR7 = (uint32_t)((PORTC_PCR7 & (uint32_t)~(uint32_t)(
                 PORT_PCR_ISF_MASK |
                 PORT_PCR_MUX(0x05)
                )) | (uint32_t)(
                 PORT_PCR_MUX(0x02)
-               ));                                  
+               ));
   /* PORTC_PCR5: ISF=0,MUX=2 */
   PORTC_PCR5 = (uint32_t)((PORTC_PCR5 & (uint32_t)~(uint32_t)(
                 PORT_PCR_ISF_MASK |
                 PORT_PCR_MUX(0x05)
                )) | (uint32_t)(
                 PORT_PCR_MUX(0x02)
-               ));                                  
+               ));
   /* PORTC_PCR4: ISF=0,MUX=2 */
   PORTC_PCR4 = (uint32_t)((PORTC_PCR4 & (uint32_t)~(uint32_t)(
                 PORT_PCR_ISF_MASK |
                 PORT_PCR_MUX(0x05)
                )) | (uint32_t)(
                 PORT_PCR_MUX(0x02)
-               ));                                  
+               ));
   /* SPI0_C1: SPIE=0,SPE=0,SPTIE=0,MSTR=0,CPOL=0,CPHA=1,SSOE=0,LSBFE=0 */
   SPI0_C1 = SPI_C1_CPHA_MASK;          /* Set Configuration register */
   /* SPI0_C2: SPMIE=0,??=0,TXDMAE=0,MODFEN=0,BIDIROE=0,RXDMAE=0,SPISWAI=0,SPC0=0 */
   SPI0_C2 = 0x00U;                     /* Set Configuration register */
   /* SPI0_BR: ??=0,SPPR=0,SPR=0 */
   SPI0_BR = (SPI_BR_SPPR(0x00) | SPI_BR_SPR(0x00)); /* Set baud rate register */
-  /* Registration of the device structure */
-  PE_LDD_RegisterDeviceStructure(PE_LDD_COMPONENT_SS_SPI0_ID,DeviceDataPrv);
-  return ((LDD_TDeviceData *)DeviceDataPrv); /* Return pointer to the data data structure */
+
+  return;
 }
 
 /*
@@ -212,10 +170,7 @@ LDD_TDeviceData* SS_SPI0_Init(LDD_TUserData *UserDataPtr)
 /* ===================================================================*/
 LDD_TError SS_SPI0_Enable(LDD_TDeviceData *DeviceDataPtr)
 {
-  if (!((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->EnUser) { /* Is the device disabled by user? */
-    ((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->EnUser = TRUE; /* If yes then set the flag "device enabled" */
-    HWEnDi((SS_SPI0_TDeviceDataPtr)DeviceDataPtr); /* Enable the device */
-  }
+    SPI_PDD_EnableDevice(SPI0_BASE_PTR,PDD_ENABLE); /* Enable device */
   return ERR_OK;                       /* OK */
 }
 
@@ -242,165 +197,8 @@ LDD_TError SS_SPI0_Enable(LDD_TDeviceData *DeviceDataPtr)
 /* ===================================================================*/
 LDD_TError SS_SPI0_Disable(LDD_TDeviceData *DeviceDataPtr)
 {
-  if (((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->EnUser) { /* Is the device enabled by user? */
-    ((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->EnUser = FALSE; /* If yes then set the flag "device disabled" */
-    HWEnDi((SS_SPI0_TDeviceDataPtr)DeviceDataPtr); /* Disable the device */
-  }
-  return ERR_OK;                       /* OK */
-}
-
-/*
-** ===================================================================
-**     Method      :  SS_SPI0_ReceiveBlock (component SPISlave_LDD)
-*/
-/*!
-**     @brief
-**         This method specifies the number of data to receive. The
-**         method returns ERR_BUSY until the specified number of
-**         characters is received. The method <CancelBlockReception>
-**         can be used to cancel a running receive operation.
-**     @param
-**         DeviceDataPtr   - Device data structure
-**                           pointer returned by <Init> method.
-**     @param
-**         BufferPtr       - Pointer to A buffer where
-**                           received characters will be stored.
-**     @param
-**         Size            - Size of the block
-**     @return
-**                         - Error code, possible codes:
-**                           ERR_OK - OK
-**                           ERR_DISABLED - Component is disabled
-**                           ERR_BUSY - The previous receive request is
-**                           pending
-*/
-/* ===================================================================*/
-LDD_TError SS_SPI0_ReceiveBlock(LDD_TDeviceData *DeviceDataPtr, LDD_TData *BufferPtr, uint16_t Size)
-{
-  /* Device state test - this test can be disabled by setting the "Ignore enable test"
-     property to the "yes" value in the "Configuration inspector" */
-  if (!((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->EnUser) { /* Is the device disabled by user? */
-    return ERR_DISABLED;               /* If yes then error */
-  }
-  if (((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->InpDataNumReq != 0x00U) { /* Is the previous receive operation pending? */
-    return ERR_BUSY;                   /* If yes then error */
-  }
-  ((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->InpDataPtr = (uint8_t*)BufferPtr; /* Store a pointer to the input data. */
-  ((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->InpDataNumReq = Size; /* Store a number of characters to be received. */
-  ((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->InpRecvDataNum = 0x00U; /* Set number of received characters to zero. */
-  return ERR_OK;                       /* OK */
-}
-
-/*
-** ===================================================================
-**     Method      :  SS_SPI0_SendBlock (component SPISlave_LDD)
-*/
-/*!
-**     @brief
-**         This method sends a block of characters. The method returns
-**         ERR_BUSY when the previous block transmission is not
-**         completed. The method <CancelBlockTransmission> can be used
-**         to cancel a transmit operation.
-**     @param
-**         DeviceDataPtr   - Device data structure
-**                           pointer returned by <Init> method.
-**     @param
-**         BufferPtr       - Pointer to the block of data
-**                           to send.
-**     @param
-**         Size            - Number of characters in the buffer.
-**     @return
-**                         - Error code, possible codes:
-**                           ERR_OK - OK
-**                           ERR_DISABLED - Component is disabled
-**                           ERR_BUSY - The previous transmit request is
-**                           pending
-*/
-/* ===================================================================*/
-LDD_TError SS_SPI0_SendBlock(LDD_TDeviceData *DeviceDataPtr, LDD_TData *BufferPtr, uint16_t Size)
-{
-  /* Device state test - this test can be disabled by setting the "Ignore enable test"
-     property to the "yes" value in the "Configuration inspector" */
-  if (!((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->EnUser) { /* Is the device disabled by user? */
-    return ERR_DISABLED;               /* If yes then error */
-  }
-  if (((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->OutDataNumReq != 0x00U) { /* Is the previous transmit operation pending? */
-    return ERR_BUSY;                   /* If yes then error */
-  }
-  ((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->OutDataPtr = (uint8_t*)BufferPtr; /* Set a pointer to the output data. */
-  ((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->OutDataNumReq = Size; /* Set the counter of characters to be sent. */
-  ((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->OutSentDataNum = 0x00U; /* Clear the counter of sent characters. */
-  return ERR_OK;                       /* OK */
-}
-
-/*
-** ===================================================================
-**     Method      :  SS_SPI0_Main (component SPISlave_LDD)
-*/
-/*!
-**     @brief
-**         This method is available only in the polling mode (Interrupt
-**         service/event = 'no'). If interrupt service is disabled this
-**         method replaces the interrupt handler. This method should be
-**         called if Receive/SendBlock was invoked before in order to
-**         run the reception/transmission. The end of the
-**         receiving/transmitting is indicated by OnBlockSent or
-**         OnBlockReceived event. 
-**     @param
-**         DeviceDataPtr   - Device data structure
-**                           pointer returned by <Init> method.
-*/
-/* ===================================================================*/
-void SS_SPI0_Main(LDD_TDeviceData *DeviceDataPtr)
-{
-  SS_SPI0_TDeviceDataPtr DeviceDataPrv = (SS_SPI0_TDeviceDataPtr)DeviceDataPtr;
-  uint8_t StatReg = SPI_PDD_ReadStatusReg(SPI0_BASE_PTR); /* Read status register */
-
-  if ((StatReg & SPI_PDD_RX_BUFFER_FULL) != 0U) { /* Is any char in HW Rx buffer? */
-    if (DeviceDataPrv->InpDataNumReq != 0x00U) { /* Is the receive block operation pending? */
-      *(DeviceDataPrv->InpDataPtr++) = SPI_PDD_ReadData8bit(SPI0_BASE_PTR); /* Put a character to the receive buffer and increment pointer to receive buffer */
-      DeviceDataPrv->InpRecvDataNum++; /* Increment received char. counter */
-      if (DeviceDataPrv->InpRecvDataNum == DeviceDataPrv->InpDataNumReq) { /* Is the requested number of characters received? */
-        DeviceDataPrv->InpDataNumReq = 0x00U; /* If yes then clear number of requested characters to be received. */
-        SS_SPI0_OnBlockReceived(DeviceDataPrv->UserData);
-      }
-    }
-  }
-  if ((StatReg & SPI_PDD_TX_BUFFER_EMPTYG) != 0U) { /* Is HW Tx buffer empty? */
-    if (DeviceDataPrv->OutSentDataNum < DeviceDataPrv->OutDataNumReq) { /* Is number of sent characters less than the number of requested incoming characters? */
-      SPI_PDD_WriteData8Bit(SPI0_BASE_PTR, (*((uint8_t *)DeviceDataPrv->OutDataPtr++))); /* Put a character with command to the transmit register and increment pointer to the transmitt buffer */
-      DeviceDataPrv->OutSentDataNum++; /* Increment the counter of sent characters. */
-      if (DeviceDataPrv->OutSentDataNum == DeviceDataPrv->OutDataNumReq) {
-        DeviceDataPrv->OutDataNumReq = 0x00U; /* Clear the counter of characters to be send by SendBlock() */
-        SS_SPI0_OnBlockSent(DeviceDataPrv->UserData);
-      }
-    }
-  }
-}
-
-/*
-** ===================================================================
-**     Method      :  HWEnDi (component SPISlave_LDD)
-**
-**     Description :
-**         Enables or disables the peripheral(s) associated with the 
-**         component. The method is called automatically as a part of the 
-**         Enable and Disable methods and several internal methods.
-**         This method is internal. It is used by Processor Expert only.
-** ===================================================================
-*/
-static void HWEnDi(LDD_TDeviceData *DeviceDataPtr)
-{
-  if (((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->EnUser) { /* Enable device? */
-    ((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->OutDataNumReq = 0x00U; /* Clear the counter of requested outgoing characters. */
-    ((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->OutSentDataNum = 0x00U; /* Clear the counter of sent characters. */
-    ((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->InpDataNumReq = 0x00U; /* Clear the counter of requested incoming characters. */
-    ((SS_SPI0_TDeviceDataPtr)DeviceDataPtr)->InpRecvDataNum = 0x00U; /* Clear the counter of received characters. */
-    SPI_PDD_EnableDevice(SPI0_BASE_PTR,PDD_ENABLE); /* Enable device */
-  }
-  else {
     SPI_PDD_EnableDevice(SPI0_BASE_PTR,PDD_DISABLE); /* Disable device */
-  }
+  return ERR_OK;                       /* OK */
 }
 
 /*lint -restore Enable MISRA rule (11.4) checking. */
@@ -408,7 +206,7 @@ static void HWEnDi(LDD_TDeviceData *DeviceDataPtr)
 
 #ifdef __cplusplus
 }  /* extern "C" */
-#endif 
+#endif
 
 /*!
 ** @}

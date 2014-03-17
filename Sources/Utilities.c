@@ -367,6 +367,7 @@ uint32 GetCurrentS(void)
     return 0;
 }
 
+#if DEBUG
 /*
  * ===================================================================
  *     Method      : //printfErrorMessage(Module Utilities)
@@ -382,7 +383,7 @@ uint32 GetCurrentS(void)
 /* ===================================================================*/
 void PrintErrorMessage(LDD_TError err)
 {
-#if DEBUG
+
     switch(err)
     {
     case ERR_OK:
@@ -554,10 +555,10 @@ void PrintErrorMessage(LDD_TError err)
         printf(ERR_MSG_UNKNOWN);
         break;
     }
-#endif  /* #if DEBUG */
 
     return;
 }
+#endif  /* #if DEBUG */
 
 /* End Utilities */
 

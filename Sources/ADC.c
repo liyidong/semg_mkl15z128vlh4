@@ -180,8 +180,6 @@ LDD_TError ADCConfigure(void)
     //LDD_TError err;
     byte cmd;
     byte regVal[25] = {0};
-//    byte regVal2[25] = {0};
-    uint16 i;
 
     cmd = ADC_CMD_SDATAC;
     ADCSendCommand(&cmd);
@@ -197,29 +195,42 @@ LDD_TError ADCConfigure(void)
 #if DEBUG
     printf("| |  -ID: %#x\n", regVal[2]);
 #endif
-    for(i = 0; i < 10; i++)
+    for(int i = 0; i < 25; i++)
     {
         regVal[i] = 0xFF;
     }
 
     cmd = ADC_REG_CONFIG1;
-    regVal[0] = 0x03U;
-    regVal[1] = 0x20U;
-    regVal[2] = 0x40U;
-    regVal[3] = 0x00U;
-    regVal[4] = 0x60U;
-    regVal[5] = 0x60U;
-    regVal[6] = 0x60U;
-    regVal[7] = 0x60U;
-    regVal[8] = 0x60U;
-    regVal[9] = 0x60U;
-    regVal[10] = 0x60U;
-    regVal[11] = 0x60U;
+    regVal[0] = 0x03U;  /* CONFIG1 */
+    regVal[1] = 0x20U;  /* CONFIG2 */
+    regVal[2] = 0x40U;  /* CONFIG3 */
+    regVal[3] = 0x00U;  /* LOFF */
+    regVal[4] = 0x10U;  /* CH1SET */
+    regVal[5] = 0x10U;  /* CH2SET */
+    regVal[6] = 0x10U;  /* CH3SET */
+    regVal[7] = 0x10U;  /* CH4SET */
+    regVal[8] = 0x10U;  /* CH5SET */
+    regVal[9] = 0x10U;  /* CH6SET */
+    regVal[10] = 0x10U; /* CH7SET */
+    regVal[11] = 0x10U; /* CH8SET */
+//    regVal[12] = 0x00U; /* RLD_SENSP */
+//    regVal[13] = 0x00U; /* RLD_SENSN */
+//    regVal[14] = 0x00U; /* LOFF_SENSP */
+//    regVal[15] = 0x00U; /* LOFF_SENSN */
+//    regVal[16] = 0x00U; /* LOFF_FLIP */
+//    regVal[17] = 0x00U; /* LOFF_STATP */
+//    regVal[18] = 0x00U; /* LOFF_STATN */
+//    regVal[19] = 0x00U; /* GPIO */
+//    regVal[20] = 0x00U; /* PACE */
+//    regVal[21] = 0x00U; /* Reserved */
+//    regVal[22] = 0x00U; /* CONFIG4 */
+//    regVal[23] = 0x00U; /* WCT1 */
+//    regVal[24] = 0x00U; /* WCT2 */
     ADCWriteRegister(cmd, regVal, 12);
     while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted && !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
     tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
     tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
-    for(i = 0; i < 10; i++)
+    for(int i = 0; i < 25; i++)
     {
         regVal[i] = 0xFF;
     }
@@ -235,7 +246,7 @@ LDD_TError ADCConfigure(void)
                                                                    regVal[0], regVal[0], regVal[0], regVal[0],
                                                                    regVal[0], regVal[0], regVal[0], regVal[0]);
 #endif
-    for(i = 0; i < 10; i++)
+    for(int i = 0; i < 25; i++)
     {
         regVal[i] = 0xFF;
     }
@@ -272,7 +283,9 @@ LDD_TError ADCPowerUp(void)
     if(!IONotResetGetVal())
     {
         err = ERR_COMMON;
+#if DEBUG
         PrintErrorMessage(err);
+#endif
     }
     else
     {
@@ -305,7 +318,9 @@ LDD_TError ADCPowerDown(void)
     if(IONotResetGetVal())
     {
         err = ERR_COMMON;
+#if DEBUG
         PrintErrorMessage(err);
+#endif
     }
     else
     {
@@ -338,7 +353,9 @@ LDD_TError ADCUseInternalClock(void)
     if(!IOClockSelectGetVal())
     {
         err = ERR_COMMON;
+#if DEBUG
         PrintErrorMessage(err);
+#endif
     }
     else
     {
@@ -371,7 +388,9 @@ LDD_TError ADCUseExternalClock(void)
     if(IOClockSelectGetVal())
     {
         err = ERR_COMMON;
+#if DEBUG
         PrintErrorMessage(err);
+#endif
     }
     else
     {
@@ -405,7 +424,9 @@ LDD_TError ADCStartConvertByHardware(void)
     if(!IOStartGetVal())
     {
         err = ERR_COMMON;
+#if DEBUG
         PrintErrorMessage(err);
+#endif
     }
     else
     {
@@ -446,7 +467,9 @@ LDD_TError ADCStartConvertByCommand(void)
 
     if(err != ERR_OK)
     {
+#if DEBUG
         PrintErrorMessage(err);
+#endif
     }
 
     return err;
@@ -476,7 +499,9 @@ LDD_TError ADCStopConvertByHardware(void)
     if(IOStartGetVal())
     {
         err = ERR_COMMON;
+#if DEBUG
         PrintErrorMessage(err);
+#endif
     }
     else
     {
@@ -514,7 +539,9 @@ LDD_TError ADCStopConvertByCommand(void)
 
     if(err != ERR_OK)
     {
+#if DEBUG
         PrintErrorMessage(err);
+#endif
     }
 
     return err;
@@ -563,7 +590,9 @@ LDD_TError ADCResetByCommand(void)
 
     if(err != ERR_OK)
     {
+#if DEBUG
         PrintErrorMessage(err);
+#endif
     }
 
     return err;
@@ -590,7 +619,9 @@ LDD_TError ADCDaisyConnect(void)
     if(!IODaisyInGetVal())
     {
         err = ERR_COMMON;
+#if DEBUG
         PrintErrorMessage(err);
+#endif
     }
     else
     {
@@ -623,7 +654,9 @@ LDD_TError ADCDirectConnect(void)
     if(IODaisyInGetVal())
     {
         err = ERR_COMMON;
+#if DEBUG
         PrintErrorMessage(err);
+#endif
     }
     else
     {
@@ -655,7 +688,9 @@ LDD_TError ADCWakeUp(void)
 
     if(err != ERR_OK)
     {
+#if DEBUG
         PrintErrorMessage(err);
+#endif
     }
 
     return err;
@@ -683,7 +718,9 @@ LDD_TError ADCStandBy(void)
 
     if(err != ERR_OK)
     {
+#if DEBUG
         PrintErrorMessage(err);
+#endif
     }
 
     return err;
@@ -711,7 +748,9 @@ LDD_TError ADCReadDataContinuous(void)
 
     if(err != ERR_OK)
     {
+#if DEBUG
         PrintErrorMessage(err);
+#endif
     }
 
     return err;
@@ -738,7 +777,9 @@ LDD_TError ADCStopReadDataContinuous(void)
 
     if(err != ERR_OK)
     {
+#if DEBUG
         PrintErrorMessage(err);
+#endif
     }
 
     return err;
@@ -777,7 +818,9 @@ LDD_TError ADCSendCommand(byte* cmd)
     err = CheckCommand(*cmd);
     if(err != ERR_OK)
     {
+#if DEBUG
         PrintErrorMessage(err);
+#endif
         return err;
     }
 
@@ -788,7 +831,9 @@ LDD_TError ADCSendCommand(byte* cmd)
                               (LDD_DMA_TByteCount)len, (LDD_DMA_TByteCount)len);
     if(err != ERR_OK)
     {
-        PrintErrorMessage(err);         /* If error occurred, print the error message, */
+#if DEBUG
+        PrintErrorMessage(err);          /* If error occurred, print the error message */
+#endif
     }
 
     return err;
@@ -801,6 +846,8 @@ LDD_TError ADCSendCommand(byte* cmd)
 /*!
  *     @brief
  *          Read data from register of ADC via SPI1.
+ *          The data returned in dat[0] and dat[1] are useless. The real data
+ *          starts from dat[2]!
  *     @param[in]
  *          regAddr         - The first address of register(s) to be read.
  *     @param[out]
@@ -821,7 +868,6 @@ LDD_TError ADCSendCommand(byte* cmd)
 /* ===================================================================*/
 LDD_TError ADCReadRegister(byte regAddr, byte* dat, uint8 n)
 {
-    uint8 i;
     LDD_TError err;
     byte strCmd[REGISTER_COUNT + 2] = {0};                 /* The read register command is a 2-byte command. */
     uint8 sendByteCount;
@@ -831,7 +877,9 @@ LDD_TError ADCReadRegister(byte regAddr, byte* dat, uint8 n)
     if(regAddr < ADC_REG_ID || regAddr > ADC_REG_WCT2)
     {
         err = ERR_PARAM_ADDRESS;
+#if DEBUG
         PrintErrorMessage(err);
+#endif
 
         return err;
     }
@@ -840,7 +888,9 @@ LDD_TError ADCReadRegister(byte regAddr, byte* dat, uint8 n)
     if(!dat)
     {
         err = ERR_PARAM_BUFFER_COUNT;
+#if DEBUG
         PrintErrorMessage(err);
+#endif
 
         return err;
     }
@@ -849,7 +899,9 @@ LDD_TError ADCReadRegister(byte regAddr, byte* dat, uint8 n)
     if(n < MIN_REGISTER_READ_NUMBER || n > MAX_REGISTER_READ_NUMBER)
     {
         err = ERR_RANGE;
+#if DEBUG
         PrintErrorMessage(err);
+#endif
 
         return err;
     }
@@ -868,20 +920,11 @@ LDD_TError ADCReadRegister(byte regAddr, byte* dat, uint8 n)
     err = SPI1ReceiveSendData((LDD_DMA_TAddress)strCmd, (LDD_DMA_TAddress)dat,
                               (LDD_DMA_TByteCount)sendByteCount, (LDD_DMA_TByteCount)receiveByteCount);
 
-
-    /*
-     * Move each bit 2 bits ahead.
-     * Make the data right.
-     * Then the real data begins at dat[0].
-     */
-//    for(i = 0; i < n; i++)
-//    {
-//        dat[i] = dat[i + 2];
-//    }
-
     if(err != ERR_OK)
     {
+#if DEBUG
         PrintErrorMessage(err);
+#endif
 #if DEBUG
         printf("Send command error\n");             /* If error occurred, print message, */
 #endif
@@ -920,13 +963,14 @@ LDD_TError ADCWriteRegister(byte regAddr, byte* dat, uint8 n)
     LDD_TError err;
     byte strCmd[REGISTER_COUNT + 2] = {0};                   /* Write register command is a double-byte command. */
     byte dummy[REGISTER_COUNT + 2] = {0};                    /* Receive dummy message. */
-    uint8 i;
 
     /* Check if the register address is valid. */
     if(regAddr < ADC_REG_ID || regAddr > ADC_REG_WCT2)
     {
         err = ERR_PARAM_ADDRESS;
+#if DEBUG
         PrintErrorMessage(err);
+#endif
 
         return err;
     }
@@ -935,7 +979,9 @@ LDD_TError ADCWriteRegister(byte regAddr, byte* dat, uint8 n)
     if(!dat)
     {
         err = ERR_PARAM_BUFFER_COUNT;
+#if DEBUG
         PrintErrorMessage(err);
+#endif
 
         return err;
     }
@@ -944,7 +990,9 @@ LDD_TError ADCWriteRegister(byte regAddr, byte* dat, uint8 n)
     if(n < MIN_REGISTER_READ_NUMBER || n > MAX_REGISTER_READ_NUMBER)
     {
         err = ERR_RANGE;
+#if DEBUG
         PrintErrorMessage(err);
+#endif
 
         return err;
     }
@@ -952,7 +1000,7 @@ LDD_TError ADCWriteRegister(byte regAddr, byte* dat, uint8 n)
     /* Send the write data command to ADC. */
     strCmd[0] = ADC_CMD_WREG(regAddr);              /* According to user manual, write ADC register command, */
     strCmd[1] = n - 1;                              /* and if the number of registers to be written is n, n - 1 should be sent to ADC. */
-    for(i = 0; i < n; i++)
+    for(int i = 0; i < n; i++)
     {
         strCmd[i + 2] = dat[i];
     }
@@ -962,7 +1010,9 @@ LDD_TError ADCWriteRegister(byte regAddr, byte* dat, uint8 n)
 
     if(err != ERR_OK)
     {
+#if DEBUG
         PrintErrorMessage(err);
+#endif
 #if DEBUG
         printf("Send command error\n");             /* If error occurred, print message, */
 #endif
@@ -1004,7 +1054,9 @@ LDD_TError ADCReadContinuousData(byte* dat, uint8 n)
     if(!dat)
     {
         err = ERR_PARAM_BUFFER_COUNT;
+#if DEBUG
         PrintErrorMessage(err);
+#endif
 
         return err;
     }
@@ -1013,7 +1065,9 @@ LDD_TError ADCReadContinuousData(byte* dat, uint8 n)
     if(n < 0 || n > RAW_DATA_SIZE)
     {
         err = ERR_PARAM_LENGTH;
+#if DEBUG
         PrintErrorMessage(err);
+#endif
 
         return err;
     }
@@ -1023,7 +1077,9 @@ LDD_TError ADCReadContinuousData(byte* dat, uint8 n)
                               (LDD_DMA_TByteCount)n, (LDD_DMA_TByteCount)n);
     if(err != ERR_OK)
     {
+#if DEBUG
         PrintErrorMessage(err);
+#endif
 #if DEBUG
         printf("Send dummy error\n");
 #endif
@@ -1039,6 +1095,8 @@ LDD_TError ADCReadContinuousData(byte* dat, uint8 n)
 /*!
  *     @brief
  *          Read conversion data from ADC in RDATA mode via SPI1.
+ *          The data returned in dat[0] is useless. The real data
+ *          starts from dat[1]!
  *     @param[out]
  *          dat             - Pointer to buffer where received data in.
  *     @param[in]
@@ -1057,7 +1115,6 @@ LDD_TError ADCReadContinuousData(byte* dat, uint8 n)
 /* ===================================================================*/
 LDD_TError ADCReadData(byte* dat, uint8 n)
 {
-    uint8 i;
     LDD_TError err;
     byte strCmd[RAW_DATA_SIZE + 1] = {0};
 
@@ -1065,7 +1122,9 @@ LDD_TError ADCReadData(byte* dat, uint8 n)
     if(!dat)
     {
         err = ERR_PARAM_BUFFER_COUNT;
+#if DEBUG
         PrintErrorMessage(err);
+#endif
 
         return err;
     }
@@ -1074,7 +1133,9 @@ LDD_TError ADCReadData(byte* dat, uint8 n)
     if(n < 0 || n > RAW_DATA_SIZE)
     {
         err = ERR_PARAM_LENGTH;
+#if DEBUG
         PrintErrorMessage(err);
+#endif
 
         return err;
     }
@@ -1087,16 +1148,6 @@ LDD_TError ADCReadData(byte* dat, uint8 n)
      */
     err = SPI1ReceiveSendData((LDD_DMA_TAddress)strCmd, (LDD_DMA_TAddress)dat,
                         (LDD_DMA_TByteCount)(n + 1), (LDD_DMA_TByteCount)(n + 1));
-
-    /*
-     * Move each bit 1 bit ahead.
-     * Make the data right.
-     * Then real data begins at dat[0].
-     */
-    for(i = 0; i < n; i++)
-    {
-        dat[i] = dat[i + 1];
-    }
 
     if(err != ERR_OK)
     {
@@ -1127,9 +1178,8 @@ void ADCDataInit(TADCPtr userDataPtr)
     extern TADC tADC[USING_ADC_COUNT];
     extern TADCPtr tADCPtr[USING_ADC_COUNT];
     TADC adc;
-    int i;
 
-    for(i = 0; i < CHANNEL_COUNT; i++)
+    for(int i = 0; i < CHANNEL_COUNT; i++)
     {
         adc.adcSetting.isChannelEnabled[i] = TRUE;
     }
@@ -1143,7 +1193,7 @@ void ADCDataInit(TADCPtr userDataPtr)
     memset(adc.adcData.rawData, 0xFFU, sizeof(adc.adcData.rawData));
     memset(adc.adcData.channelData, 0xFF, sizeof(adc.adcData.channelData));
 
-   for(i = 0; i < USING_ADC_COUNT; i++)
+   for(int i = 0; i < USING_ADC_COUNT; i++)
    {
        tADC[i] = adc;
        tADCPtr[i] = &tADC[i];

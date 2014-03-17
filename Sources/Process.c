@@ -74,7 +74,6 @@ void Process(void)
 LDD_TError SplitRawData(TADCDataPtr adcDataPtr)
 {
     LDD_TError err;
-    uint8 i;
     byte head;
     byte loffStatP;
     byte loffStatN;
@@ -85,8 +84,10 @@ LDD_TError SplitRawData(TADCDataPtr adcDataPtr)
     if(head != RAW_DATA_HEAD)                                   /* If the head byte is not right(0x0C), return with error. */
     {
         err = ERR_PARAM_DATA;
+#if DEBUG
         PrintErrorMessage(err);
         printf("%#x\n", head);
+#endif
         return err;
     }
 
@@ -98,7 +99,7 @@ LDD_TError SplitRawData(TADCDataPtr adcDataPtr)
 
     regGPIOData =  (byte)adcDataPtr->rawData[2] & 0x0F;
 
-    for(i = 0; i < USING_CHANNEL_COUNT * BYTE_COUNT_PER_CHANNEL; i += 2)    /* Every channel's data is 2 Bytes. */
+    for(int i = 0; i < USING_CHANNEL_COUNT * BYTE_COUNT_PER_CHANNEL; i += 2)    /* Every channel's data is 2 Bytes. */
     {
         channelData = ((int16)adcDataPtr->rawData[RAW_DATA_HEAD_SIZE + i] << 8) & 0xFF00;
         channelData |= (int16)adcDataPtr->rawData[RAW_DATA_HEAD_SIZE + i + 1] & 0x00FF;

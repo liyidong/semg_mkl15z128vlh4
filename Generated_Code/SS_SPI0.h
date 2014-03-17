@@ -14,21 +14,21 @@
 **          Component name                                 : SS_SPI0
 **          Device                                         : SPI0
 **          Interrupt service/event                        : Disabled
-**          Settings                                       : 
+**          Settings                                       :
 **            Input pin                                    : Enabled
 **              Pin                                        : CMP0_IN0/PTC6/LLWU_P10/SPI0_MOSI/EXTRG_IN/SPI0_MISO
 **              Pin signal                                 : SPI0_IN
 **            Output pin                                   : Enabled
 **              Pin                                        : CMP0_IN1/PTC7/SPI0_MISO/SPI0_MOSI
 **              Pin signal                                 : SPI0_OUT
-**            Clock pin                                    : 
+**            Clock pin                                    :
 **              Pin                                        : PTC5/LLWU_P9/SPI0_SCK/LPTMR0_ALT2/CMP0_OUT
 **              Pin signal                                 : SPI0_SCK
-**            Slave select                                 : 
+**            Slave select                                 :
 **              Pin                                        : PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/TPM0_CH3
 **              Pin signal                                 : SPI0_CS
 **              Active level                               : Low
-**            Attribute set                                : 
+**            Attribute set                                :
 **              Width                                      : 8 bits
 **              MSB first                                  : yes
 **              Clock polarity                             : Low
@@ -38,10 +38,10 @@
 **            HW input watermark                           : 1
 **            HW output buffer size                        : Max buffer size
 **            HW output watermark                          : 1
-**          Initialization                                 : 
+**          Initialization                                 :
 **            Enabled in init. code                        : no
 **            Auto initialization                          : no
-**            Event mask                                   : 
+**            Event mask                                   :
 **              OnBlockSent                                : Enabled
 **              OnBlockReceived                            : Enabled
 **              OnError                                    : Disabled
@@ -55,7 +55,7 @@
 **
 **     Copyright : 1997 - 2013 Freescale Semiconductor, Inc. All Rights Reserved.
 **     SOURCE DISTRIBUTION PERMISSIBLE as directed in End User License Agreement.
-**     
+**
 **     http      : www.freescale.com
 **     mail      : support@freescale.com
 ** ###################################################################*/
@@ -65,11 +65,11 @@
 ** @brief
 **         This component "SPISlave_LDD" implements SLAVE part of synchronous
 **         serial master-slave communication.
-*/         
+*/
 /*!
 ** @addtogroup SS_SPI0_module SS_SPI0 module documentation
 ** @{
-*/       
+*/
 
 #ifndef __SS_SPI0_H
 #define __SS_SPI0_H
@@ -88,12 +88,12 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 
 /*! Peripheral base address of a device allocated by the component. This constant can be used directly in PDD macros. */
 #define SS_SPI0_PRPH_BASE_ADDRESS  0x40076000U
-  
+
 /* Methods configuration constants - generated for all enabled component's methods */
 #define SS_SPI0_Init_METHOD_ENABLED    /*!< Init method of the component SS_SPI0 is enabled (generated) */
 #define SS_SPI0_Enable_METHOD_ENABLED  /*!< Enable method of the component SS_SPI0 is enabled (generated) */
@@ -122,7 +122,7 @@ extern "C" {
 **         If the "Enable in init. code" is set to "yes" value then the
 **         device is also enabled(see the description of the Enable()
 **         method). In this case the Enable() method is not necessary
-**         and needn't to be generated. 
+**         and needn't to be generated.
 **         This method can be called only once. Before the second call
 **         of Init() the Deinit() must be called first.
 **     @param
@@ -179,87 +179,11 @@ LDD_TError SS_SPI0_Enable(LDD_TDeviceData *DeviceDataPtr);
 /* ===================================================================*/
 LDD_TError SS_SPI0_Disable(LDD_TDeviceData *DeviceDataPtr);
 
-/*
-** ===================================================================
-**     Method      :  SS_SPI0_ReceiveBlock (component SPISlave_LDD)
-*/
-/*!
-**     @brief
-**         This method specifies the number of data to receive. The
-**         method returns ERR_BUSY until the specified number of
-**         characters is received. The method <CancelBlockReception>
-**         can be used to cancel a running receive operation.
-**     @param
-**         DeviceDataPtr   - Device data structure
-**                           pointer returned by <Init> method.
-**     @param
-**         BufferPtr       - Pointer to A buffer where
-**                           received characters will be stored.
-**     @param
-**         Size            - Size of the block
-**     @return
-**                         - Error code, possible codes:
-**                           ERR_OK - OK
-**                           ERR_DISABLED - Component is disabled
-**                           ERR_BUSY - The previous receive request is
-**                           pending
-*/
-/* ===================================================================*/
-LDD_TError SS_SPI0_ReceiveBlock(LDD_TDeviceData *DeviceDataPtr, LDD_TData *BufferPtr, uint16_t Size);
-
-/*
-** ===================================================================
-**     Method      :  SS_SPI0_SendBlock (component SPISlave_LDD)
-*/
-/*!
-**     @brief
-**         This method sends a block of characters. The method returns
-**         ERR_BUSY when the previous block transmission is not
-**         completed. The method <CancelBlockTransmission> can be used
-**         to cancel a transmit operation.
-**     @param
-**         DeviceDataPtr   - Device data structure
-**                           pointer returned by <Init> method.
-**     @param
-**         BufferPtr       - Pointer to the block of data
-**                           to send.
-**     @param
-**         Size            - Number of characters in the buffer.
-**     @return
-**                         - Error code, possible codes:
-**                           ERR_OK - OK
-**                           ERR_DISABLED - Component is disabled
-**                           ERR_BUSY - The previous transmit request is
-**                           pending
-*/
-/* ===================================================================*/
-LDD_TError SS_SPI0_SendBlock(LDD_TDeviceData *DeviceDataPtr, LDD_TData *BufferPtr, uint16_t Size);
-
-/*
-** ===================================================================
-**     Method      :  SS_SPI0_Main (component SPISlave_LDD)
-*/
-/*!
-**     @brief
-**         This method is available only in the polling mode (Interrupt
-**         service/event = 'no'). If interrupt service is disabled this
-**         method replaces the interrupt handler. This method should be
-**         called if Receive/SendBlock was invoked before in order to
-**         run the reception/transmission. The end of the
-**         receiving/transmitting is indicated by OnBlockSent or
-**         OnBlockReceived event. 
-**     @param
-**         DeviceDataPtr   - Device data structure
-**                           pointer returned by <Init> method.
-*/
-/* ===================================================================*/
-void SS_SPI0_Main(LDD_TDeviceData *DeviceDataPtr);
-
 /* END SS_SPI0. */
 
 #ifdef __cplusplus
 }  /* extern "C" */
-#endif 
+#endif
 
 #endif
 /* ifndef __SS_SPI0_H */
