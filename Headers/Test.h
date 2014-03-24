@@ -3,9 +3,9 @@
  **     Filename    : Test.h
  **     Project     : semg_mkl15z128vlh4
  **     Processor   : MKL15Z128VLH4
- **     Component   : 
- **     Version     : 
- **     Datasheet   : 
+ **     Component   :
+ **     Version     :
+ **     Datasheet   :
  **     Compiler    : GNU C Compiler
  **     Date/Time   : 2013-07-12, 23:38, # CodeGen: 0
  **     Author	    : Dong
@@ -15,9 +15,9 @@
  **
  **     Contents    :
  **         GPIO    - void GPIOTest(void);
- **         
+ **
  **     Mail      	: pzdongdong@163.com
- **     
+ **
  **     Revision    : No.  Name        Date/Time        Content
  ** ###################################################################*/
 /*!
@@ -25,14 +25,14 @@
  * @version 01.00
  * @brief
  *      This file contains test functions.
- */         
+ */
 /*!
  *  @addtogroup Test_module Test module documentation
  *      This module contains test functions.
  *  @{
- */        
+ */
 
-/* MODULE Test. */       
+/* MODULE Test. */
 
 #ifndef TEST_H_
 #define TEST_H_
@@ -44,7 +44,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 /*
  * ===================================================================
@@ -52,19 +52,19 @@ extern "C" {
  */
 /*!
  *     @brief
- *          Test and output GPIO level via UART. 
+ *          Test and output GPIO level via UART.
  */
 /* ===================================================================*/
 void GPIOTest(void);
 
 /* END Test. */
 
-#endif
-/* #if DEBUG */
-
 #ifdef __cplusplus
 }  /* extern "C" */
-#endif 
+#endif
+
+#endif
+/* TEST_H_ */
 
 /*!
  * @}

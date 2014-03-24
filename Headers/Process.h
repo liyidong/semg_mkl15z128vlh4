@@ -16,6 +16,8 @@
  **     Contents    :
  **         Process         - void Process(void);
  **         SplitRawData    - LDD_TError SplitRawData(TADCDataPtr adcDataPtr);
+ **         ReadADCData     - void ReadADCData(EADCFlag adcFlag);
+ **         TransmitMCUData - void TransmitMCUData(void);
  **
  **     Mail      	: pzdongdong@163.com
  **
@@ -48,62 +50,19 @@ extern "C"
 
 /*
  * ===================================================================
- *     Method      : Process(Module Process)
+ *     Method      :  StartWork ()
  */
 /*!
  *     @brief
- *          The primary routine of processing the data.
- */
-/* ===================================================================*/
-void Process(void);
-
-/*
- * ===================================================================
- *     Method      : SplitRawData(Module Process)
- */
-/*!
- *     @brief
- *          This method splits the ADC raw data to each part of the ADC data
- *          structure.
- *     @param[in]
- *          adcDataPtr      - Pointer to ADC data structure.
- *     @return
- *                          - ERR_PARAM_DATA: The head byte of the raw is not valid,
- *                                            so the data is invalid.
- *                          - ERR_OK: Succeeded to split.
- */
-/* ===================================================================*/
-LDD_TError SplitRawData(TADCDataPtr adcDataPtr);
-
-/*
- * ===================================================================
- *     Method      : SplitRawData(Module Process)
- */
-/*!
- *     @brief
- *          This method copies ADC data from ADC structure to MCU structure.
- *          The format of data in MCU structure
-       @verbatim
-       --------------------------------
-       | (Chn) | 1ms 2ms 3ms ... 99ms |
-       --------------------------------
-       | (Ch1) | [0] [1] [2] ... [99] |
-       | (Ch2) | [0] [1] [2] ... [99] |
-       | (Ch3) | [0] [1] [2] ... [99] |
-       | (Ch4) | [0] [1] [2] ... [99] |
-       | (Ch5) | [0] [1] [2] ... [99] |
-       | (Ch6) | [0] [1] [2] ... [99] |
-       | (Ch7) | [0] [1] [2] ... [99] |
-       | (Ch8) | [0] [1] [2] ... [99] |
-       --------------------------------
-       @endverbatim
+            This methods starts main loop, ADC's conversion and so on.
  *     @param
  *          void
  *     @return
  *          void
  */
 /* ===================================================================*/
-void CopyADCDataToMCUData();
+void MainLoop(void);
+
     /* END Process. */
 
 #ifdef __cplusplus

@@ -6,7 +6,7 @@
 **     Component   : DMA_LDD
 **     Version     : Component 01.065, Driver 01.07, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2013-09-21, 19:46, # CodeGen: 148
+**     Date/Time   : 2014-03-17, 13:36, # CodeGen: 187
 **     Abstract    :
 **          This embedded component implements initialization
 **          and runtime handling of an on-chip DMA controller.
@@ -540,7 +540,7 @@ PE_ISR(DMA_CTRL_Channel3Interrupt);
 /*
 ** ###################################################################
 **
-**     This file was created by Processor Expert 10.2 [05.07]
+**     This file was created by Processor Expert 10.3 [05.08]
 **     for the Freescale Kinetis series of microcontrollers.
 **
 ** ###################################################################

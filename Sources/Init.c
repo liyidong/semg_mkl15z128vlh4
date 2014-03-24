@@ -91,16 +91,18 @@
 
 /* {Default RTOS Adapter} No RTOS includes */
 #include "SysTick.h"
-#include "SS_SPI0.h"
-#include "SM_SPI1.h"
+#include "SS_SPI1.h"
+#include "SM_SPI0.h"
 #include "EINT_SYNC_INT.h"
-#include "BitIO_NOT_PWDN.h"
-#include "BitIO_NOT_RESET.h"
 #include "BitIO_UPRDY.h"
-#include "BitIO_START.h"
-#include "BitIO_DAISY_IN.h"
-#include "BitIO_CLKSEL.h"
-#include "EINT_NOT_DRDY.h"
+#include "BitIO_AD_NOT_RESET0.h"
+#include "BitIO_AD_START0.h"
+#include "BitIO_AD_NOT_CS0.h"
+#include "EINT_AD_NOT_DRDY0.h"
+#include "BitIO_AD_NOT_RESET1.h"
+#include "BitIO_AD_START1.h"
+#include "BitIO_AD_NOT_CS1.h"
+#include "EINT_AD_NOT_DRDY1.h"
 #include "PE_Types.h"
 #include "PE_Error.h"
 #include "PE_Const.h"
@@ -113,7 +115,6 @@
 
 #include "MyHeaders.h"
 #include "string.h"
-
 
 static void UserDataInit(void);
 static void MCUDataInit(TMCUDataPtr userDataPtr);
@@ -150,7 +151,9 @@ void UserInit(void)
     printf("| -UserDataInit finished.\n");
     printf("|-+OnChipInit begins...\n");
 #endif
+    __DI();             /* Disable Interrupts. */
     OnChipInit();       /* Initialize on-chip devices. */
+    __EI();             /* Enable Interrupts. */
 #if DEBUG
     printf("| -OnChipInit finished.\n");
     printf("|-+PeripheralInit begins...\n");
@@ -161,23 +164,23 @@ void UserInit(void)
 #endif
 }
 
- /*
-  * ===================================================================
-  *     Method      :  UserDataInit ()
-  */
- /*!
-  *     @brief
-  *          Initialize user data.
-  *          The method is called in the UserInit function and will be called
-  *          only once.
-  *          Function ADCDataInit is defined in ADC.h. Function MCUDataInit
-  *          and function ARMDataInit is defined below.
-  *     @param
-  *          void
-  *     @return
-  *          void
-  */
- /* ===================================================================*/
+/*
+ * ===================================================================
+ *     Method      :  UserDataInit ()
+ */
+/*!
+ *     @brief
+ *          Initialize user data.
+ *          The method is called in the UserInit function and will be called
+ *          only once.
+ *          Function ADCDataInit is defined in ADC.h. Function MCUDataInit
+ *          and function ARMDataInit is defined below.
+ *     @param
+ *          void
+ *     @return
+ *          void
+ */
+/* ===================================================================*/
 static void UserDataInit(void)
 {
     ADCDataInit(NULL);
@@ -206,26 +209,22 @@ static void MCUDataInit(TMCUDataPtr userDataPtr)
 {
     extern TMCU tMCU;
     extern TMCUPtr tMCUPtr;
-    TMCU mcu;
 
-    mcu.mcuStatus.isReceivingADCData = FALSE;
-    mcu.mcuStatus.isMasterReceived = FALSE;
-    mcu.mcuStatus.isMasterSent = FALSE;
-    mcu.mcuStatus.isSlaveReceived = FALSE;
-    mcu.mcuStatus.isSlaveSent = FALSE;
-    mcu.mcuStatus.isSPI0RxDMATransCompleted = FALSE;
-    mcu.mcuStatus.isSPI0TxDMATransCompleted = FALSE;
-    mcu.mcuStatus.isSPI1RxDMATransCompleted = FALSE;
-    mcu.mcuStatus.isSPI1TxDMATransCompleted = FALSE;
-    mcu.mcuStatus.isUploadReady = FALSE;
-    mcu.mcuStatus.isDelayed = FALSE;
-    mcu.mcuStatus.isUartReceived = FALSE;
-    mcu.mcuStatus.isUartSent = FALSE;
+    memset(&tMCU, 0, sizeof(TMCU));
 
-    memset(mcu.mcuData.filteredChannelData, 0, (sizeof(int16)) * USING_CHANNEL_COUNT * CHANNEL_DATA_COUNT);
-    memset(mcu.mcuData.channelData, 0, (sizeof(int16)) * USING_CHANNEL_COUNT * CHANNEL_DATA_COUNT);
+    tMCU.mcuStatus.isReceivingADCData = FALSE;
+    tMCU.mcuStatus.isMasterReceived = FALSE;
+    tMCU.mcuStatus.isMasterSent = FALSE;
+    tMCU.mcuStatus.isSlaveReceived = FALSE;
+    tMCU.mcuStatus.isSlaveSent = FALSE;
+    tMCU.mcuStatus.isSPI0RxDMATransCompleted = FALSE;
+    tMCU.mcuStatus.isSPI0TxDMATransCompleted = FALSE;
+    tMCU.mcuStatus.isSPI1RxDMATransCompleted = FALSE;
+    tMCU.mcuStatus.isSPI1TxDMATransCompleted = FALSE;
+    tMCU.mcuStatus.isDelayed = FALSE;
+    tMCU.mcuStatus.isUartReceived = FALSE;
+    tMCU.mcuStatus.isUartSent = FALSE;
 
-    tMCU = mcu;
     tMCUPtr = &tMCU;
 
     return;
@@ -250,25 +249,60 @@ static void ARMDataInit(TARMDataPtr userDataPtr)
 {
     extern TARM tARM;
     extern TARMPtr tARMPtr;
-    TARM arm;
 
-    arm.armStatus.isRequiringData = FALSE;
+    memset(&tARM, 0, sizeof(TARM));
 
-    memset(arm.armDataLeft.dataHigh, 0, (sizeof(int8)) * USING_CHANNEL_COUNT);
-    memset(arm.armDataLeft.dataLow, 0, (sizeof(int8)) * USING_CHANNEL_COUNT);
-    memset(arm.armDataLeft.dataFrame, 0, (sizeof(byte)) * USING_CHANNEL_COUNT);
-    arm.armDataLeft.dataFrame[0] = DATA_FRAME_HEAD_BIT;
-    arm.armDataLeft.dataFrame[1] = MCU_NUMBER;
-    arm.armDataLeft.dataFrame[DATA_FRAME_LENGTH - 1] = DATA_FRAME_TAIL_BIT;
+    tARM.armStatus.isRequiringData = FALSE;
+    //tARM.armStatus.eARMDataBufFlag = eLEFT;
+    tARM.armStatus.isUploadReady = FALSE;
+    tARM.armStatus.isForeBufferEmpty = FALSE;
+    tARM.armStatus.isForeBufferFull = FALSE;
+    tARM.armStatus.isBackBufferEmpty = FALSE;
+    tARM.armStatus.isBackBufferFull = FALSE;
+    tARM.armStatus.isTransmittingData = FALSE;
+    tARM.armStatus.backBufferStatus = eIdle;
+    tARM.armStatus.foreBufferStatus = eIdle;
+    tARM.foreBuffer = NULL;
+    tARM.backBuffer = NULL;
 
-    memset(arm.armDataRight.dataHigh, 0, (sizeof(int8)) * USING_CHANNEL_COUNT);
-    memset(arm.armDataRight.dataLow, 0, (sizeof(int8)) * USING_CHANNEL_COUNT);
-    memset(arm.armDataRight.dataFrame, 0, (sizeof(byte)) * USING_CHANNEL_COUNT);
-    arm.armDataRight.dataFrame[0] = DATA_FRAME_HEAD_BIT;
-    arm.armDataRight.dataFrame[1] = MCU_NUMBER;
-    arm.armDataRight.dataFrame[DATA_FRAME_LENGTH - 1] = DATA_FRAME_TAIL_BIT;
+    tARM.armDataLeft.dataFrame[0] = DATA_FRAME_HEAD_BIT;                        /* Head bit */
+    tARM.armDataLeft.dataFrame[1] = MCU_NUMBER;                                 /* MCU Number */
+    tARM.armDataLeft.dataFrame[2] = 0x0CU;                                      /* Data length high bits */
+    tARM.armDataLeft.dataFrame[3] = 0xB0U;                                      /* Data length low bits */
+    tARM.armDataLeft.dataFrame[4] = 0x00U;                                      /* Time stamp high bits */
+    tARM.armDataLeft.dataFrame[5] = 0x00U;                                      /* Time stamp low bits */
+    tARM.armDataLeft.dataFrame[6] = 0x00U;                                      /* Status high bits */
+    tARM.armDataLeft.dataFrame[7] = 0x00U;                                      /* Status low bits */
 
-    tARM = arm;
+    for(int i = 0; i < USING_CHANNEL_COUNT * USING_ADC_COUNT; i++)
+    {
+        int off = i * CHANNEL_PACKAGE_LENGTH;
+        tARM.armDataLeft.dataFrame[8 + off] = CHANNEL_PACKAGE_HEAD_BIT;                   /* Channel package head bit */
+        tARM.armDataLeft.dataFrame[9 + off] = i;                                          /* Channel number */
+        tARM.armDataLeft.dataFrame[10 + off] = 0x00U;                                     /* Channel package status */
+    }
+
+    tARM.armDataLeft.dataFrame[DATA_FRAME_LENGTH - 1] = DATA_FRAME_TAIL_BIT;
+
+    tARM.armDataRight.dataFrame[0] = DATA_FRAME_HEAD_BIT;
+    tARM.armDataRight.dataFrame[1] = MCU_NUMBER;
+    tARM.armDataRight.dataFrame[2] = 0x0CU;                                      /* Data length high bits */
+    tARM.armDataRight.dataFrame[3] = 0xB0U;                                      /* Data length low bits */
+    tARM.armDataRight.dataFrame[4] = 0x00U;                                      /* Time stamp high bits */
+    tARM.armDataRight.dataFrame[5] = 0x00U;                                      /* Time stamp low bits */
+    tARM.armDataRight.dataFrame[6] = 0x00U;                                      /* Status high bits */
+    tARM.armDataRight.dataFrame[7] = 0x00U;                                      /* Status low bits */
+
+    for(int i = 0; i < USING_CHANNEL_COUNT * USING_ADC_COUNT; i++)
+    {
+        int off = i * CHANNEL_PACKAGE_LENGTH;
+        tARM.armDataRight.dataFrame[8 + off] = CHANNEL_PACKAGE_HEAD_BIT;                   /* Channel package head bit */
+        tARM.armDataRight.dataFrame[9 + off] = i;                                          /* Channel number */
+        tARM.armDataRight.dataFrame[10 + off] = 0x00U;                                     /* Channel package status */
+    }
+
+    tARM.armDataRight.dataFrame[DATA_FRAME_LENGTH - 1] = DATA_FRAME_TAIL_BIT;
+
     tARMPtr = &tARM;
 
     return;
@@ -340,7 +374,11 @@ static void PeripheralInit(void)
 #if DEBUG
     printf("| |-+ADCInit begins...\n");
 #endif
-    ADCInit(); /* Initialize ADC. */
+    /* Initialize ADC. */
+    ADCInit(ADC0);
+#if USING_ADC_COUNT == 2
+    ADCInit(ADC1);
+#endif
 #if DEBUG
     printf("| | -ADCInit finished.\n");
 #endif
@@ -364,61 +402,35 @@ static void PeripheralInit(void)
 static void GPIOInit(void)
 {
     /*
-     * Initialize Port SYNC_INT for external interrupt from ARM.
-     * When level changes, an interrupt will be triggered on rising edge
-     * for synchronization signal for transmitting data to ARM.
+     * Initialize Port UPRDY for output to ARM.
+     * Inform arm upload data are ready to retrieve.
+     * Default: 0
      */
-    EINT_SYNC_INT = EIntSyncInterruptInit(NULL);
-
-    /*
-     * Initialize Port NOT_DRDY for input from ADC.
-     * Low when ADC is ready to be read.
-     * Meanwhile, an interrupt will be triggered on falling edge
-     * calling MCU to read data from ADC.
-     */
-    EINT_NOT_DRDY = EIntNotReadyInit(NULL);
+    IO_UPRDY = IOUploadReadyInit(NULL);
 
     /*
      * Initialize Port START for output to ADC.
      * High to start the ADC to convert.
      * Default: 0
      */
-    IO_START = IOStartInit(NULL);
-
-    /*
-     * Initialize Port DAISY_IN for output to ADC.
-     * Multiple ADCs connect in daisy mode when high.
-     * Default: 0
-     */
-    IO_DAISY_IN = IODaisyInInit(NULL);
-
-    /*
-     * Initialize Port CLKSEL for output to ADC.
-     * ADC uses internal clock when high.
-     * Default: 1
-     */
-    IO_CLKSEL = IOClockSelectInit(NULL);
-
-    /*
-     * Initialize Port NOT_PWDN for output to ADC.
-     * ADC power down when low.
-     * Default: 1
-     */
-    IO_NOT_PWDN = IONotPowerDownInit(NULL);
+    IO_AD_START0 = IOADStart0Init(NULL);
+    IO_AD_START1 = IOADStart1Init(NULL);
 
     /*
      * Initialize Port NOT_RESET for output to ADC.
      * Reset ADC when low.
      * Default: 1
      */
-    IO_NOT_RESET = IONotResetInit(NULL);
+    IO_AD_NOT_RESET0 = IOADNotReset0Init(NULL);
+    IO_AD_NOT_RESET1 = IOADNotReset1Init(NULL);
 
     /*
-     * Initialize Port UPRDY for output to ARM.
-     * Inform arm upload data are ready to retrieve.
-     * Default: 0
+     * Initialize Port NOT_CS for output to ADC.
+     * Low to enable SPI of ADC.
+     * Default: 1
      */
-    IO_UPRDY = IOUploadReadyInit(NULL);
+    IO_AD_NOT_CS0 = IOADNotCS0Init(NULL);
+    IO_AD_NOT_CS1 = IOADNotCS1Init(NULL);
 
 //    /*
 //     * Initialize bidirection Port TEST_SIGNAL for test some functions.
@@ -426,6 +438,22 @@ static void GPIOInit(void)
 //     * Default: 0
 //     */
 //    IO_TEST_SGINAL = IOTestSignalInit(NULL);
+
+    /*
+     * Initialize Port NOT_DRDY for input from ADC.
+     * Low when ADC is ready to be read.
+     * Meanwhile, an interrupt will be triggered on falling edge
+     * calling MCU to read data from ADC.
+     */
+    EINT_AD_NOT_DRDY0 = EIntADNotReady0Init(NULL);
+    EINT_AD_NOT_DRDY1 = EIntADNotReady1Init(NULL);
+
+    /*
+     * Initialize Port SYNC_INT for external interrupt from ARM.
+     * When level changes, an interrupt will be triggered on rising edge
+     * for synchronization signal for transmitting data to ARM.
+     */
+    EINT_SYNC_INT = EIntSyncInterruptInit(NULL);
 }
 
 /*

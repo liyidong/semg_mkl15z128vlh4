@@ -3,15 +3,15 @@
  **     Filename    : MyHeaders.h
  **     Project     : semg_mkl15z128vlh4
  **     Processor   : MKL15Z128VLH4
- **     Component   : 
- **     Version     : 
+ **     Component   :
+ **     Version     :
  **     Compiler    : GNU C Compiler
  **     Date/Time   : 2013-Sep 9, 2013, 7:16:58 PM, # CodeGen: 0
  **     Author	    : Dong
  **     Abstract    :
  **          This file contains all header files created by user.
  **          Easy for including header files in other files.
- **          
+ **
  **     Mail      	: pzdongdong@163.com
  **
  **     Revision    : No.  Name        Data/Time        Content
@@ -19,7 +19,7 @@
 /*!
  * @file MyHeaders.h
  * @version 01.00
- * @brief	
+ * @brief
  *		This file contains all header files created by user. Easy for including header files in other files.
  */
 /*!
@@ -39,7 +39,9 @@
 #include "ADC.h"
 #include "Init.h"
 #include "Process.h"
+#if DEBUG
 #include "Test.h"
+#endif
 #include "Utilities.h"
 #include "SPI.h"
 #include "Events.h"

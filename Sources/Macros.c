@@ -91,10 +91,10 @@ const uint8 BYTE_COUNT_PER_CHANNEL = 0x02;                                 /*!< 
      * @{
      */
 #if USING_DMA
-const uint8 SPI1_TX_DMA_CHANNEL = 0x00;
-const uint8 SPI1_RX_DMA_CHANNEL = 0x01;
-const uint8 SPI0_TX_DMA_CHANNEL = 0x02;
-const uint8 SPI0_RX_DMA_CHANNEL = 0x03;
+const uint8 SPI0_TX_DMA_CHANNEL = 0x00;
+const uint8 SPI0_RX_DMA_CHANNEL = 0x01;
+const uint8 SPI1_TX_DMA_CHANNEL = 0x02;
+const uint8 SPI1_RX_DMA_CHANNEL = 0x03;
 #endif /* #if USING_DMA */
     /*!
      * @}

@@ -4,9 +4,9 @@
 **     Project     : ProcessorExpert
 **     Processor   : MKL15Z128VLH4
 **     Component   : BitIO_LDD
-**     Version     : Component 01.033, Driver 01.00, CPU db: 3.00.000
+**     Version     : Component 01.033, Driver 01.03, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2013-09-24, 17:58, # CodeGen: 159
+**     Date/Time   : 2014-03-17, 16:48, # CodeGen: 199
 **     Abstract    :
 **         The HAL BitIO component provides a low level API for unified
 **         access to general purpose digital input/output pins across
@@ -16,7 +16,7 @@
 **         portable to various microprocessors.
 **     Settings    :
 **          Component name                                 : BitIO_UPRDY
-**          Pin for I/O                                    : TSI0_CH12/PTB19/TPM2_CH1
+**          Pin for I/O                                    : CMP0_IN5/ADC0_SE4b/PTE29/TPM0_CH2/TPM_CLKIN0
 **          Pin signal                                     : BitIO_UPRDY
 **          Direction                                      : Output
 **          Initialization                                 : 
@@ -39,7 +39,7 @@
 ** ###################################################################*/
 /*!
 ** @file BitIO_UPRDY.h
-** @version 01.00
+** @version 01.03
 ** @brief
 **         The HAL BitIO component provides a low level API for unified
 **         access to general purpose digital input/output pins across
@@ -76,7 +76,7 @@ extern "C" {
 
 
 /*! Peripheral base address of a device allocated by the component. This constant can be used directly in PDD macros. */
-#define BitIO_UPRDY_PRPH_BASE_ADDRESS  0x400FF040U
+#define BitIO_UPRDY_PRPH_BASE_ADDRESS  0x400FF100U
   
 /* Methods configuration constants - generated for all enabled component's methods */
 #define BitIO_UPRDY_Init_METHOD_ENABLED /*!< Init method of the component BitIO_UPRDY is enabled (generated) */
@@ -86,9 +86,9 @@ extern "C" {
 #define BitIO_UPRDY_SetVal_METHOD_ENABLED /*!< SetVal method of the component BitIO_UPRDY is enabled (generated) */
 
 /* Definition of implementation constants */
-#define BitIO_UPRDY_MODULE_BASE_ADDRESS FPTB_BASE_PTR /*!< Name of macro used as the base address */
-#define BitIO_UPRDY_PORTCONTROL_BASE_ADDRESS PORTB_BASE_PTR /*!< Name of macro used as the base address */
-#define BitIO_UPRDY_PORT_MASK 0x00080000U /*!< Mask of the allocated pin from the port */
+#define BitIO_UPRDY_MODULE_BASE_ADDRESS FPTE_BASE_PTR /*!< Name of macro used as the base address */
+#define BitIO_UPRDY_PORTCONTROL_BASE_ADDRESS PORTE_BASE_PTR /*!< Name of macro used as the base address */
+#define BitIO_UPRDY_PORT_MASK 0x20000000U /*!< Mask of the allocated pin from the port */
 
 
 
@@ -210,7 +210,7 @@ void BitIO_UPRDY_SetVal(LDD_TDeviceData *DeviceDataPtr);
 /*
 ** ###################################################################
 **
-**     This file was created by Processor Expert 10.2 [05.07]
+**     This file was created by Processor Expert 10.3 [05.08]
 **     for the Freescale Kinetis series of microcontrollers.
 **
 ** ###################################################################

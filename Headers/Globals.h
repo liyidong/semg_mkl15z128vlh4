@@ -73,22 +73,22 @@ TARMPtr tARMPtr;                        /*!< The pointer to structure of ARM dev
         /*!
          * @{
          */
-#if USING_SPI1
-LDD_TDeviceData* masterSPI1DevData; /*!< Pointer to SPI1 device data structure in master mode. */
+#if USING_SPI0
+LDD_TDeviceData* masterSPI0DevData; /*!< Pointer to SPI0 device data structure in slave mode. */
 #endif
 
-#if USING_SPI0
-LDD_TDeviceData* slaveSPI0DevData; /*!< Pointer to SPI0 device data structure in slave mode. */
+#if USING_SPI1
+LDD_TDeviceData* slaveSPI1DevData; /*!< Pointer to SPI1 device data structure in master mode. */
 #endif
 
 #if USING_SPI0_DMA
-LDD_TDeviceData* slaveSPIRxDMADevData;  /*!< Pointer to SPI0 DMA reception device data structure in slave mode. */
-LDD_TDeviceData* slaveSPITxDMADevData;  /*!< Pointer to SPI0 DMA transmission device data structure in slave mode. */
+LDD_TDeviceData* masterSPIRxDMADevData;  /*!< Pointer to SPI0 DMA reception device data structure in slave mode. */
+LDD_TDeviceData* masterSPITxDMADevData;  /*!< Pointer to SPI0 DMA transmission device data structure in slave mode. */
 #endif
 
 #if USING_SPI1_DMA
-LDD_TDeviceData* masterSPIRxDMADevData; /*!< Pointer to SPI1 DMA reception device data structure in master mode. */
-LDD_TDeviceData* masterSPITxDMADevData; /*!< Pointer to SPI1 DMA transmission device data structure in master mode. */
+LDD_TDeviceData* slaveSPIRxDMADevData; /*!< Pointer to SPI1 DMA reception device data structure in master mode. */
+LDD_TDeviceData* slaveSPITxDMADevData; /*!< Pointer to SPI1 DMA transmission device data structure in master mode. */
 #endif
 
 #if USING_UART0
@@ -116,15 +116,20 @@ LDD_TDeviceData* dmaControllerDevData;             /*!< Pointer to DMA controlle
         /*!
          * @{
          */
+LDD_TDeviceData* portA1DevData;  /*!< Pointer to PortA Pin1 device data structure, signal: AD_NOT_DRDY0. */
+LDD_TDeviceData* portB2DevData;  /*!< Pointer to PortB Pin2 device data structure, signal: AD_START0. */
+LDD_TDeviceData* portC4DevData;  /*!< Pointer to PortC Pin4 device data structure, signal: AD_NO_CS0. */
+LDD_TDeviceData* portE19DevData; /*!< Pointer to PortE Pin19 device data structure, signal: AD_NOT_RESET0. */
+
+LDD_TDeviceData* portA5DevData;  /*!< Pointer to PortA Pin5 device data structure, signal: AD_NOT_DRDY1. */
+LDD_TDeviceData* portB1DevData;  /*!< Pointer to PortB Pin1 device data structure, signal: AD_START1. */
+LDD_TDeviceData* portC8DevData;  /*!< Pointer to PortC Pin8 device data structure, signal: AD_NO_CS1. */
+LDD_TDeviceData* portE21DevData; /*!< Pointer to PortE Pin21 device data structure, signal: AD_NOT_RESET1. */
+
 LDD_TDeviceData* portA2DevData;  /*!< Pointer to PortA Pin2 device data structure, signal: SYNC_INT. */
-LDD_TDeviceData* portB1DevData;  /*!< Pointer to PortB Pin1 device data structure, signal: START. */
-LDD_TDeviceData* portB19DevData; /*!< Pointer to PortB Pin19 device data structure, signal: UPDRDY. */
-LDD_TDeviceData* portC1DevData;  /*!< Pointer to PortC Pin1 device data structure, signal: DAISY_IN. */
-LDD_TDeviceData* portC2DevData;  /*!< Pointer to PortC Pin2 device data structure, signal: CLKSEL. */
+LDD_TDeviceData* portE29DevData; /*!< Pointer to PortE Pin29 device data structure, signal: UPDRDY. */
+
 //LDD_TDeviceData* portC3DevData;  /*!< Pointer to PortC Pin3 device data structure, signal: TEST_SIGNAL. */
-LDD_TDeviceData* portD4DevData;  /*!< Pointer to PortD Pin4 device data structure, signal: ~DRDY. */
-LDD_TDeviceData* portE18DevData; /*!< Pointer to PortE Pin18 device data structure, signal: ~PWDN. */
-LDD_TDeviceData* portE19DevData; /*!< Pointer to PortE Pin19 device data structure, signal: ~RESET. */
         /*!
          * @}
          */

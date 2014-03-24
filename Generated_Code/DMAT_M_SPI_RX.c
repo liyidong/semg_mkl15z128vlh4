@@ -6,7 +6,7 @@
 **     Component   : DMATransfer_LDD
 **     Version     : Component 01.100, Driver 01.08, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2013-09-21, 19:46, # CodeGen: 148
+**     Date/Time   : 2014-03-17, 13:36, # CodeGen: 187
 **     Abstract    :
 **          This embedded component implements
 **          a DMA transfer channel descriptor definition.
@@ -20,23 +20,23 @@
 **              Allocate channel                           : yes
 **          Trigger                                        : 
 **            Trigger source type                          : Peripheral device
-**              Trigger source                             : SPI1_Receive_DMA_Request
+**              Trigger source                             : SPI0_Receive_DMA_Request
 **              Periodic trigger                           : Disabled
 **          Data source                                    : 
-**            External object declaration                  : volatile byte* SPI1RxDMADataSourceBuffer = NULL;
-**            Address                                      : (&SPI1_D)
+**            External object declaration                  : volatile byte* SPI0RxDMADataSourceBuffer = NULL;
+**            Address                                      : (&SPI0_D)
 **            Transfer size                                : 8-bit
 **            Address offset                               : 0
 **            Circular buffer                              : Buffer disabled
 **          Data destination                               : 
-**            External object declaration                  : volatile byte* SPI1RxDMADataDestinationBuffer = NULL;
-**            Address                                      : SPI1RxDMADataDestinationBuffer
+**            External object declaration                  : volatile byte* SPI0RxDMADataDestinationBuffer = NULL;
+**            Address                                      : SPI0RxDMADataDestinationBuffer
 **            Transfer size                                : 8-bit
 **            Address offset                               : 1
 **            Circular buffer                              : Buffer disabled
 **          Data size                                      : 
-**            External object declaration                  : volatile uint8_t SPI1RxDMAByteCount = 0;
-**            Value                                        : SPI1RxDMAByteCount
+**            External object declaration                  : volatile uint8_t SPI0RxDMAByteCount = 0;
+**            Value                                        : SPI0RxDMAByteCount
 **          Transfer control                               : Cycle-steal
 **            Disable after transfer                       : yes
 **            Asynchronous requests                        : Disabled
@@ -82,13 +82,13 @@
 #include "Events.h"
 #include "DMAT_M_SPI_RX.h"
 /* User external source object declaration */
-volatile byte* SPI1RxDMADataSourceBuffer = NULL;
+volatile byte* SPI0RxDMADataSourceBuffer = NULL;
 
 /* User external destination object declaration */
-volatile byte* SPI1RxDMADataDestinationBuffer = NULL;
+volatile byte* SPI0RxDMADataDestinationBuffer = NULL;
 
 /* User external data size object declaration */
-volatile uint8_t SPI1RxDMAByteCount = 0;
+volatile uint8_t SPI0RxDMAByteCount = 0;
 
 typedef struct {
   DMA_CTRL_TDeviceData *DMA_LDD_DeviceDataPtr; /* Pointer to the DMA_LDD component data structure */
@@ -132,20 +132,20 @@ LDD_TDeviceData* DMAT_M_SPI_RX_Init(LDD_TUserData *UserDataPtr)
   /* Transfer descriptor initialization */
   DeviceDataPtr->DescriptorPtr->UserDataPtr = UserDataPtr; /* User device data structure pointer to be returned by the DMA_LDD component's ISR to the dynamic callback of this Descriptor */
   /* Source settings */
-  DeviceDataPtr->DescriptorPtr->SourceAddress = (LDD_DMA_TAddress)(&SPI1_D); /* Address of a DMA transfer source data */
+  DeviceDataPtr->DescriptorPtr->SourceAddress = (LDD_DMA_TAddress)(&SPI0_D); /* Address of a DMA transfer source data */
   DeviceDataPtr->DescriptorPtr->SourceTransferSize = (LDD_DMA_TTransferSize)DMA_PDD_8_BIT; /* 8-bit source data transfer size. */
   DeviceDataPtr->DescriptorPtr->SourceModuloSize = (LDD_DMA_TModuloSize)DMA_PDD_CIRCULAR_BUFFER_DISABLED; /* Circular buffer size. */
   DeviceDataPtr->DescriptorPtr->SourceAddressIncrement = FALSE; /* Address not incremented. */
   /* Destination settings */
-  DeviceDataPtr->DescriptorPtr->DestinationAddress = (LDD_DMA_TAddress)SPI1RxDMADataDestinationBuffer; /* Address of a DMA transfer destination data */
+  DeviceDataPtr->DescriptorPtr->DestinationAddress = (LDD_DMA_TAddress)SPI0RxDMADataDestinationBuffer; /* Address of a DMA transfer destination data */
   DeviceDataPtr->DescriptorPtr->DestinationTransferSize = (LDD_DMA_TTransferSize)DMA_PDD_8_BIT; /* 8-bit destination data transfer size. */
   DeviceDataPtr->DescriptorPtr->DestinationModuloSize = (LDD_DMA_TModuloSize)DMA_PDD_CIRCULAR_BUFFER_DISABLED; /* Circular buffer size. */
   DeviceDataPtr->DescriptorPtr->DestinationAddressIncrement = TRUE; /* Address incremented after each elemental read operation. */
   /* Byte count value */
-  DeviceDataPtr->DescriptorPtr->ByteCount = (LDD_DMA_TByteCount)SPI1RxDMAByteCount; /* Size of data to be transferred. */
+  DeviceDataPtr->DescriptorPtr->ByteCount = (LDD_DMA_TByteCount)SPI0RxDMAByteCount; /* Size of data to be transferred. */
   /* Trigger settings */
   DeviceDataPtr->DescriptorPtr->TriggerType = LDD_DMA_HW_TRIGGER; /* External peripheral trigger is used */
-  DeviceDataPtr->DescriptorPtr->TriggerSource = (LDD_DMA_TTriggerSource)0x12U; /* External peripheral trigger source number */
+  DeviceDataPtr->DescriptorPtr->TriggerSource = (LDD_DMA_TTriggerSource)0x10U; /* External peripheral trigger source number */
   DeviceDataPtr->DescriptorPtr->PeriodicTrigger = FALSE; /* Periodic trigger mode is not used */
   DeviceDataPtr->DescriptorPtr->ChannelAutoSelection = FALSE; /* DMA channel fixed value */
   DeviceDataPtr->DescriptorPtr->ChannelNumber = (LDD_DMA_TChannelNumber)0x01U; /* DMA channel number */
@@ -428,7 +428,7 @@ LDD_TError DMAT_M_SPI_RX_SetByteCount(LDD_TDeviceData *DeviceDataPtr, LDD_DMA_TB
 /*
 ** ###################################################################
 **
-**     This file was created by Processor Expert 10.2 [05.07]
+**     This file was created by Processor Expert 10.3 [05.08]
 **     for the Freescale Kinetis series of microcontrollers.
 **
 ** ###################################################################

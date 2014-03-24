@@ -14,32 +14,26 @@
  **     Settings    :
  **
  **     Contents    :
- **         Init               - void ADCInit(void);
- **         Configure          - LDD_TError ADCConfigure(void);
- **         Enable             - LDD_TError ADCEnable(void);
- **         Disable            - LDD_TError ADCDisable(void);
- **         PowerUp            - LDD_TError ADCPowerUp(void);
- **         PowerDown          - LDD_TError ADCPowerDown(void);
- **         UseInClock         - LDD_TError ADCUseInternalClock(void);
- **         UseExClock         - LDD_TError ADCUseExternalClock(void);
- **         StartConvert       - LDD_TError ADCStartConvertByHardware(void);
- **                            - LDD_TError ADCStartConvertByCommand(void);
- **         StopConvert        - LDD_TError ADCStopConvertByHardware(void);
- **                            - LDD_TError ADCStopConvertByCommand(void);
- **         Reset              - void ADCResetByHardware(void);
- **                            - LDD_TError ADCResetByCommand(void);
- **         DaisyConnect       - LDD_TError ADCDaisyConnect(void);
- **         DirectConnect      - LDD_TError ADCDirectConnect(void);
- **         WakeUp             - LDD_TError ADCWakeUp();
- **         StandBy            - LDD_TError ADCStandBy();
- **         RDATAC             - LDD_TError ADCReadDataContinuous(void);
- **         SDATAC             - LDD_TError ADCStopDataContinuous(void);
- **         SendCommand        - LDD_TError ADCSendCommand(byte* cmd);
- **         ReadRegister       - LDD_TError ADCReadRegister(byte regAddrbyte* dat, uint8 n);
- **         WriteRegister      - LDD_TError ADCWriteRegister(byte regAddr, byte* dat, uint8 n);
- **         ReadData           - LDD_TError ADCReadContinuousData(byte* dat, uint8 n);
- **                            - LDD_TError ADCReadData(byte* dat, uint8 n);
- **         ADCDataInit        - ADCDataInit(TADCPtr userDataPtr);
+ **         Init               - void ADCInit(eADCFlag adcFlag);
+ **         Configure          - LDD_TError ADCConfigure(eADCFlag adcFlag);
+ **         Enable             - LDD_TError ADCEnable(eADCFlag adcFlag);
+ **         Disable            - LDD_TError ADCDisable(eADCFlag adcFlag);
+ **         StartConvert       - LDD_TError ADCStartConvertByHardware(eADCFlag adcFlag);
+ **                            - LDD_TError ADCStartConvertByCommand(eADCFlag adcFlag);
+ **         StopConvert        - LDD_TError ADCStopConvertByHardware(eADCFlag adcFlag);
+ **                            - LDD_TError ADCStopConvertByCommand(eADCFlag adcFlag);
+ **         Reset              - void ADCResetByHardware(eADCFlag adcFlag);
+ **                            - LDD_TError ADCResetByCommand(eADCFlag adcFlag);
+ **         WakeUp             - LDD_TError ADCWakeUp(eADCFlag adcFlag);
+ **         StandBy            - LDD_TError ADCStandBy(eADCFlag adcFlag);
+ **         RDATAC             - LDD_TError ADCReadDataContinuous(eADCFlag adcFlag);
+ **         SDATAC             - LDD_TError ADCStopReadDataContinuous(eADCFlag adcFlag);
+ **         SendCommand        - LDD_TError ADCSendCommand(eADCFlag adcFlag, byte* cmd);
+ **         ReadRegister       - LDD_TError ADCReadRegister(eADCFlag adcFlag, byte regAddrbyte* dat, uint8 n);
+ **         WriteRegister      - LDD_TError ADCWriteRegister(eADCFlag adcFlag, byte regAddr, byte* dat, uint8 n);
+ **         ReadData           - LDD_TError ADCReadContinuousData(eADCFlag adcFlag, byte* dat, uint8 n);
+ **                            - LDD_TError ADCReadData(eADCFlag adcFlag, byte* dat, uint8 n);
+ **         ADCDataInit        - void ADCDataInit(eADCFlag adcFlag, TADCPtr userDataPtr);
  **         CheckCommand       - LDD_TError CheckCommand(byte cmd);
  **
  **     Mail      	: pzdongdong@163.com
@@ -82,28 +76,14 @@ extern "C"
  *          Initializes ADC.
  *          The method is called in the PeripheralInit function and will be called
  *          only once.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *          void
  */
 /* ===================================================================*/
-void ADCInit(void);
-
-/*
- * ===================================================================
- *     Method      : ADCConfigure (Module ADC)
- */
-/*!
- *     @brief
- *         	Configure the registers of ADC via SPI1.
- *     @param
- *          void
- *     @return
- *         	                - See PE_Error.h
- */
-/* ===================================================================*/
-LDD_TError ADCConfigure(void);
+void ADCInit(EADCFlag adcFlag);
 
 /*
  * ===================================================================
@@ -112,14 +92,15 @@ LDD_TError ADCConfigure(void);
 /*!
  *     @brief
  *          Signal ~CS is low, enable ADC.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - ERR_OK: Output of this pin is OK.
  *                          - ERR_COMMON: Output of this pin goes wrong.
  */
 /* ===================================================================*/
-LDD_TError ADCEnable(void);
+LDD_TError ADCEnable(EADCFlag adcFlag);
 
 /*
  * ===================================================================
@@ -128,79 +109,31 @@ LDD_TError ADCEnable(void);
 /*!
  *     @brief
  *          Signal ~CS is High, disable ADC.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - ERR_OK: Output of this pin is OK.
  *                          - ERR_COMMON: Output of this pin goes wrong.
- *
  */
 /* ===================================================================*/
-LDD_TError ADCDisable(void);
+LDD_TError ADCDisable(EADCFlag adcFlag);
 
 /*
  * ===================================================================
- *     Method      :  ADCPowerUp (Component ADC)
+ *     Method      : ADCConfigure (Module ADC)
  */
 /*!
  *     @brief
- *          Signal ~PWDN is high, ADC power up.
- *     @param
- *          void
+ *          Configure the registers of ADC via SPI1.
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
- *                          - ERR_OK: Output of this pin is OK.
- *                          - ERR_COMMON: Output of this pin goes wrong.
+ *                          - See PE_Error.h
  */
 /* ===================================================================*/
-LDD_TError ADCPowerUp(void);
-
-/*
- * ===================================================================
- *     Method      :  ADCPowerDown (Component ADC)
- */
-/*!
- *     @brief
- *          Signal ~PWDN is low, ADC power down.
- *     @param
- *          void
- *     @return
- *                          - ERR_OK: Output of this pin is OK.
- *                          - ERR_COMMON: Output of this pin goes wrong.
- */
-/* ===================================================================*/
-LDD_TError ADCPowerDown(void);
-
-/*
- * ===================================================================
- *     Method      :  ADCUseInternalClock (Component ADC)
- */
-/*!
- *     @brief
- *          Signal CLKSEL is high, ADC uses internal clock.
- *     @param
- *          void
- *     @return
- *                          - ERR_OK: Output of this pin is OK.
- *                          - ERR_COMMON: Output of this pin goes wrong.
- */
-/* ===================================================================*/
-LDD_TError ADCUseInternalClock(void);
-
-/*
- * ===================================================================
- *     Method      :  ADCUseExternalClock (Component ADC)
- */
-/*!
- *     @brief
- *          Signal CLKSEL is low, ADC uses external clock.
- *     @param
- *          void
- *     @return
- *                          - ERR_OK: Output of this pin is OK.
- *                          - ERR_COMMON: Output of this pin goes wrong.
- */
-/* ===================================================================*/
-LDD_TError ADCUseExternalClock(void);
+LDD_TError ADCConfigure(EADCFlag adcFlag);
 
 /*
  * ===================================================================
@@ -210,14 +143,15 @@ LDD_TError ADCUseExternalClock(void);
  *     @brief
  *          Signal START is high, ADC starts to convert.
  *          This function starts ADC to convert via signal START.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - ERR_OK: Output of this pin is OK.
  *                          - ERR_COMMON: Output of this pin goes wrong.
  */
 /* ===================================================================*/
-LDD_TError ADCStartConvertByHardware(void);
+LDD_TError ADCStartConvertByHardware(EADCFlag adcFlag);
 
 /*
  * ===================================================================
@@ -228,13 +162,14 @@ LDD_TError ADCStartConvertByHardware(void);
  *          MCU sends START command to ADC, ADC starts to convert.
  *          This function starts ADC to convert via SPI1.
  *          In this method, signal START must be low.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - See PE_Error.h
  */
 /* ===================================================================*/
-LDD_TError ADCStartConvertByCommand(void);
+LDD_TError ADCStartConvertByCommand(EADCFlag adcFlag);
 
 /*
  * ===================================================================
@@ -244,14 +179,15 @@ LDD_TError ADCStartConvertByCommand(void);
  *     @brief
  *          Signal START is low, ADC stops converting.
  *          This function starts ADC to convert via signal START.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - ERR_OK: Output of this pin is OK.
  *                          - ERR_COMMON: Output of this pin goes wrong.
  */
 /* ===================================================================*/
-LDD_TError ADCStopConvertByHardware(void);
+LDD_TError ADCStopConvertByHardware(EADCFlag adcFlag);
 
 /*
  * ===================================================================
@@ -262,13 +198,14 @@ LDD_TError ADCStopConvertByHardware(void);
  *          MCU sends STOP command to ADC, ADC stops to convert.
  *          This function stops ADC to convert via SPI1.
  *          In this method, signal START must be low.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - See PE_Error.h
  */
 /* ===================================================================*/
-LDD_TError ADCStopConvertByCommand(void);
+LDD_TError ADCStopConvertByCommand(EADCFlag adcFlag);
 
 /*
  * ===================================================================
@@ -278,14 +215,14 @@ LDD_TError ADCStopConvertByCommand(void);
  *     @brief
  *          Signal ~RESET varies from high to low to high, ADC resets.
  *          This function resets ADC via signal RESET.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
- *                          - ERR_OK: Output of this pin is OK.
- *                          - ERR_COMMON: Output of this pin goes wrong.
+ *          void
  */
 /* ===================================================================*/
-void ADCResetByHardware(void);
+void ADCResetByHardware(EADCFlag adcFlag);
 
 /*
  * ===================================================================
@@ -296,46 +233,14 @@ void ADCResetByHardware(void);
  *          MCU sends RESET command to ADC, ADC resets.
  *          This function resets ADC via SPI1.
  *          Avoid sending any commands during reset.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
- *          void
+ *                          - See PE_Error.h
  */
 /* ===================================================================*/
-LDD_TError ADCResetByCommand(void);
-
-/*
- * ===================================================================
- *     Method      :  ADCDaisyConnect (Component ADC)
- */
-/*!
- *     @brief
- *          Signal Daisy_IN is high, ADC connects in daisy mode.
- *     @param
- *          void
- *     @return
- *                          - ERR_OK: Output of this pin is OK.
- *                          - ERR_COMMON: Output of this pin goes wrong.
- */
-/* ===================================================================*/
-LDD_TError ADCDaisyConnect(void);
-
-/*
- * ===================================================================
- *     Method      :  ADCDirectConnect (Component ADC)
- */
-/*!
- *     @brief
- *          Signal Daisy_IN is low, ADC connects in direct mode.
- *     @param
- *          void
- *     @return
- *                          - ERR_OK: Output of this pin is OK.
- *                          - ERR_COMMON: Output of this pin goes wrong.
- */
-/* ===================================================================*/
-LDD_TError ADCDirectConnect(void);
-
+LDD_TError ADCResetByCommand(EADCFlag adcFlag);
 
 /*
  * ===================================================================
@@ -343,15 +248,16 @@ LDD_TError ADCDirectConnect(void);
  */
 /*!
  *     @brief
- *         	Send command WAKEUP to ADC via SPI1 to wake up ADC
- *         	from low-power standby mode.
- *     @param
- *          void
+ *          Send command WAKEUP to ADC via SPI1 to wake up ADC
+ *          from low-power standby mode.
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
- *         	                - See PE_Error.h
+ *                          - See PE_Error.h
  */
 /* ===================================================================*/
-LDD_TError ADCWakeUp(void);
+LDD_TError ADCWakeUp(EADCFlag adcFlag);
 
 /*
  * ===================================================================
@@ -361,13 +267,14 @@ LDD_TError ADCWakeUp(void);
  *     @brief
  *          Send command STANDBY via SPI1 to make ADC entering
  *          the low-power standby mode.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - See PE_Error.h
  */
 /* ===================================================================*/
-LDD_TError ADCStandBy(void);
+LDD_TError ADCStandBy(EADCFlag adcFlag);
 
 /*
  * ===================================================================
@@ -377,13 +284,14 @@ LDD_TError ADCStandBy(void);
  *     @brief
  *          Send command RDATAC via SPI1 to make the conversion data
  *          of ADC can read continuously without command RDATA.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - See PE_Error.h
  */
 /* ===================================================================*/
-LDD_TError ADCReadDataContinuous(void);
+LDD_TError ADCReadDataContinuous(EADCFlag adcFlag);
 
 /*
  * ===================================================================
@@ -392,13 +300,14 @@ LDD_TError ADCReadDataContinuous(void);
 /*!
  *     @brief
  *          Send command SDATAC to ADC via SPI1 to stop ADC's RDATAC mode.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - See PE_Error.h
  */
 /* ===================================================================*/
-LDD_TError ADCStopReadDataContinuous(void);
+LDD_TError ADCStopReadDataContinuous(EADCFlag adcFlag);
 
 /*
  * ===================================================================
@@ -406,7 +315,11 @@ LDD_TError ADCStopReadDataContinuous(void);
  */
 /*!
  *     @brief
- *          Send command to ADC via SPI1.
+ *          Send command to ADC via SPI1. Please use ADCReadRegister and
+ *          ADCWriteRegister, but not this function, to read and write ADC's register!
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @param[in]
  *          cmd             - Pointer to command to be sent.
  *                            See group ADC Commands in Macros.h.
@@ -422,7 +335,7 @@ LDD_TError ADCStopReadDataContinuous(void);
  *                              - etc.         - See PE_Error.h.
  */
 /* ===================================================================*/
-LDD_TError ADCSendCommand(byte* cmd);
+LDD_TError ADCSendCommand(EADCFlag adcFlag, byte* cmd);
 
 /*
  * ===================================================================
@@ -540,13 +453,47 @@ LDD_TError ADCReadData(byte* dat, uint8 n);
  *     @brief
  *          This method initialize the ADC device structure, including
  *          data, setting and status.
- *     @param
+ *     @param[in]
  *          userDataPtr     - Pointer to specific user data.
  *     @return
  *          void
  */
 /* ===================================================================*/
 void ADCDataInit(TADCPtr userDataPtr);
+
+/*
+ * ===================================================================
+ *     Method      : EnableADCSPI (Module ADC)
+ */
+/*!
+ *     @brief
+ *          This method pull the CS signal down to enable corresonding ADC's SPI.
+ *          Each time only one ADC's SPI is available.
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
+ *     @return
+ *          void
+ */
+/* ===================================================================*/
+void EnableADCSPI(EADCFlag adcFlag);
+
+/*
+ * ===================================================================
+ *     Method      : DisableADCSPI (Module ADC)
+ */
+/*!
+ *     @brief
+ *          This method pull the CS signal up to disable corresonding ADC's SPI.
+ *          Each time only one ADC's SPI is disabled.
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
+ *     @return
+ *          void
+ */
+/* ===================================================================*/
+void DisableADCSPI(EADCFlag adcFlag);
 
     /* END ADC. */
 

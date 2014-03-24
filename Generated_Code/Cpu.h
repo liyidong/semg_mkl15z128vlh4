@@ -7,7 +7,7 @@
 **     Version     : Component 01.000, Driver 01.04, CPU db: 3.00.000
 **     Datasheet   : KL15P80M48SF0RM, Rev.3, Sep 2012
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2013-12-12, 21:57, # CodeGen: 166
+**     Date/Time   : 2014-03-19, 10:55, # CodeGen: 204
 **     Abstract    :
 **
 **     Settings    :
@@ -120,6 +120,19 @@ extern volatile uint8_t SR_reg;        /* Current FAULTMASK register */
 /*lint -esym(765,SR_lock) Disable MISRA rule (8.10) checking for symbols (SR_lock). The SR_reg is used in inline assembler. */
 extern volatile uint8_t SR_lock;
 
+/* {Default RTOS Adapter} ISR function prototype */
+PE_ISR(Cpu_ivINT_PORTA);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_PORTA (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services the ivINT_PORTA interrupt shared by several 
+**         components.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
 /*
 ** ===================================================================
 **     Method      :  PE_low_level_init (component MKL15Z128LH4)
@@ -145,10 +158,428 @@ PE_ISR(Cpu_INT_NMIInterrupt);
 ** ===================================================================
 */
 
-PE_ISR(Cpu_Interrupt);
+PE_ISR(Cpu_ivINT_Hard_Fault);
 /*
 ** ===================================================================
-**     Method      :  Cpu_Cpu_Interrupt (component MKL15Z128LH4)
+**     Method      :  Cpu_Cpu_ivINT_Hard_Fault (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_Reserved4);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved4 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_Reserved5);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved5 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_Reserved6);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved6 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_Reserved7);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved7 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_Reserved8);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved8 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_Reserved9);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved9 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_Reserved10);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved10 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_SVCall);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_SVCall (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_Reserved12);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved12 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_Reserved13);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved13 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_PendableSrvReq);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_PendableSrvReq (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_Reserved20);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved20 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_FTFA);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_FTFA (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_LVD_LVW);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_LVD_LVW (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_LLW);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_LLW (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_I2C0);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_I2C0 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_I2C1);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_I2C1 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_SPI0);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_SPI0 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_SPI1);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_SPI1 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_UART0);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_UART0 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_UART1);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_UART1 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_UART2);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_UART2 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_ADC0);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_ADC0 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_CMP0);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_CMP0 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_TPM0);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_TPM0 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_TPM1);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_TPM1 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_TPM2);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_TPM2 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_RTC);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_RTC (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_RTC_Seconds);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_RTC_Seconds (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_PIT);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_PIT (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_Reserved39);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved39 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_USB0);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_USB0 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_DAC0);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_DAC0 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_TSI0);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_TSI0 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_MCG);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_MCG (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_LPTimer);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_LPTimer (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_Reserved45);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved45 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+
+PE_ISR(Cpu_ivINT_PORTD);
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_PORTD (component MKL15Z128LH4)
 **
 **     Description :
 **         This ISR services an unused interrupt/exception vector.

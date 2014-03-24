@@ -14,32 +14,26 @@
  **     Settings    :
  **
  **     Contents    :
- **         Init               - void ADCInit(void);
- **         Configure          - LDD_TError ADCConfigure(void);
- **         Enable             - LDD_TError ADCEnable(void);
- **         Disable            - LDD_TError ADCDisable(void);
- **         PowerUp            - LDD_TError ADCPowerUp(void);
- **         PowerDown          - LDD_TError ADCPowerDown(void);
- **         UseInClock         - LDD_TError ADCUseInternalClock(void);
- **         UseExClock         - LDD_TError ADCUseExternalClock(void);
- **         StartConvert       - LDD_TError ADCStartConvertByHardware(void);
- **                            - LDD_TError ADCStartConvertByCommand(void);
- **         StopConvert        - LDD_TError ADCStopConvertByHardware(void);
- **                            - LDD_TError ADCStopConvertByCommand(void);
- **         Reset              - void ADCResetByHardware(void);
- **                            - LDD_TError ADCResetByCommand(void);
- **         DaisyConnect       - LDD_TError ADCDaisyConnect(void);
- **         DirectConnect      - LDD_TError ADCDirectConnect(void);
- **         WakeUp             - LDD_TError ADCWakeUp();
- **         StandBy            - LDD_TError ADCStandBy();
- **         RDATAC             - LDD_TError ADCReadDataContinuous(void);
- **         SDATAC             - LDD_TError ADCStopDataContinuous(void);
- **         SendCommand        - LDD_TError ADCSendCommand(byte* cmd);
- **         ReadRegister       - LDD_TError ADCReadRegister(byte regAddr, byte* dat, uint8 n);
- **         WriteRegister      - LDD_TError ADCWriteRegister(byte regAddr, byte* dat, uint8 n);
- **         ReadData           - LDD_TError ADCReadContinuousData(byte* dat, uint8 n);
- **                            - LDD_TError ADCReadData(byte* dat, uint8 n);
- **         ADCDataInit        - ADCDataInit(TADCPtr userDataPtr);
+ **         Init               - void ADCInit(eADCFlag adcFlag);
+ **         Configure          - LDD_TError ADCConfigure(eADCFlag adcFlag);
+ **         Enable             - LDD_TError ADCEnable(eADCFlag adcFlag);
+ **         Disable            - LDD_TError ADCDisable(eADCFlag adcFlag);
+ **         StartConvert       - LDD_TError ADCStartConvertByHardware(eADCFlag adcFlag);
+ **                            - LDD_TError ADCStartConvertByCommand(eADCFlag adcFlag);
+ **         StopConvert        - LDD_TError ADCStopConvertByHardware(eADCFlag adcFlag);
+ **                            - LDD_TError ADCStopConvertByCommand(eADCFlag adcFlag);
+ **         Reset              - void ADCResetByHardware(eADCFlag adcFlag);
+ **                            - LDD_TError ADCResetByCommand(eADCFlag adcFlag);
+ **         WakeUp             - LDD_TError ADCWakeUp(eADCFlag adcFlag);
+ **         StandBy            - LDD_TError ADCStandBy(eADCFlag adcFlag);
+ **         RDATAC             - LDD_TError ADCReadDataContinuous(eADCFlag adcFlag);
+ **         SDATAC             - LDD_TError ADCStopReadDataContinuous(eADCFlag adcFlag);
+ **         SendCommand        - LDD_TError ADCSendCommand(eADCFlag adcFlag, byte* cmd);
+ **         ReadRegister       - LDD_TError ADCReadRegister(eADCFlag adcFlag, byte regAddrbyte* dat, uint8 n);
+ **         WriteRegister      - LDD_TError ADCWriteRegister(eADCFlag adcFlag, byte regAddr, byte* dat, uint8 n);
+ **         ReadData           - LDD_TError ADCReadContinuousData(eADCFlag adcFlag, byte* dat, uint8 n);
+ **                            - LDD_TError ADCReadData(eADCFlag adcFlag, byte* dat, uint8 n);
+ **         ADCDataInit        - void ADCDataInit(eADCFlag adcFlag, TADCPtr userDataPtr);
  **         CheckCommand       - LDD_TError CheckCommand(byte cmd);
  **
  **     Mail      	: pzdongdong@163.com
@@ -61,12 +55,9 @@
 /* MODULE ADC. */
 
 /* {Default RTOS Adapter} No RTOS includes */
-#include "SM_SPI1.h"
-#include "BitIO_NOT_PWDN.h"
-#include "BitIO_NOT_RESET.h"
-#include "BitIO_START.h"
-#include "BitIO_DAISY_IN.h"
-#include "BitIO_CLKSEL.h"
+#include "SM_SPI0.h"
+#include "BitIO_AD_NOT_RESET0.h"
+#include "BitIO_AD_START0.h"
 #include "PE_Types.h"
 #include "PE_Error.h"
 #include "PE_Const.h"
@@ -98,26 +89,19 @@ static LDD_TError CheckCommand(byte cmd);
  *          Initializes ADC.
  *          The method is called in the PeripheralInit function and will be called
  *          only once.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *          void
  */
 /* ===================================================================*/
-void ADCInit(void)
+void ADCInit(EADCFlag adcFlag)
 {
-    ADCEnable();                /* Clear ~CS, select ADC */
+    ADCStopConvertByHardware(adcFlag); /* Clear START, ADC does not convert */
     DelaySomeMs(1);
-    ADCUseInternalClock();      /* Set CLKSEL, ADC uses internal clock  */
+    ADCConfigure(adcFlag);             /* Configure the register of ADC. */
     DelaySomeMs(1);
-    ADCStopConvertByHardware(); /* Clear START, ADC does not convert */
-    DelaySomeMs(1);
-    ADCPowerUp();               /* Set ~PWDN */
-    DelaySomeMs(1);
-//    ADCDirectConnect();         /* Use direct connect mode */
-    ADCResetByHardware();       /* Reset ADC when power on */
-    DelaySomeMs(1);
-    ADCConfigure();             /* Configure the register of ADC. */
 }
 
 /*
@@ -127,14 +111,15 @@ void ADCInit(void)
 /*!
  *     @brief
  *          Signal ~CS is low, enable ADC.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - ERR_OK: Output of this pin is OK.
  *                          - ERR_COMMON: Output of this pin goes wrong.
  */
 /* ===================================================================*/
-LDD_TError ADCEnable(void)
+LDD_TError ADCEnable(EADCFlag adcFlag)
 {
 //    LDD_TError err;
 
@@ -148,14 +133,15 @@ LDD_TError ADCEnable(void)
 /*!
  *     @brief
  *          Signal ~CS is High, disable ADC.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - ERR_OK: Output of this pin is OK.
  *                          - ERR_COMMON: Output of this pin goes wrong.
  */
 /* ===================================================================*/
-LDD_TError ADCDisable(void)
+LDD_TError ADCDisable(EADCFlag adcFlag)
 {
 //    LDD_TError err;
 
@@ -169,37 +155,50 @@ LDD_TError ADCDisable(void)
 /*!
  *     @brief
  *          Configure the registers of ADC via SPI1.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - See PE_Error.h
  */
 /* ===================================================================*/
-LDD_TError ADCConfigure(void)
+LDD_TError ADCConfigure(EADCFlag adcFlag)
 {
     //LDD_TError err;
     byte cmd;
     byte regVal[25] = {0};
 
+    /* Stop Data Continuous mode. */
     cmd = ADC_CMD_SDATAC;
-    ADCSendCommand(&cmd);
-    while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted || !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
-    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
-    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
 
+    ADCSendCommand(adcFlag, &cmd);
+    while(!tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted);
+    tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
+    DelaySomeMs(1);
+
+    /* Read ADC ID, should be 0xB6. */
     cmd = ADC_REG_ID;
+    EnableADCSPI(adcFlag);      /* Select corresponding ADC. */
     ADCReadRegister(cmd, regVal, 1);
-    while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted || !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
-    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
-    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
+    while(!tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted || !tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted);
+    tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
+    tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = FALSE;
+    DisableADCSPI(adcFlag);         /* De-select ADC. */
+    DelaySomeMs(1);
 #if DEBUG
     printf("| |  -ID: %#x\n", regVal[2]);
 #endif
+    if(0xB6 != regVal[2])
+    {
+        /* Do something. */
+    }
+
     for(int i = 0; i < 25; i++)
     {
         regVal[i] = 0xFF;
     }
 
+    /* Configure the register in ADC at one time. */
     cmd = ADC_REG_CONFIG1;
     regVal[0] = 0x03U;  /* CONFIG1 */
     regVal[1] = 0x20U;  /* CONFIG2 */
@@ -226,178 +225,42 @@ LDD_TError ADCConfigure(void)
 //    regVal[22] = 0x00U; /* CONFIG4 */
 //    regVal[23] = 0x00U; /* WCT1 */
 //    regVal[24] = 0x00U; /* WCT2 */
+    EnableADCSPI(adcFlag);      /* Select corresponding ADC. */
     ADCWriteRegister(cmd, regVal, 12);
-    while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted && !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
-    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
-    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
-    for(int i = 0; i < 25; i++)
-    {
-        regVal[i] = 0xFF;
-    }
-//    DelaySomeMs(100);
-    ADCReadRegister(cmd, regVal, 12);
-    while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted && !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
-    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
-    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
-#if DEBUG
-//    DelaySomeMs(100);
-    //printf("| |  -CONFIG3: %#x\n", regVal[2]);
-    printf("%#x|%#x|%#x|%#x\n%#x|%#x|%#x|%#x|%#x|%#x|%#x|%#x\n", regVal[0], regVal[0], regVal[0], regVal[0],
-                                                                   regVal[0], regVal[0], regVal[0], regVal[0],
-                                                                   regVal[0], regVal[0], regVal[0], regVal[0]);
-#endif
+    while(!tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted && !tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted);
+    tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
+    tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = FALSE;
+    DisableADCSPI(adcFlag);         /* De-select ADC. */
+    DelaySomeMs(100);
     for(int i = 0; i < 25; i++)
     {
         regVal[i] = 0xFF;
     }
 
+//    ADCReadRegister(cmd, regVal, 12);
+//    while(!tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted && !tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted);
+//    tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
+//    tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = FALSE;
+//#if DEBUG
+//    DelaySomeMs(100);
+//    printf("| |  -CONFIG3: %#x\n", regVal[2]);
+//    printf("%#x|%#x|%#x|%#x\n%#x|%#x|%#x|%#x|%#x|%#x|%#x|%#x\n", regVal[0], regVal[0], regVal[0], regVal[0],
+//                                                                   regVal[0], regVal[0], regVal[0], regVal[0],
+//                                                                   regVal[0], regVal[0], regVal[0], regVal[0]);
+//#endif
+//    for(int i = 0; i < 25; i++)
+//    {
+//        regVal[i] = 0xFF;
+//    }
+
+    /* Read Data Continuous Mode. */
     cmd = ADC_CMD_RDATAC;
-    ADCSendCommand(&cmd);
-    while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted || !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
-    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
-    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
+    ADCSendCommand(adcFlag, &cmd);
+    while(!tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted);
+    tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
+    DelaySomeMs(1);
 
     return ERR_OK;
-}
-
-/*
- * ===================================================================
- *     Method      :  ADCPowerUp (Component ADC)
- */
-/*!
- *     @brief
- *          Signal ~PWDN is high, ADC power up.
- *     @param
- *          void
- *     @return
- *                          - ERR_OK: Output of this pin is OK.
- *                          - ERR_COMMON: Output of this pin goes wrong.
- */
-/* ===================================================================*/
-LDD_TError ADCPowerUp(void)
-{
-    LDD_TError err;
-
-    IONotResetSetVal(); /* Set ~PWDN, ADC power up */
-
-    if(!IONotResetGetVal())
-    {
-        err = ERR_COMMON;
-#if DEBUG
-        PrintErrorMessage(err);
-#endif
-    }
-    else
-    {
-        err = ERR_OK;
-    }
-
-    return err;
-}
-
-/*
- * ===================================================================
- *     Method      :  ADCPowerDown (Component ADC)
- */
-/*!
- *     @brief
- *          Signal ~PWDN is low, ADC power down.
- *     @param
- *          void
- *     @return
- *                          - ERR_OK: Output of this pin is OK.
- *                          - ERR_COMMON: Output of this pin goes wrong.
- */
-/* ===================================================================*/
-LDD_TError ADCPowerDown(void)
-{
-    LDD_TError err;
-
-    IONotResetClrVal(); /* Clear ~PWDN, ADC power down */
-
-    if(IONotResetGetVal())
-    {
-        err = ERR_COMMON;
-#if DEBUG
-        PrintErrorMessage(err);
-#endif
-    }
-    else
-    {
-        err = ERR_OK;
-    }
-
-    return err;
-}
-
-/*
- * ===================================================================
- *     Method      :  ADCUseInternalClock (Component ADC)
- */
-/*!
- *     @brief
- *          Signal CLKSEL is high, ADC uses internal clock.
- *     @param
- *          void
- *     @return
- *                          - ERR_OK: Output of this pin is OK.
- *                          - ERR_COMMON: Output of this pin goes wrong.
- */
-/* ===================================================================*/
-LDD_TError ADCUseInternalClock(void)
-{
-    LDD_TError err;
-
-    IOClockSelectSetVal(); /* Set CLKSEL, use internal clock */
-
-    if(!IOClockSelectGetVal())
-    {
-        err = ERR_COMMON;
-#if DEBUG
-        PrintErrorMessage(err);
-#endif
-    }
-    else
-    {
-        err = ERR_OK;
-    }
-
-    return err;
-}
-
-/*
- * ===================================================================
- *     Method      :  ADCUseExternalClock (Component ADC)
- */
-/*!
- *     @brief
- *          Signal CLKSEL is low, ADC uses external clock.
- *     @param
- *          void
- *     @return
- *                          - ERR_OK: Output of this pin is OK.
- *                          - ERR_COMMON: Output of this pin goes wrong.
- */
-/* ===================================================================*/
-LDD_TError ADCUseExternalClock(void)
-{
-    LDD_TError err;
-
-    IOClockSelectClrVal(); /* Clear CLKSEL, use external clock */
-
-    if(IOClockSelectGetVal())
-    {
-        err = ERR_COMMON;
-#if DEBUG
-        PrintErrorMessage(err);
-#endif
-    }
-    else
-    {
-        err = ERR_OK;
-    }
-
-    return err;
 }
 
 /*
@@ -408,29 +271,49 @@ LDD_TError ADCUseExternalClock(void)
  *     @brief
  *          Signal START is high, ADC starts to convert.
  *          This function starts ADC to convert via signal START.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - ERR_OK: Output of this pin is OK.
  *                          - ERR_COMMON: Output of this pin goes wrong.
  */
 /* ===================================================================*/
-LDD_TError ADCStartConvertByHardware(void)
+LDD_TError ADCStartConvertByHardware(EADCFlag adcFlag)
 {
     LDD_TError err;
 
-    IOStartSetVal(); /* Set START, ADC starts to convert */
+    if(eADC0 == adcFlag)
+    {
+        IOADStart0SetVal(); /* Set START, ADC starts to convert */
 
-    if(!IOStartGetVal())
-    {
-        err = ERR_COMMON;
+        if(!IOADStart0GetVal())
+        {
+            err = ERR_COMMON;
 #if DEBUG
-        PrintErrorMessage(err);
+            PrintErrorMessage(err);
 #endif
+        }
+        else
+        {
+            err = ERR_OK;
+        }
     }
-    else
+    else if(eADC1 == adcFlag)
     {
-        err = ERR_OK;
+        IOADStart1SetVal(); /* Set START, ADC starts to convert */
+
+        if(!IOADStart1GetVal())
+        {
+            err = ERR_COMMON;
+#if DEBUG
+            PrintErrorMessage(err);
+#endif
+        }
+        else
+        {
+            err = ERR_OK;
+        }
     }
 
     return err;
@@ -445,25 +328,34 @@ LDD_TError ADCStartConvertByHardware(void)
  *          MCU sends START command to ADC, ADC starts to convert.
  *          This function starts ADC to convert via SPI1.
  *          In this method, signal START must be low.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - See PE_Error.h
  */
 /* ===================================================================*/
-LDD_TError ADCStartConvertByCommand(void)
+LDD_TError ADCStartConvertByCommand(EADCFlag adcFlag)
 {
     LDD_TError err;
     byte cmd = ADC_CMD_START;
 
-    IOStartClrVal(); /* Clear START, in this method, signal START must be low */
+    if(eADC0 == adcFlag)
+    {
+        IOADStart0ClrVal(); /* Clear START, in this method, signal START must be low */
+    }
+    else if(eADC1 == adcFlag)
+    {
+        IOADStart1ClrVal(); /* Clear START, in this method, signal START must be low */
+    }
+
+    /* Select the corresponding ADC. */
+    EnableADCSPI(adcFlag);
 
     /* Sends START command via SPI1 */
-    err = ADCSendCommand(&cmd);
-    DelaySomeMs(1);
-    while(!tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted || !tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted);
-    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
-    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
+    err = ADCSendCommand(adcFlag, &cmd);
+    while(!tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted);
+    tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
 
     if(err != ERR_OK)
     {
@@ -471,6 +363,9 @@ LDD_TError ADCStartConvertByCommand(void)
         PrintErrorMessage(err);
 #endif
     }
+
+    /* De-select ADC. */
+    DisableADCSPI(adcFlag);
 
     return err;
 }
@@ -483,29 +378,49 @@ LDD_TError ADCStartConvertByCommand(void)
  *     @brief
  *          Signal START is low, ADC stops converting.
  *          This function starts ADC to convert via signal START.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - ERR_OK: Output of this pin is OK.
  *                          - ERR_COMMON: Output of this pin goes wrong.
  */
 /* ===================================================================*/
-LDD_TError ADCStopConvertByHardware(void)
+LDD_TError ADCStopConvertByHardware(EADCFlag adcFlag)
 {
     LDD_TError err;
 
-    IOStartClrVal(); /* Clear START, ADC does not convert */
+    if(eADC0 == adcFlag)
+    {
+        IOADStart0ClrVal(); /* Clear START, ADC does not convert */
 
-    if(IOStartGetVal())
-    {
-        err = ERR_COMMON;
+        if(IOADStart0GetVal())
+        {
+            err = ERR_COMMON;
 #if DEBUG
-        PrintErrorMessage(err);
+            PrintErrorMessage(err);
 #endif
+        }
+        else
+        {
+            err = ERR_OK;
+        }
     }
-    else
+    else if(eADC1 == adcFlag)
     {
-        err = ERR_OK;
+        IOADStart1ClrVal(); /* Clear START, ADC does not convert */
+
+        if(IOADStart1GetVal())
+        {
+            err = ERR_COMMON;
+#if DEBUG
+            PrintErrorMessage(err);
+#endif
+        }
+        else
+        {
+            err = ERR_OK;
+        }
     }
 
     return err;
@@ -520,21 +435,34 @@ LDD_TError ADCStopConvertByHardware(void)
  *          MCU sends STOP command to ADC, ADC stops to convert.
  *          This function stops ADC to convert via SPI1.
  *          In this method, signal START must be low.
- *     @param
- *          void
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - See PE_Error.h
  */
 /* ===================================================================*/
-LDD_TError ADCStopConvertByCommand(void)
+LDD_TError ADCStopConvertByCommand(EADCFlag adcFlag)
 {
     LDD_TError err;
     byte cmd = ADC_CMD_STOP;
 
-    IOStartClrVal(); /* Clear START, in this method, signal START must be low */
+    if(eADC0 == adcFlag)
+    {
+        IOADStart0ClrVal(); /* Clear START, in this method, signal START must be low */
+    }
+    else if(eADC1 == adcFlag)
+    {
+        IOADStart1ClrVal(); /* Clear START, in this method, signal START must be low */
+    }
+
+    /* Select the correspnoding ADC. */
+    EnableADCSPI(adcFlag);
 
     /* Sends STOP command via SPI1 */
-    err = ADCSendCommand(&cmd);
+    err = ADCSendCommand(adcFlag, &cmd);
+    while(!tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted);
+    tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
     DelaySomeMs(1);
 
     if(err != ERR_OK)
@@ -543,6 +471,9 @@ LDD_TError ADCStopConvertByCommand(void)
         PrintErrorMessage(err);
 #endif
     }
+
+    /* De-select ADC. */
+    DisableADCSPI(adcFlag);
 
     return err;
 }
@@ -555,15 +486,33 @@ LDD_TError ADCStopConvertByCommand(void)
  *     @brief
  *          Signal ~RESET varies from high to low to high, ADC resets.
  *          This function resets ADC via signal RESET.
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
+ *     @return
+ *          void
  */
 /* ===================================================================*/
-void ADCResetByHardware(void)
+void ADCResetByHardware(EADCFlag adcFlag)
 {
-    IONotResetSetVal(); /* Set ~RESET */
-    DelaySomeMs(100);
-    IONotResetClrVal(); /* Clear ~RESET, reset ADC */
-    DelaySomeMs(100);
-    IONotResetSetVal(); /* Set ~RESET */
+    if(eADC0 == adcFlag)
+    {
+        IOADNotReset0SetVal(); /* Set ~RESET */
+        DelaySomeMs(100);
+        IOADNotReset0ClrVal(); /* Clear ~RESET, reset ADC */
+        DelaySomeMs(100);
+        IOADNotReset0SetVal(); /* Set ~RESET */
+    }
+    else if(eADC1 == adcFlag)
+    {
+        IOADNotReset1SetVal(); /* Set ~RESET */
+        DelaySomeMs(100);
+        IOADNotReset1ClrVal(); /* Clear ~RESET, reset ADC */
+        DelaySomeMs(100);
+        IOADNotReset1SetVal(); /* Set ~RESET */
+    }
+
+    return;
 }
 
 /*
@@ -575,17 +524,25 @@ void ADCResetByHardware(void)
  *          MCU sends RESET command to ADC, ADC resets.
  *          This function resets ADC via SPI1.
  *          Avoid sending any commands during reset.
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - See PE_Error.h
  */
 /* ===================================================================*/
-LDD_TError ADCResetByCommand(void)
+LDD_TError ADCResetByCommand(EADCFlag adcFlag)
 {
     LDD_TError err;
     byte cmd = ADC_CMD_RESET;
 
+    /* Select the corresponding ADC. */
+    EnableADCSPI(adcFlag);
+
     /* Sends RESET command via SPI1 */
-    err = ADCSendCommand(&cmd);
+    err = ADCSendCommand(adcFlag, &cmd);
+    while(!tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted);
+    tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
     DelaySomeMs(1);
 
     if(err != ERR_OK)
@@ -595,73 +552,8 @@ LDD_TError ADCResetByCommand(void)
 #endif
     }
 
-    return err;
-}
-
-/*
- * ===================================================================
- *     Method      :  ADCDaisyConnect (Component ADC)
- */
-/*!
- *     @brief
- *          Signal Daisy_IN is high, ADC connects in daisy mode.
- *     @return
- *                          - ERR_OK: Output of this pin is OK.
- *                          - ERR_COMMON: Output of this pin goes wrong.
- */
-/* ===================================================================*/
-LDD_TError ADCDaisyConnect(void)
-{
-    LDD_TError err;
-
-    IODaisyInSetVal(); /* Set DIASY_IN high, connect ADC in daisy mode */
-
-    if(!IODaisyInGetVal())
-    {
-        err = ERR_COMMON;
-#if DEBUG
-        PrintErrorMessage(err);
-#endif
-    }
-    else
-    {
-        err = ERR_OK;
-    }
-
-    return err;
-}
-
-/*
- * ===================================================================
- *     Method      :  ADCDirectConnect (Component ADC)
- */
-/*!
- *     @brief
- *          Signal Daisy_IN is low, ADC connects in direct mode.
- *     @param
- *          void
- *     @return
- *                          - ERR_OK: Output of this pin is OK.
- *                          - ERR_COMMON: Output of this pin goes wrong.
- */
-/* ===================================================================*/
-LDD_TError ADCDirectConnect(void)
-{
-    LDD_TError err;
-
-    IODaisyInClrVal(); /* Clear DIASY_IN high, connect ADC in direct mode */
-
-    if(IODaisyInGetVal())
-    {
-        err = ERR_COMMON;
-#if DEBUG
-        PrintErrorMessage(err);
-#endif
-    }
-    else
-    {
-        err = ERR_OK;
-    }
+    /* De-select ADC. */
+    DisableADCSPI(adcFlag);
 
     return err;
 }
@@ -674,16 +566,24 @@ LDD_TError ADCDirectConnect(void)
  *     @brief
  *          Send command WAKEUP to ADC via SPI1 to wake up ADC
  *          from low-power standby mode.
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - See PE_Error.h
  */
 /* ===================================================================*/
-LDD_TError ADCWakeUp(void)
+LDD_TError ADCWakeUp(EADCFlag adcFlag)
 {
     LDD_TError err;
     byte cmd = ADC_CMD_WAKEUP;
 
-    err = ADCSendCommand(&cmd);
+    /* Select the corresponding ADC. */
+    EnableADCSPI(adcFlag);
+
+    err = ADCSendCommand(adcFlag, &cmd);
+    while(!tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted);
+    tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
     DelaySomeMs(1);
 
     if(err != ERR_OK)
@@ -692,6 +592,9 @@ LDD_TError ADCWakeUp(void)
         PrintErrorMessage(err);
 #endif
     }
+
+    /* De-select ADC. */
+    DisableADCSPI(adcFlag);
 
     return err;
 }
@@ -704,16 +607,24 @@ LDD_TError ADCWakeUp(void)
  *     @brief
  *          Send command STANDBY via SPI1 to make ADC entering
  *          the low-power standby mode.
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - See PE_Error.h
  */
 /* ===================================================================*/
-LDD_TError ADCStandBy(void)
+LDD_TError ADCStandBy(EADCFlag adcFlag)
 {
     LDD_TError err;
     byte cmd = ADC_CMD_STANDBY;
 
-    err = ADCSendCommand(&cmd);
+    /* Select the corresponding ADC. */
+    EnableADCSPI(adcFlag);
+
+    err = ADCSendCommand(adcFlag, &cmd);
+    while(!tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted);
+    tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
     DelaySomeMs(1);
 
     if(err != ERR_OK)
@@ -722,6 +633,9 @@ LDD_TError ADCStandBy(void)
         PrintErrorMessage(err);
 #endif
     }
+
+    /* De-select ADC. */
+    DisableADCSPI(adcFlag);
 
     return err;
 }
@@ -734,16 +648,24 @@ LDD_TError ADCStandBy(void)
  *     @brief
  *          Send command RDATAC via SPI1 to make the conversion data
  *          of ADC can read continuously without command RDATA.
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - See PE_Error.h
  */
 /* ===================================================================*/
-LDD_TError ADCReadDataContinuous(void)
+LDD_TError ADCReadDataContinuous(EADCFlag adcFlag)
 {
     LDD_TError err;
     byte cmd = ADC_CMD_RDATAC;
 
-    err = ADCSendCommand(&cmd);
+    /* Select the corresponding ADC. */
+    EnableADCSPI(adcFlag);
+
+    err = ADCSendCommand(adcFlag, &cmd);
+    while(!tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted);
+    tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
     DelaySomeMs(1);
 
     if(err != ERR_OK)
@@ -752,6 +674,9 @@ LDD_TError ADCReadDataContinuous(void)
         PrintErrorMessage(err);
 #endif
     }
+
+    /* De-select ADC. */
+    DisableADCSPI(adcFlag);
 
     return err;
 }
@@ -763,16 +688,24 @@ LDD_TError ADCReadDataContinuous(void)
 /*!
  *     @brief
  *          Send command SDATAC to ADC via SPI1 to stop ADC's RDATAC mode.
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @return
  *                          - See PE_Error.h
  */
 /* ===================================================================*/
-LDD_TError ADCStopReadDataContinuous(void)
+LDD_TError ADCStopReadDataContinuous(EADCFlag adcFlag)
 {
     LDD_TError err;
     byte cmd = ADC_CMD_SDATAC;
 
-    err = ADCSendCommand(&cmd);
+    /* Select the corresponding ADC. */
+    EnableADCSPI(adcFlag);
+
+    err = ADCSendCommand(adcFlag, &cmd);
+    while(!tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted);
+    tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
     DelaySomeMs(1);
 
     if(err != ERR_OK)
@@ -781,6 +714,9 @@ LDD_TError ADCStopReadDataContinuous(void)
         PrintErrorMessage(err);
 #endif
     }
+
+    /* De-select ADC. */
+    DisableADCSPI(adcFlag);
 
     return err;
 }
@@ -793,6 +729,9 @@ LDD_TError ADCStopReadDataContinuous(void)
  *     @brief
  *          Send command to ADC via SPI1. Please use ADCReadRegister and
  *          ADCWriteRegister, but not this function, to read and write ADC's register!
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
  *     @param[in]
  *          cmd             - Pointer to command to be sent.
  *                            See group ADC Commands in Macros.h.
@@ -808,11 +747,10 @@ LDD_TError ADCStopReadDataContinuous(void)
  *                              - etc.         - See PE_Error.h.
  */
 /* ===================================================================*/
-LDD_TError ADCSendCommand(byte* cmd)
+LDD_TError ADCSendCommand(EADCFlag adcFlag, byte* cmd)
 {
     LDD_TError err;
-    uint8 len;
-    byte dummy = {0};
+    //byte dummy = 0;
 
     /* Check the command. */
     err = CheckCommand(*cmd);
@@ -824,17 +762,22 @@ LDD_TError ADCSendCommand(byte* cmd)
         return err;
     }
 
-    len = ((*cmd) < ADC_CMD_RREG(0x00)) ? 1 : 2;
+    /* Select the corresponding ADC. */
+    EnableADCSPI(adcFlag);
 
     /* Try to send the command to ADC. */
-    err = SPI1ReceiveSendData((LDD_DMA_TAddress)cmd, (LDD_DMA_TAddress)(&dummy),
-                              (LDD_DMA_TByteCount)len, (LDD_DMA_TByteCount)len);
+    //err = SPI0ReceiveSendData((LDD_DMA_TAddress)cmd, (LDD_DMA_TAddress)(&dummy), 1U, 1U);
+    SPI0SendData((LDD_DMA_TAddress)cmd,  1U);
+    DelaySomeMs(1);
     if(err != ERR_OK)
     {
 #if DEBUG
         PrintErrorMessage(err);          /* If error occurred, print the error message */
 #endif
     }
+
+    /* De-select ADC. */
+    DisableADCSPI(adcFlag);
 
     return err;
 }
@@ -917,7 +860,7 @@ LDD_TError ADCReadRegister(byte regAddr, byte* dat, uint8 n)
      * Remember that the dat[0] and dat[1] are useless!!!
      * The real data begins at dat[2]!!!
      */
-    err = SPI1ReceiveSendData((LDD_DMA_TAddress)strCmd, (LDD_DMA_TAddress)dat,
+    err = SPI0ReceiveSendData((LDD_DMA_TAddress)strCmd, (LDD_DMA_TAddress)dat,
                               (LDD_DMA_TByteCount)sendByteCount, (LDD_DMA_TByteCount)receiveByteCount);
 
     if(err != ERR_OK)
@@ -1005,7 +948,7 @@ LDD_TError ADCWriteRegister(byte regAddr, byte* dat, uint8 n)
         strCmd[i + 2] = dat[i];
     }
 
-    err = SPI1ReceiveSendData((LDD_DMA_TAddress)strCmd, (LDD_DMA_TAddress)dummy,
+    err = SPI0ReceiveSendData((LDD_DMA_TAddress)strCmd, (LDD_DMA_TAddress)dummy,
                               (LDD_DMA_TByteCount)(n + 2), (LDD_DMA_TByteCount)(n + 2));
 
     if(err != ERR_OK)
@@ -1073,7 +1016,7 @@ LDD_TError ADCReadContinuousData(byte* dat, uint8 n)
     }
 
     /* Try to receive data. */
-    err = SPI1ReceiveSendData((LDD_DMA_TAddress)dummy, (LDD_DMA_TAddress)dat,
+    err = SPI0ReceiveSendData((LDD_DMA_TAddress)dummy, (LDD_DMA_TAddress)dat,
                               (LDD_DMA_TByteCount)n, (LDD_DMA_TByteCount)n);
     if(err != ERR_OK)
     {
@@ -1146,7 +1089,7 @@ LDD_TError ADCReadData(byte* dat, uint8 n)
      * Remember that the dat[0] is useless!!!
      * The real data begins at dat[1]!!!
      */
-    err = SPI1ReceiveSendData((LDD_DMA_TAddress)strCmd, (LDD_DMA_TAddress)dat,
+    err = SPI0ReceiveSendData((LDD_DMA_TAddress)strCmd, (LDD_DMA_TAddress)dat,
                         (LDD_DMA_TByteCount)(n + 1), (LDD_DMA_TByteCount)(n + 1));
 
     if(err != ERR_OK)
@@ -1167,7 +1110,7 @@ LDD_TError ADCReadData(byte* dat, uint8 n)
  *     @brief
  *         	This method initialize the ADC device structure, including
  *         	data, setting and status.
- *     @param
+ *     @param[in]
  *         	userDataPtr     - Pointer to specific user data.
  *     @return
  *          void
@@ -1179,6 +1122,8 @@ void ADCDataInit(TADCPtr userDataPtr)
     extern TADCPtr tADCPtr[USING_ADC_COUNT];
     TADC adc;
 
+    memset(&adc, 0xFF, sizeof(TADC));
+
     for(int i = 0; i < CHANNEL_COUNT; i++)
     {
         adc.adcSetting.isChannelEnabled[i] = TRUE;
@@ -1186,18 +1131,71 @@ void ADCDataInit(TADCPtr userDataPtr)
 
     adc.adcStatus.isDataReady = FALSE;
 
-    adc.adcData.head = (!userDataPtr) ? 0xFFU : userDataPtr->adcData.head;
-    adc.adcData.loffStatP = (!userDataPtr) ? 0xFFU : userDataPtr->adcData.loffStatP;
-    adc.adcData.loffStatN = (!userDataPtr) ? 0xFFU : userDataPtr->adcData.loffStatN;
-    adc.adcData.regGPIOData = (!userDataPtr) ? 0xFFU : userDataPtr->adcData.regGPIOData;
-    memset(adc.adcData.rawData, 0xFFU, sizeof(adc.adcData.rawData));
-    memset(adc.adcData.channelData, 0xFF, sizeof(adc.adcData.channelData));
+    for(int i = 0; i < USING_ADC_COUNT; i++)
+    {
+        tADC[i] = adc;
+        tADCPtr[i] = &tADC[i];
+    }
 
-   for(int i = 0; i < USING_ADC_COUNT; i++)
-   {
-       tADC[i] = adc;
-       tADCPtr[i] = &tADC[i];
-   }
+    return;
+}
+
+/*
+ * ===================================================================
+ *     Method      : EnableADCSPI (Module ADC)
+ */
+/*!
+ *     @brief
+ *          This method pull the CS signal down to enable corresonding ADC's SPI.
+ *          Each time only one ADC's SPI is available.
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
+ *     @return
+ *          void
+ */
+/* ===================================================================*/
+void EnableADCSPI(EADCFlag adcFlag)
+{
+    if(eADC0 == adcFlag)
+    {
+        IOADNotCS1SetVal();
+        IOADNotCS0ClrVal();
+    }
+    else if(eADC1 == adcFlag)
+    {
+        IOADNotCS0SetVal();
+        IOADNotCS1ClrVal();
+    }
+
+    return;
+}
+
+/*
+ * ===================================================================
+ *     Method      : DisableADCSPI (Module ADC)
+ */
+/*!
+ *     @brief
+ *          This method pull the CS signal up to disable corresonding ADC's SPI.
+ *          Each time only one ADC's SPI is disabled.
+ *     @param[in]
+ *          adcFlag         - Shows which ADC is selected.
+ *                            Possible value: eADC0, eADC1.
+ *     @return
+ *          void
+ */
+/* ===================================================================*/
+void DisableADCSPI(EADCFlag adcFlag)
+{
+    if(eADC0 == adcFlag)
+    {
+        IOADNotCS0SetVal();
+    }
+    else if(eADC1 == adcFlag)
+    {
+        IOADNotCS1SetVal();
+    }
 
     return;
 }

@@ -53,7 +53,6 @@
      * @{
      */
 #if USING_MKL15Z128VLH4
-#define USING_ADC_COUNT 2U                                     /*!< The count of ADC used. */
 extern const uint32 MIN_SYSTICK_VALUE;                         /*!< Minimum value of the SysTick value register. */
 extern const uint32 MAX_SYSTICK_VALUE;                         /*!< Maximum value of the SysTick value register. */
 extern const uint32 TICK_TO_US_PROCESSOR_CLOCK;                /*!< 48 ticks equals to 1us, when using processor clock(48MHz). */
@@ -79,6 +78,11 @@ extern const uint8 MCU_NUMBER;                                 /*!< The number o
      * @addtogroup ADCConst ADC Constants
      * @{
      */
+#define USING_ADC_COUNT 2U                                     /*!< The count of ADC used. */
+#define ADC0            0                                      /*!< ADC number. */
+#if USING_ADC_COUNT == 2
+#define ADC1            1                                      /*!< ADC number. */
+#endif
 #if USING_ADS1198
 #define REGISTER_COUNT 26U                                     /*!< Count of registers in ADS1198. */
 #define CHANNEL_COUNT 0x08U                                    /*!< Count of ADC's channel. */
@@ -120,9 +124,11 @@ extern const uint8 SPI0_RX_DMA_CHANNEL;
  * The length of channel package.
  *
    @verbatim
-   ----------------------------------------------------------------------------------------
-   |0x11|channel_num|channel_state|(channel_data_high+channel_data_low)*CHANNEL_DATA_COUNT|
-   ----------------------------------------------------------------------------------------
+   ----------------------------------------------------------------
+   |0x11|channel_num|channel_state|channel_data*CHANNEL_DATA_COUNT|
+   ----------------------------------------------------------------
+   channel_num: 0x00-0xff
+   channel_num = MCU_NUMBER * USING_CHANNEL_COUNT * USING_ADC_COUNT + ADC_NUMBER * USING_CHANNEL_COUNT + i
    @endverbatim
  */
 #define CHANNEL_PACKAGE_LENGTH 203U                            /*!< The length of a channel package. */
@@ -132,15 +138,16 @@ extern const byte CHANNEL_PACKAGE_HEAD_BIT;                    /*!< The head bit
  * The length of data frame.
  *
    @verbatim
-   ---------------------------------------------------------------------------------------------------------------------------------
-   |0xb7|MCU_NUMBER|channel_package_length_high|channel_package_length_low|channel_package*USING_CHANNEL_COUNT*USING_ADC_COUNT|0xed|
-   ---------------------------------------------------------------------------------------------------------------------------------
+   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   |0xb7|MCU_NUMBER|channel_package_length_high|channel_package_length_low|time_stamp_high|time_stamp_low|state_high_|state_low|channel_package*USING_CHANNEL_COUNT*USING_ADC_COUNT|0xed|
+   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   MCU_NUMBER: 0-7
    @endverbatim
  */
 #if USING_ADC_COUNT == 1U
-#define DATA_FRAME_LENGTH 1629                                 /*!< The length of a data frame when using 1 ADC. */
+#define DATA_FRAME_LENGTH 1633                                 /*!< The length of a data frame when using 1 ADC. */
 #elif USING_ADC_COUNT == 2U
-#define DATA_FRAME_LENGTH 3253                                 /*!< The length of a data frame when using 2 ADC. */
+#define DATA_FRAME_LENGTH 3257                                 /*!< The length of a data frame when using 2 ADC. */
 #endif /* #if USING_ADC_COUNT == 1U */
 extern const byte DATA_FRAME_HEAD_BIT;                         /*!< The head bit of data frame. */
 extern const byte DATA_FRAME_TAIL_BIT;                         /*!< The tail bit of data frame. */
@@ -257,6 +264,16 @@ extern const uint8 ADC_REG_WCT2;
  * ===================================================================
  */
     /*!
+     * @addtogroup EnumGrp Enum Group
+     * @{
+     */
+typedef enum ADC_FLAG{eADC0 = 0, eADC1 = 1} EADCFlag;                       /*!< The value of flag to mark ADC. */
+typedef enum ARM_DATA_BUF_FLAG{eIdle = -1, eEmpty = 0, eRead = 1, eWrite = 2, eFull = 1} EARMDataBufferFlag;      /*!< The value of flag to mark which buffer's data transmitting to ARM. */
+    /*!
+     * @}
+     */
+
+    /*!
      * @addtogroup StrcGrp Structure Group
      * @{
      */
@@ -343,8 +360,8 @@ typedef struct TADC* TADCPtr;
  */
 struct TMCUData
 {
-    int16 channelData[USING_CHANNEL_COUNT][CHANNEL_DATA_COUNT];            /*!< The value of every channel's data from ADC. */
-    int16 filteredChannelData[USING_CHANNEL_COUNT][CHANNEL_DATA_COUNT];    /*!< The value of every channel's data that has been filtered. */
+    int16 channelData[USING_ADC_COUNT][USING_CHANNEL_COUNT][CHANNEL_DATA_COUNT];            /*!< The value of every channel's data from ADC. */
+    int16 filteredChannelData[USING_ADC_COUNT][USING_CHANNEL_COUNT][CHANNEL_DATA_COUNT];    /*!< The value of every channel's data that has been filtered. */
 };
 typedef struct TMCUData TMCUData;
 typedef struct TMCUData* TMCUDataPtr;
@@ -364,19 +381,18 @@ typedef struct TMCUSetting* TMCUSettingPtr;
  */
 struct TMCUStatus
 {
-    volatile bool isReceivingADCData;                          /*!< Flag of whether MCU is receiving data from ADC. */
-    volatile bool isMasterReceived;                            /*!< Flag of whether Master SPI finishing reception. */
-    volatile bool isMasterSent;                                /*!< Flag of whether Master SPI finishing transmission. */
-    volatile bool isSlaveReceived;                             /*!< Flag of whether Slave SPI finishing reception. */
-    volatile bool isSlaveSent;                                 /*!< Flag of whether Slave SPI finishing transmission. */
-    volatile bool isUartReceived;                              /*!< Flag of whether UART finishing reception. */
-    volatile bool isUartSent;                                  /*!< Flag of whether UART finishing transmission. */
-    volatile bool isUploadReady;                               /*!< Flag of whether data is ready for uploading to ARM. */
-    volatile bool isSPI0TxDMATransCompleted;                   /*!< Flag of whether SPI0 DMA transmission is completed. */
-    volatile bool isSPI0RxDMATransCompleted;                   /*!< Flag of whether SPI0 DMA reception is completed. */
-    volatile bool isSPI1TxDMATransCompleted;                   /*!< Flag of whether SPI1 DMA transmission is completed. */
-    volatile bool isSPI1RxDMATransCompleted;                   /*!< Flag of whether SPI1 DMA reception is completed. */
-    volatile bool isDelayed;                                   /*!< Flag of whether delayed. */
+    volatile bool isReceivingADCData;                           /*!< Flag of whether MCU is receiving data from ADC. */
+    volatile bool isMasterReceived;                             /*!< Flag of whether Master SPI finishing reception. */
+    volatile bool isMasterSent;                                 /*!< Flag of whether Master SPI finishing transmission. */
+    volatile bool isSlaveReceived;                              /*!< Flag of whether Slave SPI finishing reception. */
+    volatile bool isSlaveSent;                                  /*!< Flag of whether Slave SPI finishing transmission. */
+    volatile bool isUartReceived;                               /*!< Flag of whether UART finishing reception. */
+    volatile bool isUartSent;                                   /*!< Flag of whether UART finishing transmission. */
+    volatile bool isSPI0TxDMATransCompleted;                    /*!< Flag of whether SPI0 DMA transmission is completed. */
+    volatile bool isSPI0RxDMATransCompleted;                    /*!< Flag of whether SPI0 DMA reception is completed. */
+    volatile bool isSPI1TxDMATransCompleted;                    /*!< Flag of whether SPI1 DMA transmission is completed. */
+    volatile bool isSPI1RxDMATransCompleted;                    /*!< Flag of whether SPI1 DMA reception is completed. */
+    volatile bool isDelayed;                                    /*!< Flag of whether delayed, used in delay functions. */
 };
 typedef struct TMCUStatus TMCUStatus;
 typedef struct TMCUStatus* TMCUStatusPtr;
@@ -405,9 +421,10 @@ typedef struct TMCU* TMCUPtr;
  */
 struct TARMData
 {
-    int8 dataHigh[USING_CHANNEL_COUNT];                        /*!< The high byte of filtered channel data being transmitting to ARM. */
-    int8 dataLow[USING_CHANNEL_COUNT];                         /*!< The low byte of filtered channel data being transmitting to ARM. */
-    byte dataFrame[DATA_FRAME_LENGTH];                         /*!< The data frame transmitted to ARM. */
+//    int8 dataHigh[USING_CHANNEL_COUNT];                         /*!< The high byte of filtered channel data being transmitting to ARM. */
+//    int8 dataLow[USING_CHANNEL_COUNT];                          /*!< The low byte of filtered channel data being transmitting to ARM. */
+//    int16 data[USING_CHANNEL_COUNT];                            /*!<The data of filtered channel data being transmitting to ARM. */
+    byte dataFrame[DATA_FRAME_LENGTH];                          /*!< The data frame transmitted to ARM. */
 };
 typedef struct TARMData TARMData;
 typedef struct TARMData* TARMDataPtr;
@@ -427,7 +444,16 @@ typedef struct TARMSetting* TARMSettingPtr;
  */
 struct TARMStatus
 {
-    volatile bool isRequiringData;                             /*!< Flag of whether arm requires data. */
+    volatile bool isRequiringData;                              /*!< Flag of whether arm requires data. */
+    volatile bool isUploadReady;                                /*!< Flag of whether data is ready for uploading to ARM. */
+    volatile bool isForeBufferEmpty;                            /*!< Flag of is the foreground buffer empty. TRUE: Cannot be read, can swap. */
+    volatile bool isForeBufferFull;                             /*!< Flag of is the foreground buffer full. TRUE: Cannot swap, can be read. */
+    volatile bool isBackBufferEmpty;                            /*!< Flag of is the background buffer empty. TRUE: Cannot swap, can be written. */
+    volatile bool isBackBufferFull;                             /*!< Flag of is the background buffer full. TRUE: Cannot be written, can swap*/
+    volatile bool isTransmittingData;                           /*!< Flag of whether the data is being transmitted, difference from commands or others being transmitted. */
+    volatile EARMDataBufferFlag foreBufferStatus;               /*!< Flag of foreground buffer status. */
+    volatile EARMDataBufferFlag backBufferStatus;               /*!< Flag of background buffer status. */
+
 };
 typedef struct TARMStatus TARMStatus;
 typedef struct TARMStatus* TARMStatusPtr;
@@ -439,8 +465,10 @@ struct TARM
 {
     TARMStatus armStatus;
     TARMSetting armSetting;
-    TARMData armDataLeft;
-    TARMData armDataRight;
+    TARMData armDataLeft;                   /*!< Buffer1. */
+    TARMData armDataRight;                  /*!< Buffer2. */
+    byte* foreBuffer;                       /*!< The pointer to the buffer to be transmitted. */
+    byte* backBuffer;                       /*!< The pointer to the buffer to be written. */
 };
 typedef struct TARM TARM;
 typedef struct TARM* TARMPtr;

@@ -32,24 +32,24 @@
 /* Including needed modules to compile this module/procedure */
 #include "Cpu.h"
 #include "Events.h"
-#include "SM_SPI1.h"
-#include "SS_SPI0.h"
-#include "CsIO_UART2.h"
-#include "IO2.h"
+#include "SM_SPI0.h"
+#include "SS_SPI1.h"
 #include "SysTick.h"
-#include "BitIO_NOT_PWDN.h"
-#include "BitIO_NOT_RESET.h"
-#include "BitIO_START.h"
-#include "BitIO_DAISY_IN.h"
-#include "BitIO_CLKSEL.h"
-#include "EINT_NOT_DRDY.h"
+#include "BitIO_AD_NOT_RESET0.h"
+#include "BitIO_AD_START0.h"
+#include "EINT_AD_NOT_DRDY0.h"
 #include "EINT_SYNC_INT.h"
 #include "DMAT_M_SPI_TX.h"
 #include "DMA_CTRL.h"
 #include "DMAT_M_SPI_RX.h"
 #include "DMAT_S_SPI_TX.h"
 #include "DMAT_S_SPI_RX.h"
+#include "BitIO_AD_NOT_CS1.h"
+#include "BitIO_AD_NOT_RESET1.h"
+#include "BitIO_AD_START1.h"
+#include "EINT_AD_NOT_DRDY1.h"
 #include "BitIO_UPRDY.h"
+#include "BitIO_AD_NOT_CS0.h"
 /* Including shared modules, which are used for whole project */
 #include "PE_Types.h"
 #include "PE_Error.h"
@@ -66,16 +66,12 @@
  * Macros
  * ===================================================================
  */
-//const int MSG_SIZE = 2000;
 
 /*
  * ===================================================================
  * Global Variables
  * ===================================================================
  */
-//volatile byte* uploadBufferPtr = NULL;
-//volatile byte msg[MSG_SIZE] = {0};
-//volatile byte msg2[MSG_SIZE] = {0};
 
 /*
  * ===================================================================
@@ -95,12 +91,6 @@ int main(void)
 /*lint -restore Enable MISRA rule (6.3) checking. */
 {
     /* Write your local variable definition here */
-    extern TADCPtr tADCPtr[USING_ADC_COUNT];
-    extern TMCUPtr tMCUPtr;
-    extern TARMPtr tARMPtr;
-
-    //byte dummy[MSG_SIZE];
-    enum {eLEFT, eRIGHT} flag1 = eLEFT;
 
     /*** Processor Expert internal initialization. DON'T REMOVE THIS CODE!!! ***/
     PE_low_level_init();
@@ -123,68 +113,8 @@ int main(void)
     GPIOTest();
 #endif
 
-//    for(i = 0; i < MSG_SIZE; i++)
-//    {
-//        msg[i] = 0xAAU;
-//        msg2[i] = 0xBBU;
-//    }
-//    msg[MSG_SIZE - 1] = 0x01U;
-//    msg2[MSG_SIZE - 1] = 0x20U;
-
-    EIntNotReadyEnable(EINT_NOT_DRDY);
-    EIntSyncInterruptEnable(EINT_SYNC_INT);
-
-    ADCStartConvertByCommand();
-
-    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = TRUE;
-    for(;;)
-    {
-        /* If data of ADC is ready, read it. */
-        if(tADCPtr[0]->adcStatus.isDataReady)
-        {
-            if(!tMCUPtr->mcuStatus.isReceivingADCData && tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted)
-            {
-                ADCReadContinuousData(tADCPtr[0]->adcData.rawData, RAW_DATA_SIZE);
-                tMCUPtr->mcuStatus.isReceivingADCData = TRUE;
-                tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = FALSE;
-            }
-            if(tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted)
-            {
-                tADCPtr[0]->adcStatus.isDataReady = FALSE;
-                tMCUPtr->mcuStatus.isReceivingADCData = FALSE;
-                SplitRawData(&(tADCPtr[0]->adcData));
-//                printf("%#x\n", tADCPtr[0]->adcData.head);
-//                printf("%#x %#x %#x %#x | %#x %#x %#x %#x %#x %#x %#x %#x\n", tADCPtr[0]->adcData.head, tADCPtr[0]->adcData.loffStatP,
-//                                                                                tADCPtr[0]->adcData.loffStatN, tADCPtr[0]->adcData.regGPIOData,
-//                                                                                tADCPtr[0]->adcData.channelData[0], tADCPtr[0]->adcData.channelData[1],
-//                                                                                tADCPtr[0]->adcData.channelData[2], tADCPtr[0]->adcData.channelData[3],
-//                                                                                tADCPtr[0]->adcData.channelData[4], tADCPtr[0]->adcData.channelData[5],
-//                                                                                tADCPtr[0]->adcData.channelData[6], tADCPtr[0]->adcData.channelData[7]);
-                CopyADCDataToMCUData();
-//                DelaySomeMs(200);
-            }
-        }
-
-        /*  If the ARM requires data, transmit. */
-        if(tARMPtr->armStatus.isRequiringData && tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted)
-        {
-            tARMPtr->armStatus.isRequiringData = FALSE;
-            tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
-            IOUploadReadyClrVal();
-            if(eLEFT == flag1)
-            {
-//                SPI0ReceiveSendData((LDD_DMA_TAddress)msg, (LDD_DMA_TAddress)dummy,
-//                                    (LDD_DMA_TByteCount)MSG_SIZE, (LDD_DMA_TByteCount)MSG_SIZE);
-                flag1 = eRIGHT;
-            }
-            else
-            {
-//                SPI0ReceiveSendData((LDD_DMA_TAddress)msg2, (LDD_DMA_TAddress)dummy,
-//                                    (LDD_DMA_TByteCount)MSG_SIZE, (LDD_DMA_TByteCount)MSG_SIZE);
-                flag1 = eLEFT;
-            }
-        }
-    }
+    /* The main loop */
+    MainLoop();
 
     /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
   /*** RTOS startup code. Macro PEX_RTOS_START is defined by the RTOS component. DON'T MODIFY THIS CODE!!! ***/

@@ -116,7 +116,7 @@ extern "C"
 /* ===================================================================*/
 void UserInit(void);
 
-/* END Cpu. */
+/* END Init. */
 
 #ifdef __cplusplus
 } /* extern "C" */

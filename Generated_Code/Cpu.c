@@ -7,7 +7,7 @@
 **     Version     : Component 01.000, Driver 01.04, CPU db: 3.00.000
 **     Datasheet   : KL15P80M48SF0RM, Rev.3, Sep 2012
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2013-12-12, 21:57, # CodeGen: 166
+**     Date/Time   : 2014-03-19, 16:12, # CodeGen: 212
 **     Abstract    :
 **
 **     Settings    :
@@ -35,24 +35,24 @@
 /* MODULE Cpu. */
 
 /* {Default RTOS Adapter} No RTOS includes */
-#include "SM_SPI1.h"
-#include "SS_SPI0.h"
-#include "CsIO_UART2.h"
-#include "IO2.h"
+#include "SM_SPI0.h"
+#include "SS_SPI1.h"
 #include "SysTick.h"
-#include "BitIO_NOT_PWDN.h"
-#include "BitIO_NOT_RESET.h"
-#include "BitIO_START.h"
-#include "BitIO_DAISY_IN.h"
+#include "BitIO_AD_NOT_RESET0.h"
+#include "BitIO_AD_START0.h"
 #include "BitIO_UPRDY.h"
-#include "BitIO_CLKSEL.h"
-#include "EINT_NOT_DRDY.h"
+#include "BitIO_AD_NOT_CS0.h"
+#include "EINT_AD_NOT_DRDY0.h"
 #include "EINT_SYNC_INT.h"
 #include "DMAT_M_SPI_TX.h"
 #include "DMA_CTRL.h"
 #include "DMAT_M_SPI_RX.h"
 #include "DMAT_S_SPI_TX.h"
 #include "DMAT_S_SPI_RX.h"
+#include "BitIO_AD_NOT_CS1.h"
+#include "BitIO_AD_NOT_RESET1.h"
+#include "BitIO_AD_START1.h"
+#include "EINT_AD_NOT_DRDY1.h"
 #include "PE_Types.h"
 #include "PE_Error.h"
 #include "PE_Const.h"
@@ -71,6 +71,23 @@ volatile uint8_t SR_lock = 0x00U;      /* Lock */
 
 /*
 ** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_PORTA (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services the ivINT_PORTA interrupt shared by several 
+**         components.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_PORTA)
+{
+  EINT_AD_NOT_DRDY0_Interrupt();       /* Call the service routine */
+  EINT_SYNC_INT_Interrupt();           /* Call the service routine */
+  EINT_AD_NOT_DRDY1_Interrupt();       /* Call the service routine */
+}
+
+/*
+** ===================================================================
 **     Method      :  Cpu_INT_NMIInterrupt (component MKL15Z128LH4)
 **
 **     Description :
@@ -85,14 +102,584 @@ PE_ISR(Cpu_INT_NMIInterrupt)
 
 /*
 ** ===================================================================
-**     Method      :  Cpu_Cpu_Interrupt (component MKL15Z128LH4)
+**     Method      :  Cpu_Cpu_ivINT_Hard_Fault (component MKL15Z128LH4)
 **
 **     Description :
 **         This ISR services an unused interrupt/exception vector.
 **         This method is internal. It is used by Processor Expert only.
 ** ===================================================================
 */
-PE_ISR(Cpu_Interrupt)
+PE_ISR(Cpu_ivINT_Hard_Fault)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved4 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_Reserved4)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved5 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_Reserved5)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved6 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_Reserved6)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved7 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_Reserved7)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved8 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_Reserved8)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved9 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_Reserved9)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved10 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_Reserved10)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_SVCall (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_SVCall)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved12 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_Reserved12)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved13 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_Reserved13)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_PendableSrvReq (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_PendableSrvReq)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved20 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_Reserved20)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_FTFA (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_FTFA)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_LVD_LVW (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_LVD_LVW)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_LLW (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_LLW)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_I2C0 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_I2C0)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_I2C1 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_I2C1)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_SPI0 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_SPI0)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_SPI1 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_SPI1)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_UART0 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_UART0)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_UART1 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_UART1)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_UART2 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_UART2)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_ADC0 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_ADC0)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_CMP0 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_CMP0)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_TPM0 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_TPM0)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_TPM1 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_TPM1)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_TPM2 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_TPM2)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_RTC (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_RTC)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_RTC_Seconds (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_RTC_Seconds)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_PIT (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_PIT)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved39 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_Reserved39)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_USB0 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_USB0)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_DAC0 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_DAC0)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_TSI0 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_TSI0)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_MCG (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_MCG)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_LPTimer (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_LPTimer)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_Reserved45 (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_Reserved45)
+{
+  /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
+  PE_DEBUGHALT();
+}
+
+/*
+** ===================================================================
+**     Method      :  Cpu_Cpu_ivINT_PORTD (component MKL15Z128LH4)
+**
+**     Description :
+**         This ISR services an unused interrupt/exception vector.
+**         This method is internal. It is used by Processor Expert only.
+** ===================================================================
+*/
+PE_ISR(Cpu_ivINT_PORTD)
 {
   /* This code can be changed using the CPU component property "Build Options / Unhandled int code" */
   PE_DEBUGHALT();
@@ -240,10 +827,8 @@ void PE_low_level_init(void)
   /* Common initialization of the CPU registers */
   /* SCB_SHPR3: PRI_15=0 */
   SCB_SHPR3 &= (uint32_t)~(uint32_t)(SCB_SHPR3_PRI_15(0xFF));                                   
-  /* GPIOD_PDDR: PDD&=~0x10 */
-  GPIOD_PDDR &= (uint32_t)~(uint32_t)(GPIO_PDDR_PDD(0x10));                                   
-  /* GPIOA_PDDR: PDD&=~4 */
-  GPIOA_PDDR &= (uint32_t)~(uint32_t)(GPIO_PDDR_PDD(0x04));                                   
+  /* GPIOA_PDDR: PDD&=~0x26 */
+  GPIOA_PDDR &= (uint32_t)~(uint32_t)(GPIO_PDDR_PDD(0x26));                                   
   /* PORTA_PCR20: ISF=0,MUX=7 */
   PORTA_PCR20 = (uint32_t)((PORTA_PCR20 & (uint32_t)~(uint32_t)(
                  PORT_PCR_ISF_MASK
@@ -252,8 +837,6 @@ void PE_low_level_init(void)
                 ));                                  
   /* NVIC_IPR1: PRI_6=0 */
   NVIC_IPR1 &= (uint32_t)~(uint32_t)(NVIC_IP_PRI_6(0xFF));                                   
-  /* ### Serial_LDD "IO2" component auto initialization. Auto initialization feature can be disabled by component property "Auto initialization". */
-  (void)IO2_Init(NULL);
   /* ### Init_SysTick "SysTick" init code ... */
   /* ### Call "SysTick_Init();" init method in a user code, i.e. in the main code */
 

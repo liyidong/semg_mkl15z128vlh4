@@ -20,11 +20,11 @@
 **         DMAT_M_SPI_TX_OnComplete  - void DMAT_M_SPI_TX_OnComplete(LDD_TUserData *UserDataPtr);
 **         DMAT_M_SPI_TX_OnError     - void DMAT_M_SPI_TX_OnError(LDD_TUserData *UserDataPtr);
 **         EINT_SYNC_INT_OnInterrupt - void EINT_SYNC_INT_OnInterrupt(LDD_TUserData *UserDataPtr);
-**         EINT_NOT_DRDY_OnInterrupt - void EINT_NOT_DRDY_OnInterrupt(LDD_TUserData *UserDataPtr);
-**         SS_SPI0_OnBlockSent       - void SS_SPI0_OnBlockSent(LDD_TUserData *UserDataPtr);
-**         SS_SPI0_OnBlockReceived   - void SS_SPI0_OnBlockReceived(LDD_TUserData *UserDataPtr);
-**         SM_SPI1_OnBlockSent       - void SM_SPI1_OnBlockSent(LDD_TUserData *UserDataPtr);
-**         SM_SPI1_OnBlockReceived   - void SM_SPI1_OnBlockReceived(LDD_TUserData *UserDataPtr);
+**         EINT_AD_NOT_DRDY0_OnInterrupt - void EINT_AD_NOT_DRDY0_OnInterrupt(LDD_TUserData *UserDataPtr);
+**         SS_SPI1_OnBlockSent       - void SS_SPI1_OnBlockSent(LDD_TUserData *UserDataPtr);
+**         SS_SPI1_OnBlockReceived   - void SS_SPI1_OnBlockReceived(LDD_TUserData *UserDataPtr);
+**         SM_SPI0_OnBlockSent       - void SM_SPI0_OnBlockSent(LDD_TUserData *UserDataPtr);
+**         SM_SPI0_OnBlockReceived   - void SM_SPI0_OnBlockReceived(LDD_TUserData *UserDataPtr);
 **         Cpu_OnNMIINT              - void Cpu_OnNMIINT(void);
 **
 ** ###################################################################*/
@@ -48,24 +48,24 @@
 #include "PE_Error.h"
 #include "PE_Const.h"
 #include "IO_Map.h"
-#include "SM_SPI1.h"
-#include "SS_SPI0.h"
-#include "CsIO_UART2.h"
-#include "IO2.h"
+#include "SM_SPI0.h"
+#include "SS_SPI1.h"
 #include "SysTick.h"
-#include "BitIO_NOT_PWDN.h"
-#include "BitIO_NOT_RESET.h"
-#include "BitIO_START.h"
-#include "BitIO_DAISY_IN.h"
+#include "BitIO_AD_NOT_RESET0.h"
+#include "BitIO_AD_START0.h"
 #include "BitIO_UPRDY.h"
-#include "BitIO_CLKSEL.h"
-#include "EINT_NOT_DRDY.h"
+#include "BitIO_AD_NOT_CS0.h"
+#include "EINT_AD_NOT_DRDY0.h"
 #include "EINT_SYNC_INT.h"
 #include "DMAT_M_SPI_TX.h"
 #include "DMA_CTRL.h"
 #include "DMAT_M_SPI_RX.h"
 #include "DMAT_S_SPI_TX.h"
 #include "DMAT_S_SPI_RX.h"
+#include "BitIO_AD_NOT_CS1.h"
+#include "BitIO_AD_NOT_RESET1.h"
+#include "BitIO_AD_START1.h"
+#include "EINT_AD_NOT_DRDY1.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -258,9 +258,9 @@ void EINT_SYNC_INT_OnInterrupt(LDD_TUserData *UserDataPtr);
 
 /*
 ** ===================================================================
-**     Event       :  EINT_NOT_DRDY_OnInterrupt (module Events)
+**     Event       :  EINT_AD_NOT_DRDY0_OnInterrupt (module Events)
 **
-**     Component   :  EINT_NOT_DRDY [ExtInt_LDD]
+**     Component   :  EINT_AD_NOT_DRDY0 [ExtInt_LDD]
 */
 /*!
 **     @brief
@@ -271,13 +271,13 @@ void EINT_SYNC_INT_OnInterrupt(LDD_TUserData *UserDataPtr);
 **                           data structure pointer.
 */
 /* ===================================================================*/
-void EINT_NOT_DRDY_OnInterrupt(LDD_TUserData *UserDataPtr);
+void EINT_AD_NOT_DRDY0_OnInterrupt(LDD_TUserData *UserDataPtr);
 
 /*
 ** ===================================================================
-**     Event       :  SS_SPI0_OnBlockSent (module Events)
+**     Event       :  SS_SPI1_OnBlockSent (module Events)
 **
-**     Component   :  SS_SPI0 [SPISlave_LDD]
+**     Component   :  SS_SPI1 [SPISlave_LDD]
 */
 /*!
 **     @brief
@@ -290,13 +290,13 @@ void EINT_NOT_DRDY_OnInterrupt(LDD_TUserData *UserDataPtr);
 **                           as the parameter of Init method. 
 */
 /* ===================================================================*/
-void SS_SPI0_OnBlockSent(LDD_TUserData *UserDataPtr);
+void SS_SPI1_OnBlockSent(LDD_TUserData *UserDataPtr);
 
 /*
 ** ===================================================================
-**     Event       :  SS_SPI0_OnBlockReceived (module Events)
+**     Event       :  SS_SPI1_OnBlockReceived (module Events)
 **
-**     Component   :  SS_SPI0 [SPISlave_LDD]
+**     Component   :  SS_SPI1 [SPISlave_LDD]
 */
 /*!
 **     @brief
@@ -309,13 +309,13 @@ void SS_SPI0_OnBlockSent(LDD_TUserData *UserDataPtr);
 **                           as the parameter of Init method. 
 */
 /* ===================================================================*/
-void SS_SPI0_OnBlockReceived(LDD_TUserData *UserDataPtr);
+void SS_SPI1_OnBlockReceived(LDD_TUserData *UserDataPtr);
 
 /*
 ** ===================================================================
-**     Event       :  SM_SPI1_OnBlockSent (module Events)
+**     Event       :  SM_SPI0_OnBlockSent (module Events)
 **
-**     Component   :  SM_SPI1 [SPIMaster_LDD]
+**     Component   :  SM_SPI0 [SPIMaster_LDD]
 */
 /*!
 **     @brief
@@ -328,13 +328,13 @@ void SS_SPI0_OnBlockReceived(LDD_TUserData *UserDataPtr);
 **                           as the parameter of Init method. 
 */
 /* ===================================================================*/
-void SM_SPI1_OnBlockSent(LDD_TUserData *UserDataPtr);
+void SM_SPI0_OnBlockSent(LDD_TUserData *UserDataPtr);
 
 /*
 ** ===================================================================
-**     Event       :  SM_SPI1_OnBlockReceived (module Events)
+**     Event       :  SM_SPI0_OnBlockReceived (module Events)
 **
-**     Component   :  SM_SPI1 [SPIMaster_LDD]
+**     Component   :  SM_SPI0 [SPIMaster_LDD]
 */
 /*!
 **     @brief
@@ -347,7 +347,7 @@ void SM_SPI1_OnBlockSent(LDD_TUserData *UserDataPtr);
 **                           as the parameter of Init method. 
 */
 /* ===================================================================*/
-void SM_SPI1_OnBlockReceived(LDD_TUserData *UserDataPtr);
+void SM_SPI0_OnBlockReceived(LDD_TUserData *UserDataPtr);
 
 /*
 ** ===================================================================
@@ -364,6 +364,23 @@ void SM_SPI1_OnBlockReceived(LDD_TUserData *UserDataPtr);
 /* ===================================================================*/
 void Cpu_OnNMIINT(void);
 
+
+/*
+** ===================================================================
+**     Event       :  EINT_AD_NOT_DRDY1_OnInterrupt (module Events)
+**
+**     Component   :  EINT_AD_NOT_DRDY1 [ExtInt_LDD]
+*/
+/*!
+**     @brief
+**         This event is called when an active signal edge/level has
+**         occurred.
+**     @param
+**         UserDataPtr     - Pointer to RTOS device
+**                           data structure pointer.
+*/
+/* ===================================================================*/
+void EINT_AD_NOT_DRDY1_OnInterrupt(LDD_TUserData *UserDataPtr);
 
 /* END Events */
 

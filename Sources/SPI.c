@@ -47,8 +47,8 @@
 #include "DMAT_M_SPI_TX.h"
 #include "DMAT_S_SPI_RX.h"
 #include "DMAT_S_SPI_TX.h"
-#include "SM_SPI1.h"
-#include "SS_SPI0.h"
+#include "SM_SPI0.h"
+#include "SS_SPI1.h"
 #include "Events.h"
 #include "SPI_PDD.h"
 #include "PE_Types.h"
@@ -133,13 +133,13 @@ LDD_TError SPI0ReceiveData(LDD_DMA_TAddress destAddr, LDD_DMA_TByteCount receive
 /* ===================================================================*/
 LDD_TError SPI0SendData(LDD_DMA_TAddress srcAddr, LDD_DMA_TByteCount sendByteCount)
 {
-    byte* dummy = NULL;
+//    byte* dummy = NULL;
 
-    dummy = (byte*)malloc(sendByteCount);
+//    dummy = (byte*)malloc(sendByteCount);
 
 //    SPI0RxDMASetSourceAddress((LDD_DMA_TAddress)(&SPI0_D));
-    SPI0RxDMASetDestinationAddress((LDD_DMA_TAddress)dummy);
-    SPI0RxDMASetByteCount((LDD_DMA_TByteCount)sendByteCount);
+//    SPI0RxDMASetDestinationAddress((LDD_DMA_TAddress)dummy);
+//    SPI0RxDMASetByteCount((LDD_DMA_TByteCount)sendByteCount);
 
     SPI0TxDMASetSourceAddress((LDD_DMA_TAddress)srcAddr);
 //    SPI0TxDMASetDestinationAddress((LDD_DMA_TAddress)(&SPI0_D));
@@ -148,10 +148,10 @@ LDD_TError SPI0SendData(LDD_DMA_TAddress srcAddr, LDD_DMA_TByteCount sendByteCou
 //    SPI0Enable();
 //    SPI0EnableRxDMA();
 //    SPI0EnableTxDMA();
-    SPI0RxDMAEnable();
+//    SPI0RxDMAEnable();
     SPI0TxDMAEnable();
 
-    free(dummy);
+//    free(dummy);
 
     return ERR_OK;
 }
@@ -229,25 +229,25 @@ LDD_TError SPI0ReceiveSendData(LDD_DMA_TAddress srcAddr, LDD_DMA_TAddress destAd
 /* ===================================================================*/
 LDD_TError SPI1ReceiveData(LDD_DMA_TAddress destAddr, LDD_DMA_TByteCount receiveByteCount)
 {
-    byte* dummy = NULL;
+//    byte* dummy = NULL;
 
-    dummy = (byte*)malloc(receiveByteCount);
+//    dummy = (byte*)malloc(receiveByteCount);
 
 //    SPI1RxDMASetSourceAddress((LDD_DMA_TAddress)(&SPI1_D));
     SPI1RxDMASetDestinationAddress((LDD_DMA_TAddress)destAddr);
     SPI1RxDMASetByteCount((LDD_DMA_TByteCount)receiveByteCount);
 
-    SPI1TxDMASetSourceAddress((LDD_DMA_TAddress)dummy);
+//    SPI1TxDMASetSourceAddress((LDD_DMA_TAddress)dummy);
 //    SPI1TxDMASetDestinationAddress((LDD_DMA_TAddress)(&SPI1_D));
-    SPI1TxDMASetByteCount((LDD_DMA_TByteCount)receiveByteCount);
+//    SPI1TxDMASetByteCount((LDD_DMA_TByteCount)receiveByteCount);
 
 //    SPI1Enable();
 //    SPI1EnableRxDMA();
 //    SPI1EnableTxDMA();
     SPI1RxDMAEnable();
-    SPI1TxDMAEnable();
+//    SPI1TxDMAEnable();
 
-    free(dummy);
+//    free(dummy);
 
     return ERR_OK;
 }
@@ -278,13 +278,13 @@ LDD_TError SPI1ReceiveData(LDD_DMA_TAddress destAddr, LDD_DMA_TByteCount receive
 /* ===================================================================*/
 LDD_TError SPI1SendData(LDD_DMA_TAddress srcAddr, LDD_DMA_TByteCount sendByteCount)
 {
-    byte* dummy = NULL;
+//    byte* dummy = NULL;
 
-    dummy = (byte*)malloc(sendByteCount);
+//    dummy = (byte*)malloc(sendByteCount);
 
 //    SPI1RxDMASetSourceAddress((LDD_DMA_TAddress)(&SPI1_D));
-    SPI1RxDMASetDestinationAddress((LDD_DMA_TAddress)dummy);
-    SPI1RxDMASetByteCount((LDD_DMA_TByteCount)sendByteCount);
+//    SPI1RxDMASetDestinationAddress((LDD_DMA_TAddress)dummy);
+//    SPI1RxDMASetByteCount((LDD_DMA_TByteCount)sendByteCount);
 
     SPI1TxDMASetSourceAddress((LDD_DMA_TAddress)srcAddr);
 //    SPI1TxDMASetDestinationAddress((LDD_DMA_TAddress)(&SPI1_D));
@@ -293,10 +293,10 @@ LDD_TError SPI1SendData(LDD_DMA_TAddress srcAddr, LDD_DMA_TByteCount sendByteCou
 //    SPI1Enable();
 //    SPI1EnableRxDMA();
 //    SPI1EnableTxDMA();
-    SPI1RxDMAEnable();
+//    SPI1RxDMAEnable();
     SPI1TxDMAEnable();
 
-    free(dummy);
+//    free(dummy);
 
     return ERR_OK;
 }

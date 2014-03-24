@@ -60,15 +60,20 @@
             /*!
              * @{
              */
-#define EINT_SYNC_INT  portA2DevData
-#define EINT_NOT_DRDY  portD4DevData
-#define IO_START       portB1DevData
-#define IO_UPRDY      portB19DevData
-#define IO_DAISY_IN    portC1DevData
-#define IO_CLKSEL      portC2DevData
-#define IO_TEST_SGINAL portC3DevData
-#define IO_NOT_PWDN    portE18DevData
-#define IO_NOT_RESET   portE19DevData
+#define EINT_AD_NOT_DRDY0 portA1DevData
+#define IO_AD_START0      portB2DevData
+#define IO_AD_NOT_RESET0  portE19DevData
+#define IO_AD_NOT_CS0     portC4DevData
+
+#define EINT_AD_NOT_DRDY1 portA5DevData
+#define IO_AD_START1      portB1DevData
+#define IO_AD_NOT_RESET1  portE21DevData
+#define IO_AD_NOT_CS1     portC8DevData
+
+#define EINT_SYNC_INT     portA2DevData
+#define IO_UPRDY          portE29DevData
+
+#define IO_TEST_SGINAL    portC3DevData
             /*!
              * @}
              */
@@ -83,19 +88,19 @@
              * @{
              */
 #if USING_SPI0
-#define SPI0 slaveSPI0DevData
+#define SPI0 masterSPI0DevData
 #endif
 #if USING_SPI1
-#define SPI1 masterSPI1DevData
+#define SPI1 slaveSPI1DevData
 #endif
 
 #if USING_SPI0_DMA
-#define SPI0_RX_DMA slaveSPIRxDMADevData
-#define SPI0_TX_DMA slaveSPITxDMADevData
+#define SPI0_RX_DMA masterSPIRxDMADevData
+#define SPI0_TX_DMA masterSPITxDMADevData
 #endif
 #if USING_SPI1_DMA
-#define SPI1_RX_DMA masterSPIRxDMADevData
-#define SPI1_TX_DMA masterSPITxDMADevData
+#define SPI1_RX_DMA slaveSPIRxDMADevData
+#define SPI1_TX_DMA slaveSPITxDMADevData
 #endif
             /*!
              * @}
@@ -139,20 +144,93 @@
             /*!
              * @{
              */
-#define EIntSyncInterruptInit(userDataPtr)    EINT_SYNC_INT_Init(userDataPtr)
-#define EIntSyncInterruptEnable(userDataPtr)  EINT_SYNC_INT_Enable(userDataPtr)
-#define EIntSyncInterruptDisable(userDataPtr) EINT_SYNC_INT_Disable(userDataPtr)
+#define IOADStart0Init(userDataPtr) BitIO_AD_START0_Init(userDataPtr)
+#define IOADStart0GetVal()          BitIO_AD_START0_GetVal(IO_AD_START0)
+#define IOADStart0PutVal(value)     BitIO_AD_START0_PutVal(IO_AD_START0, value)
+#define IOADStart0ClrVal()          BitIO_AD_START0_ClrVal(IO_AD_START0)
+#define IOADStart0SetVal()          BitIO_AD_START0_SetVal(IO_AD_START0)
             /*!
              * @}
              */
             /*!
              * @{
              */
-#define IOStartInit(userDataPtr) BitIO_START_Init(userDataPtr)
-#define IOStartGetVal()          BitIO_START_GetVal(IO_START)
-#define IOStartPutVal(value)     BitIO_START_PutVal(IO_START, value)
-#define IOStartClrVal()          BitIO_START_ClrVal(IO_START)
-#define IOStartSetVal()          BitIO_START_SetVal(IO_START)
+#define EIntADNotReady0Init(userDataPtr)    EINT_AD_NOT_DRDY0_Init(userDataPtr)
+#define EIntADNotReady0Enable(userDataPtr)  EINT_AD_NOT_DRDY0_Enable(userDataPtr)
+#define EIntADNotReady0Disable(userDataPtr) EINT_AD_NOT_DRDY0_Disable(userDataPtr)
+            /*!
+             * @}
+             */
+            /*!
+             * @{
+             */
+#define IOADNotReset0Init(userDataPtr) BitIO_AD_NOT_RESET0_Init(userDataPtr)
+#define IOADNotReset0GetVal()          BitIO_AD_NOT_RESET0_GetVal(IO_AD_NOT_RESET0)
+#define IOADNotReset0PutVal(value)     BitIO_AD_NOT_RESET0_PutVal(IO_AD_NOT_RESET0, value)
+#define IOADNotReset0ClrVal()          BitIO_AD_NOT_RESET0_ClrVal(IO_AD_NOT_RESET0)
+#define IOADNotReset0SetVal()          BitIO_AD_NOT_RESET0_SetVal(IO_AD_NOT_RESET0)
+            /*!
+             * @}
+             */
+            /*!
+             * @{
+             */
+#define IOADNotCS0Init(userDataPtr) BitIO_AD_NOT_CS0_Init(userDataPtr)
+#define IOADNotCS0GetVal()          BitIO_AD_NOT_CS0_GetVal(IO_AD_NOT_CS0)
+#define IOADNotCS0PutVal(value)     BitIO_AD_NOT_CS0_PutVal(IO_AD_NOT_CS0, value)
+#define IOADNotCS0ClrVal()          BitIO_AD_NOT_CS0_ClrVal(IO_AD_NOT_CS0)
+#define IOADNotCS0SetVal()          BitIO_AD_NOT_CS0_SetVal(IO_AD_NOT_CS0)
+            /*!
+             * @}
+             */
+            /*!
+             * @{
+             */
+#define IOADStart1Init(userDataPtr) BitIO_AD_START1_Init(userDataPtr)
+#define IOADStart1GetVal()          BitIO_AD_START1_GetVal(IO_AD_START1)
+#define IOADStart1PutVal(value)     BitIO_AD_START1_PutVal(IO_AD_START1, value)
+#define IOADStart1ClrVal()          BitIO_AD_START1_ClrVal(IO_AD_START1)
+#define IOADStart1SetVal()          BitIO_AD_START1_SetVal(IO_AD_START1)
+            /*!
+             * @}
+             */
+            /*!
+             * @{
+             */
+#define EIntADNotReady1Init(userDataPtr)    EINT_AD_NOT_DRDY1_Init(userDataPtr)
+#define EIntADNotReady1Enable(userDataPtr)  EINT_AD_NOT_DRDY1_Enable(userDataPtr)
+#define EIntADNotReady1Disable(userDataPtr) EINT_AD_NOT_DRDY1_Disable(userDataPtr)
+            /*!
+             * @}
+             */
+            /*!
+             * @{
+             */
+#define IOADNotReset1Init(userDataPtr) BitIO_AD_NOT_RESET1_Init(userDataPtr)
+#define IOADNotReset1GetVal()          BitIO_AD_NOT_RESET1_GetVal(IO_AD_NOT_RESET1)
+#define IOADNotReset1PutVal(value)     BitIO_AD_NOT_RESET1_PutVal(IO_AD_NOT_RESET1, value)
+#define IOADNotReset1ClrVal()          BitIO_AD_NOT_RESET1_ClrVal(IO_AD_NOT_RESET1)
+#define IOADNotReset1SetVal()          BitIO_AD_NOT_RESET1_SetVal(IO_AD_NOT_RESET1)
+            /*!
+             * @}
+             */
+            /*!
+             * @{
+             */
+#define IOADNotCS1Init(userDataPtr) BitIO_AD_NOT_CS1_Init(userDataPtr)
+#define IOADNotCS1GetVal()          BitIO_AD_NOT_CS1_GetVal(IO_AD_NOT_CS1)
+#define IOADNotCS1PutVal(value)     BitIO_AD_NOT_CS1_PutVal(IO_AD_NOT_CS1, value)
+#define IOADNotCS1ClrVal()          BitIO_AD_NOT_CS1_ClrVal(IO_AD_NOT_CS1)
+#define IOADNotCS1SetVal()          BitIO_AD_NOT_CS1_SetVal(IO_AD_NOT_CS1)
+            /*!
+             * @}
+             */
+            /*!
+             * @{
+             */
+#define EIntSyncInterruptInit(userDataPtr)    EINT_SYNC_INT_Init(userDataPtr)
+#define EIntSyncInterruptEnable(userDataPtr)  EINT_SYNC_INT_Enable(userDataPtr)
+#define EIntSyncInterruptDisable(userDataPtr) EINT_SYNC_INT_Disable(userDataPtr)
             /*!
              * @}
              */
@@ -164,59 +242,6 @@
 #define IOUploadReadyPutVal(value)     BitIO_UPRDY_PutVal(IO_UPRDY, value)
 #define IOUploadReadyClrVal()          BitIO_UPRDY_ClrVal(IO_UPRDY)
 #define IOUploadReadySetVal()          BitIO_UPRDY_SetVal(IO_UPRDY)
-            /*!
-             * @}
-             */
-            /*!
-             * @{
-             */
-#define IODaisyInInit(userDataPtr) BitIO_DAISY_IN_Init(userDataPtr)
-#define IODaisyInGetVal()          BitIO_DAISY_IN_GetVal(IO_DAISY_IN)
-#define IODaisyInPutVal(value)     BitIO_DAISY_IN_PutVal(IO_DAISY_IN,value)
-#define IODaisyInClrVal()          BitIO_DAISY_IN_ClrVal(IO_DAISY_IN)
-#define IODaisyInSetVal()          BitIO_DAISY_IN_SetVal(IO_DAISY_IN)
-            /*!
-             * @}
-             */
-            /*!
-             * @{
-             */
-#define IOClockSelectInit(userDataPtr) BitIO_CLKSEL_Init(userDataPtr)
-#define IOClockSelectGetVal()          BitIO_CLKSEL_GetVal(IO_CLKSEL)
-#define IOClockSelectPutVal(value)     BitIO_CLKSEL_PutVal(IO_CLKSEL, value)
-#define IOClockSelectClrVal()          BitIO_CLKSEL_ClrVal(IO_CLKSEL)
-#define IOClockSelectSetVal()          BitIO_CLKSEL_SetVal(IO_CLKSEL)
-            /*!
-             * @}
-             */
-            /*!
-             * @{
-             */
-#define EIntNotReadyInit(userDataPtr)    EINT_NOT_DRDY_Init(userDataPtr)
-#define EIntNotReadyEnable(userDataPtr)  EINT_NOT_DRDY_Enable(userDataPtr)
-#define EIntNotReadyDisable(userDataPtr) EINT_NOT_DRDY_Disable(userDataPtr)
-            /*!
-             * @}
-             */
-            /*!
-             * @{
-             */
-#define IONotPowerDownInit(userDataPtr) BitIO_NOT_PWDN_Init(userDataPtr)
-#define IONotPowerDownGetVal()          BitIO_NOT_PWDN_GetVal(IO_NOT_PWDN)
-#define IONotPowerDownPutVal(value)     BitIO_NOT_PWDN_PutVal(IO_NOT_PWDN, value)
-#define IONotPowerDownClrVal()          BitIO_NOT_PWDN_ClrVal(IO_NOT_PWDN)
-#define IONotPowerDownSetVal()          BitIO_NOT_PWDN_SetVal(IO_NOT_PWDN)
-            /*!
-             * @}
-             */
-            /*!
-             * @{
-             */
-#define IONotResetInit(userDataPtr) BitIO_NOT_RESET_Init(userDataPtr)
-#define IONotResetGetVal()          BitIO_NOT_RESET_GetVal(IO_NOT_RESET)
-#define IONotResetPutVal(value)     BitIO_NOT_RESET_PutVal(IO_NOT_RESET, value)
-#define IONotResetClrVal()          BitIO_NOT_RESET_ClrVal(IO_NOT_RESET)
-#define IONotResetSetVal()          BitIO_NOT_RESET_SetVal(IO_NOT_RESET)
             /*!
              * @}
              */
@@ -252,14 +277,14 @@
              * @{
              */
 #if USING_SPI0
-#define SPI0Init(userDataPtr)   SS_SPI0_Init(userDataPtr)
-#define SPI0Enable()            SS_SPI0_Enable(SPI0)
-#define SPI0Disable()           SS_SPI0_Disable(SPI0)
-#define SPI0Receive(data, size) SS_SPI0_ReceiveBlock(SPI0, data, size)
-#define SPI0Send(data, size)    SS_SPI0_SendBlock(SPI0, data, size)
-#define SPI0EnableInterrupt()   SS_SPI0_EnableInterrupt(TRUE, TRUE)
-#define SPI0EnableTxInterrupt() SS_SPI0_EnableInterrupt(TRUE, FALSE)
-#define SPI0EnableRxInterrupt() SS_SPI0_EnableInterrupt(FALSE, TRUE)
+#define SPI0Init(userDataPtr)   SM_SPI0_Init(userDataPtr)
+#define SPI0Enable()            SM_SPI0_Enable(SPI0)
+#define SPI0Disable()           SM_SPI0_Disable(SPI0)
+#define SPI0Receive(data, size) SM_SPI0_ReceiveBlock(SPI0, data, size)
+#define SPI0Send(data, size)    SM_SPI0_SendBlock(SPI0, data, size)
+#define SPI0EnableInterrupt()   SM_SPI0_EnableInterrupt(TRUE, TRUE)
+#define SPI0EnableTxInterrupt() SM_SPI0_EnableInterrupt(TRUE, FALSE)
+#define SPI0EnableRxInterrupt() SM_SPI0_EnableInterrupt(FALSE, TRUE)
 #define SPI0EnableTxDMA()       SPI_PDD_EnableTransmitDma(SPI0_BASE_PTR, PDD_ENABLE)
 #define SPI0DisableTxDMA()      SPI_PDD_EnableTransmitDma(SPI0_BASE_PTR, PDD_DISABLE)
 #define SPI0EnableRxDMA()       SPI_PDD_EnableReceiveDma(SPI0_BASE_PTR, PDD_ENABLE)
@@ -272,13 +297,13 @@
              * @{
              */
 #if USING_SPI1
-#define SPI1Init(userDataPtr)   SM_SPI1_Init(userDataPtr)
-#define SPI1Enable()            SM_SPI1_Enable(SPI1)
-#define SPI1Disable()           SM_SPI1_Disable(SPI1)
-#define SPI1Receive(data, size) SM_SPI1_ReceiveBlock(SPI1, data, size)
-#define SPI1Send(data, size)    SM_SPI1_SendBlock(SPI1, data, size)
-#define SPI1EnableInterrupt()   SM_SPI1_EnableInterrupt(TRUE, TRUE)
-#define SPI1EnableTxInterrupt() SM_SPI1_EnableInterrupt(TRUE, FALSE)
+#define SPI1Init(userDataPtr)   SS_SPI1_Init(userDataPtr)
+#define SPI1Enable()            SS_SPI1_Enable(SPI1)
+#define SPI1Disable()           SS_SPI1_Disable(SPI1)
+#define SPI1Receive(data, size) SS_SPI1_ReceiveBlock(SPI1, data, size)
+#define SPI1Send(data, size)    SS_SPI1_SendBlock(SPI1, data, size)
+#define SPI1EnableInterrupt()   SS_SPI1_EnableInterrupt(TRUE, TRUE)
+#define SPI1EnableTxInterrupt() SS_SPI1_EnableInterrupt(TRUE, FALSE)
 #define SPI1EnableTxDMA()       SPI_PDD_EnableTransmitDma(SPI1_BASE_PTR, PDD_ENABLE)
 #define SPI1DisableTxDMA()      SPI_PDD_EnableTransmitDma(SPI1_BASE_PTR, PDD_DISABLE)
 #define SPI1EnableRxDMA()       SPI_PDD_EnableReceiveDma(SPI1_BASE_PTR, PDD_ENABLE)
@@ -291,21 +316,21 @@
              * @{
              */
 #if USING_SPI0_DMA
-#define SPI0RxDMAInit(userDataPtr)              DMAT_S_SPI_RX_Init(userDataPtr)
-#define SPI0RxDMAAllocateChannel()              DMAT_S_SPI_RX_AllocateChannel(SPI0_RX_DMA)
-#define SPI0RxDMAEnable()                       DMAT_S_SPI_RX_EnableChannel(SPI0_RX_DMA)
-#define SPI0RxDMADisable()                      DMAT_S_SPI_RX_DisableChannel(SPI0_RX_DMA)
-#define SPI0RxDMASetSourceAddress(address)      DMAT_S_SPI_RX_SetSourceAddress(SPI0_RX_DMA, address)
-#define SPI0RxDMASetDestinationAddress(address) DMAT_S_SPI_RX_SetDestinationAddress(SPI0_RX_DMA, address)
-#define SPI0RxDMASetByteCount(address)          DMAT_S_SPI_RX_SetByteCount(SPI0_RX_DMA, address)
+#define SPI0RxDMAInit(userDataPtr)              DMAT_M_SPI_RX_Init(userDataPtr)
+#define SPI0RxDMAAllocateChannel()              DMAT_M_SPI_RX_AllocateChannel(SPI0_RX_DMA)
+#define SPI0RxDMAEnable()                       DMAT_M_SPI_RX_EnableChannel(SPI0_RX_DMA)
+#define SPI0RxDMADisable()                      DMAT_M_SPI_RX_DisableChannel(SPI0_RX_DMA)
+#define SPI0RxDMASetSourceAddress(address)      DMAT_M_SPI_RX_SetSourceAddress(SPI0_RX_DMA, address)
+#define SPI0RxDMASetDestinationAddress(address) DMAT_M_SPI_RX_SetDestinationAddress(SPI0_RX_DMA, address)
+#define SPI0RxDMASetByteCount(address)          DMAT_M_SPI_RX_SetByteCount(SPI0_RX_DMA, address)
 
-#define SPI0TxDMAInit(userDataPtr)              DMAT_S_SPI_TX_Init(userDataPtr)
-#define SPI0TxDMAAllocateChannel()              DMAT_S_SPI_TX_AllocateChannel(SPI0_TX_DMA)
-#define SPI0TxDMAEnable()                       DMAT_S_SPI_TX_EnableChannel(SPI0_TX_DMA)
-#define SPI0TxDMADisable()                      DMAT_S_SPI_TX_DisableChannel(SPI0_TX_DMA)
-#define SPI0TxDMASetSourceAddress(address)      DMAT_S_SPI_TX_SetSourceAddress(SPI0_TX_DMA, address)
-#define SPI0TxDMASetDestinationAddress(address) DMAT_S_SPI_TX_SetDestinationAddress(SPI0_TX_DMA, address)
-#define SPI0TxDMASetByteCount(byteCount)        DMAT_S_SPI_TX_SetByteCount(SPI0_TX_DMA, byteCount)
+#define SPI0TxDMAInit(userDataPtr)              DMAT_M_SPI_TX_Init(userDataPtr)
+#define SPI0TxDMAAllocateChannel()              DMAT_M_SPI_TX_AllocateChannel(SPI0_TX_DMA)
+#define SPI0TxDMAEnable()                       DMAT_M_SPI_TX_EnableChannel(SPI0_TX_DMA)
+#define SPI0TxDMADisable()                      DMAT_M_SPI_TX_DisableChannel(SPI0_TX_DMA)
+#define SPI0TxDMASetSourceAddress(address)      DMAT_M_SPI_TX_SetSourceAddress(SPI0_TX_DMA, address)
+#define SPI0TxDMASetDestinationAddress(address) DMAT_M_SPI_TX_SetDestinationAddress(SPI0_TX_DMA, address)
+#define SPI0TxDMASetByteCount(byteCount)        DMAT_M_SPI_TX_SetByteCount(SPI0_TX_DMA, byteCount)
 #endif
             /*!
              * @}
@@ -314,21 +339,21 @@
              * @{
              */
 #if USING_SPI1_DMA
-#define SPI1RxDMAInit(userDataPtr)              DMAT_M_SPI_RX_Init(userDataPtr)
-#define SPI1RxDMAAllocateChannel()              DMAT_M_SPI_RX_AllocateChannel(SPI1_RX_DMA)
-#define SPI1RxDMAEnable()                       DMAT_M_SPI_RX_EnableChannel(SPI1_RX_DMA)
-#define SPI1RxDMADisable()                      DMAT_M_SPI_RX_DisableChannel(SPI1_RX_DMA)
-#define SPI1RxDMASetSourceAddress(address)      DMAT_M_SPI_RX_SetSourceAddress(SPI1_RX_DMA, address)
-#define SPI1RxDMASetDestinationAddress(address) DMAT_M_SPI_RX_SetDestinationAddress(SPI1_RX_DMA, address)
-#define SPI1RxDMASetByteCount(address)          DMAT_M_SPI_RX_SetByteCount(SPI1_RX_DMA, address)
+#define SPI1RxDMAInit(userDataPtr)              DMAT_S_SPI_RX_Init(userDataPtr)
+#define SPI1RxDMAAllocateChannel()              DMAT_S_SPI_RX_AllocateChannel(SPI1_RX_DMA)
+#define SPI1RxDMAEnable()                       DMAT_S_SPI_RX_EnableChannel(SPI1_RX_DMA)
+#define SPI1RxDMADisable()                      DMAT_S_SPI_RX_DisableChannel(SPI1_RX_DMA)
+#define SPI1RxDMASetSourceAddress(address)      DMAT_S_SPI_RX_SetSourceAddress(SPI1_RX_DMA, address)
+#define SPI1RxDMASetDestinationAddress(address) DMAT_S_SPI_RX_SetDestinationAddress(SPI1_RX_DMA, address)
+#define SPI1RxDMASetByteCount(address)          DMAT_S_SPI_RX_SetByteCount(SPI1_RX_DMA, address)
 
-#define SPI1TxDMAInit(userDataPtr)              DMAT_M_SPI_TX_Init(userDataPtr)
-#define SPI1TxDMAAllocateChannel()              DMAT_M_SPI_TX_AllocateChannel(SPI1_TX_DMA)
-#define SPI1TxDMAEnable()                       DMAT_M_SPI_TX_EnableChannel(SPI1_TX_DMA)
-#define SPI1TxDMADisable()                      DMAT_M_SPI_TX_DisableChannel(SPI1_TX_DMA)
-#define SPI1TxDMASetSourceAddress(address)      DMAT_M_SPI_TX_SetSourceAddress(SPI1_TX_DMA, address)
-#define SPI1TxDMASetDestinationAddress(address) DMAT_M_SPI_TX_SetDestinationAddress(SPI1_TX_DMA, address)
-#define SPI1TxDMASetByteCount(byteCount)        DMAT_M_SPI_TX_SetByteCount(SPI1_TX_DMA, byteCount)
+#define SPI1TxDMAInit(userDataPtr)              DMAT_S_SPI_TX_Init(userDataPtr)
+#define SPI1TxDMAAllocateChannel()              DMAT_S_SPI_TX_AllocateChannel(SPI1_TX_DMA)
+#define SPI1TxDMAEnable()                       DMAT_S_SPI_TX_EnableChannel(SPI1_TX_DMA)
+#define SPI1TxDMADisable()                      DMAT_S_SPI_TX_DisableChannel(SPI1_TX_DMA)
+#define SPI1TxDMASetSourceAddress(address)      DMAT_S_SPI_TX_SetSourceAddress(SPI1_TX_DMA, address)
+#define SPI1TxDMASetDestinationAddress(address) DMAT_S_SPI_TX_SetDestinationAddress(SPI1_TX_DMA, address)
+#define SPI1TxDMASetByteCount(byteCount)        DMAT_S_SPI_TX_SetByteCount(SPI1_TX_DMA, byteCount)
 #endif
             /*!
              * @}

@@ -6,7 +6,7 @@
 **     Component   : DMATransfer_LDD
 **     Version     : Component 01.100, Driver 01.08, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2013-09-21, 19:46, # CodeGen: 148
+**     Date/Time   : 2014-03-17, 13:36, # CodeGen: 187
 **     Abstract    :
 **          This embedded component implements
 **          a DMA transfer channel descriptor definition.
@@ -20,23 +20,23 @@
 **              Allocate channel                           : yes
 **          Trigger                                        : 
 **            Trigger source type                          : Peripheral device
-**              Trigger source                             : SPI1_Receive_DMA_Request
+**              Trigger source                             : SPI0_Receive_DMA_Request
 **              Periodic trigger                           : Disabled
 **          Data source                                    : 
-**            External object declaration                  : volatile byte* SPI1RxDMADataSourceBuffer = NULL;
-**            Address                                      : (&SPI1_D)
+**            External object declaration                  : volatile byte* SPI0RxDMADataSourceBuffer = NULL;
+**            Address                                      : (&SPI0_D)
 **            Transfer size                                : 8-bit
 **            Address offset                               : 0
 **            Circular buffer                              : Buffer disabled
 **          Data destination                               : 
-**            External object declaration                  : volatile byte* SPI1RxDMADataDestinationBuffer = NULL;
-**            Address                                      : SPI1RxDMADataDestinationBuffer
+**            External object declaration                  : volatile byte* SPI0RxDMADataDestinationBuffer = NULL;
+**            Address                                      : SPI0RxDMADataDestinationBuffer
 **            Transfer size                                : 8-bit
 **            Address offset                               : 1
 **            Circular buffer                              : Buffer disabled
 **          Data size                                      : 
-**            External object declaration                  : volatile uint8_t SPI1RxDMAByteCount = 0;
-**            Value                                        : SPI1RxDMAByteCount
+**            External object declaration                  : volatile uint8_t SPI0RxDMAByteCount = 0;
+**            Value                                        : SPI0RxDMAByteCount
 **          Transfer control                               : Cycle-steal
 **            Disable after transfer                       : yes
 **            Asynchronous requests                        : Disabled
@@ -364,7 +364,7 @@ LDD_TError DMAT_M_SPI_RX_SetByteCount(LDD_TDeviceData *DeviceDataPtr, LDD_DMA_TB
 /*
 ** ###################################################################
 **
-**     This file was created by Processor Expert 10.2 [05.07]
+**     This file was created by Processor Expert 10.3 [05.08]
 **     for the Freescale Kinetis series of microcontrollers.
 **
 ** ###################################################################

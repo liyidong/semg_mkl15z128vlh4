@@ -14,8 +14,7 @@
  **     Settings    :
  **
  **     Contents    :
- **         Process         - void Process(void);
- **         SplitRawData    - LDD_TError SplitRawData(TADCDataPtr adcDataPtr);
+ **                 MainLoop - void MainLoop(void)
  **
  **     Mail        : pzdongdong@163.com
  **
@@ -40,6 +39,67 @@
 #include "PE_Types.h"
 
 #include "MyHeaders.h"
+#include "string.h"
+
+static void Process(EADCFlag);
+static void ReadADCData(EADCFlag adcFlag);
+static void TransmitMCUData(void);
+static LDD_TError SplitRawData(TADCDataPtr adcDataPtr);
+static void CopyADCDataToMCUData(EADCFlag adcFlag);
+static void PackData(EADCFlag adcFlag);
+static void SwapARMDataBuffer(void);
+
+/*
+ * ===================================================================
+ * Global Variables
+ * ===================================================================
+ */
+
+/*
+ * ===================================================================
+ *     Method      :  MainLoop ()
+ */
+/*!
+ *     @brief
+            This methods starts main loop, ADC's conversion and so on.
+ *     @param
+ *          void
+ *     @return
+ *          void
+ */
+/* ===================================================================*/
+void MainLoop(void)
+{
+    extern TMCUPtr tMCUPtr;
+
+    /* Enable PortA's interrupt. */
+    EIntADNotReady0Enable(EINT_AD_NOT_DRDY0);
+    EIntADNotReady1Enable(EINT_AD_NOT_DRDY1);
+    EIntSyncInterruptEnable(EINT_SYNC_INT);
+    NVIC_ISER |= NVIC_ISER_SETENA(0x40000000);      /* Enable PortA's hardware interrupt */
+
+    ADCStartConvertByCommand(ADC0);
+    ADCStartConvertByCommand(ADC1);
+
+    tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = TRUE;
+    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = TRUE;
+
+    for(;;)
+    {
+        SwapARMDataBuffer();
+
+        /* If data of ADC is ready, read it. */
+        ReadADCData(ADC0);
+        ReadADCData(ADC1);
+
+        /* Processing the Data. */
+        Process(ADC0);
+        Process(ADC1);
+
+        /*  If the ARM requires data, transmit. */
+        TransmitMCUData();
+    }
+}
 
 /*
  * ===================================================================
@@ -48,11 +108,88 @@
 /*!
  *     @brief
  *         	The primary routine of processing the data.
+ *     @param[in]
+ *          adcFlag         - Show which ADC's data is processed.
+ *     @return
+ *          void
  */
 /* ===================================================================*/
-void Process(void)
+static void Process(EADCFlag adcFlag)
 {
 
+}
+
+/*
+ * ===================================================================
+ *     Method      : ReadADCData(Module Process)
+ */
+/*!
+ *     @brief
+ *          This method reads ADC's data when ADC's is ready to be read.
+ *     @param[in]
+ *          adcFlag         - Show which ADC to be read.
+ *     @return
+ *          void
+ */
+/* ===================================================================*/
+static void ReadADCData(EADCFlag adcFlag)
+{
+    extern TADCPtr tADCPtr[USING_ADC_COUNT];
+    extern TMCUPtr tMCUPtr;
+
+    if(tADCPtr[adcFlag]->adcStatus.isDataReady)
+    {
+        if(!tMCUPtr->mcuStatus.isReceivingADCData && tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted)
+        {
+            EnableADCSPI(adcFlag);
+            ADCReadContinuousData(tADCPtr[adcFlag]->adcData.rawData, RAW_DATA_SIZE);
+            tMCUPtr->mcuStatus.isReceivingADCData = TRUE;
+            tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = FALSE;
+        }
+        if(tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted)
+        {
+            DisableADCSPI(adcFlag);
+            tADCPtr[adcFlag]->adcStatus.isDataReady = FALSE;
+            tMCUPtr->mcuStatus.isReceivingADCData = FALSE;
+            SplitRawData(&(tADCPtr[adcFlag]->adcData));
+            CopyADCDataToMCUData(adcFlag);
+            PackData(adcFlag);
+        }
+    }
+}
+
+/*
+ * ===================================================================
+ *     Method      : TransmitADCData(Module Process)
+ */
+/*!
+ *     @brief
+ *          This method transmit MCU's data to ARM when is required.
+ *     @param
+ *          void
+ *     @return
+ *          void
+ */
+/* ===================================================================*/
+static void TransmitMCUData(void)
+{
+    extern TMCUPtr tMCUPtr;
+    extern TARMPtr tARMPtr;
+
+    if(tARMPtr->armStatus.isRequiringData &&
+            tARMPtr->armStatus.isUploadReady &&
+                tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted)
+    {
+        tARMPtr->armStatus.isRequiringData = FALSE;
+        tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
+        IOUploadReadyClrVal();
+        SPI1SendData((LDD_DMA_TAddress)tARMPtr->foreBuffer, DATA_FRAME_LENGTH);
+        tARMPtr->armStatus.isTransmittingData = TRUE;
+//        tARMPtr->armStatus.isForeBufferEmpty = FALSE;
+//        tARMPtr->armStatus.isForeBufferFull = FALSE;
+        tARMPtr->armStatus.foreBufferStatus = eRead;
+        tARMPtr->armStatus.isUploadReady = FALSE;
+    }
 }
 
 /*
@@ -71,7 +208,7 @@ void Process(void)
  *         	                - ERR_OK: Succeeded to split.
  */
 /* ===================================================================*/
-LDD_TError SplitRawData(TADCDataPtr adcDataPtr)
+static LDD_TError SplitRawData(TADCDataPtr adcDataPtr)
 {
     LDD_TError err;
     byte head;
@@ -123,42 +260,193 @@ LDD_TError SplitRawData(TADCDataPtr adcDataPtr)
  *          This method copies ADC data from ADC structure to MCU structure.
  *          The format of data in MCU structure
        @verbatim
-       --------------------------------
-       | (Chn) | 1ms 2ms 3ms ... 99ms |
-       --------------------------------
-       | (Ch1) | [0] [1] [2] ... [99] |
-       | (Ch2) | [0] [1] [2] ... [99] |
-       | (Ch3) | [0] [1] [2] ... [99] |
-       | (Ch4) | [0] [1] [2] ... [99] |
-       | (Ch5) | [0] [1] [2] ... [99] |
-       | (Ch6) | [0] [1] [2] ... [99] |
-       | (Ch7) | [0] [1] [2] ... [99] |
-       | (Ch8) | [0] [1] [2] ... [99] |
-       --------------------------------
+       --------------------------------------
+       | ADC | (Chn) | 1ms 2ms 3ms ... 99ms |
+       --------------------------------------
+       |  0  | (Ch1) | [0] [1] [2] ... [99] |
+       |  0  | (Ch2) | [0] [1] [2] ... [99] |
+       |  0  | (Ch3) | [0] [1] [2] ... [99] |
+       |  0  | (Ch4) | [0] [1] [2] ... [99] |
+       |  0  | (Ch5) | [0] [1] [2] ... [99] |
+       |  0  | (Ch6) | [0] [1] [2] ... [99] |
+       |  0  | (Ch7) | [0] [1] [2] ... [99] |
+       |  0  | (Ch8) | [0] [1] [2] ... [99] |
+       ======================================
+       |  1  | (Ch1) | [0] [1] [2] ... [99] |
+       |  1  | (Ch2) | [0] [1] [2] ... [99] |
+       |  1  | (Ch3) | [0] [1] [2] ... [99] |
+       |  1  | (Ch4) | [0] [1] [2] ... [99] |
+       |  1  | (Ch5) | [0] [1] [2] ... [99] |
+       |  1  | (Ch6) | [0] [1] [2] ... [99] |
+       |  1  | (Ch7) | [0] [1] [2] ... [99] |
+       |  1  | (Ch8) | [0] [1] [2] ... [99] |
+       --------------------------------------
        @endverbatim
+ *     @param
+ *          adcFlag     - Shows which ADC is selected.
+ *     @return
+ *          void
+ */
+/* ===================================================================*/
+static void CopyADCDataToMCUData(EADCFlag adcFlag)
+{
+    extern TMCUPtr tMCUPtr;
+    static uint8 chDataCnt[USING_ADC_COUNT] = {0};
+
+    tMCUPtr->mcuData.channelData[adcFlag][0][chDataCnt[adcFlag]] = tADCPtr[0]->adcData.channelData[0];
+    tMCUPtr->mcuData.channelData[adcFlag][1][chDataCnt[adcFlag]] = tADCPtr[0]->adcData.channelData[1];
+    tMCUPtr->mcuData.channelData[adcFlag][2][chDataCnt[adcFlag]] = tADCPtr[0]->adcData.channelData[2];
+    tMCUPtr->mcuData.channelData[adcFlag][3][chDataCnt[adcFlag]] = tADCPtr[0]->adcData.channelData[3];
+    tMCUPtr->mcuData.channelData[adcFlag][4][chDataCnt[adcFlag]] = tADCPtr[0]->adcData.channelData[4];
+    tMCUPtr->mcuData.channelData[adcFlag][5][chDataCnt[adcFlag]] = tADCPtr[0]->adcData.channelData[5];
+    tMCUPtr->mcuData.channelData[adcFlag][6][chDataCnt[adcFlag]] = tADCPtr[0]->adcData.channelData[6];
+    tMCUPtr->mcuData.channelData[adcFlag][7][chDataCnt[adcFlag]] = tADCPtr[0]->adcData.channelData[7];
+
+    chDataCnt[adcFlag]++;
+    chDataCnt[adcFlag] %= CHANNEL_DATA_COUNT;
+}
+
+/*
+ * ===================================================================
+ *     Method      : PackData (Module Process)
+ */
+/*!
+ *     @brief
+ *         	This method is called to pack filtered data adapting to the
+ *         	format according to the protocol between MCU and ARM.
+ *     @param
+ *         	adcFlag         - Show which ADC's is being processed.
+ *     @return
+ *         	void
+ */
+/* ===================================================================*/
+static void PackData(EADCFlag adcFlag)
+{
+    extern TMCUPtr tMCUPtr;
+    extern TARMPtr tARMPtr;
+    static int chDataCnt[USING_ADC_COUNT] = {0};
+    int off;
+
+    for(int channelNum = 0;  channelNum < USING_CHANNEL_COUNT; channelNum++)
+    {
+        off = adcFlag * USING_CHANNEL_COUNT * CHANNEL_PACKAGE_LENGTH
+                      + 8 + 3
+                          + channelNum * CHANNEL_DATA_COUNT
+                              + chDataCnt[adcFlag];
+
+        tARMPtr->backBuffer[off] = tMCUPtr->mcuData.channelData[adcFlag][channelNum][chDataCnt[adcFlag]];
+    }
+
+    chDataCnt[adcFlag]++;
+    chDataCnt[adcFlag] %= CHANNEL_DATA_COUNT;
+    if(!chDataCnt[0] && !chDataCnt[1])
+    {
+//        tARMPtr->armStatus.isBackBufferEmpty = FALSE;
+//        tARMPtr->armStatus.isBackBufferFull = TRUE;
+        tARMPtr->armStatus.backBufferStatus = eFull;
+    }
+    else
+    {
+//        tARMPtr->armStatus.isBackBufferEmpty = FALSE;
+//        tARMPtr->armStatus.isBackBufferFull = FALSE;
+        tARMPtr->armStatus.backBufferStatus = eWrite;
+    }
+}
+//static void PackData(void)
+//{
+//    extern TMCUPtr tMCUPtr;
+//    extern TARMPtr tARMPtr;
+//    byte channelPackage[CHANNEL_PACKAGE_LENGTH] = {0};
+//
+//    channelPackage[0] = CHANNEL_PACKAGE_HEAD_BIT;
+//    channelPackage[2] = 0x00U;      /* Channel package state bit */
+//
+//    for(int adcNum = 0; adcNum < USING_ADC_COUNT; adcNum++)
+//    {
+//        for(int channelNum = 0; channelNum < USING_CHANNEL_COUNT; channelNum++)
+//        {
+//            channelPackage[1] = MCU_NUMBER * USING_CHANNEL_COUNT * USING_ADC_COUNT
+//                                    + adcNum * USING_CHANNEL_COUNT
+//                                        + channelNum;      /* Channel number */
+//
+//            for(int dataNum = 3; dataNum < CHANNEL_PACKAGE_LENGTH; dataNum += 2)
+//            {
+//                channelPackage[dataNum] = tMCUPtr->mcuData.channelData[adcNum][channelNum][dataNum] >> 8 & 0xFFU;
+//                channelPackage[dataNum + 1] = tMCUPtr->mcuData.channelData[adcNum][channelNum][dataNum] & 0xFFU;
+//            }
+//
+//            int startPos = (int)tARMPtr->armDataLeft.dataFrame + 7
+//                               + adcNum * USING_CHANNEL_COUNT * CHANNEL_PACKAGE_LENGTH
+//                                   + CHANNEL_PACKAGE_LENGTH;
+//            if(eLEFT == tARMPtr->armStatus.eARMDataBufFlag)
+//            {
+//                memcpy(startPos, channelPackage, CHANNEL_PACKAGE_LENGTH);
+//            }
+//            else if(eRIGHT == tARMPtr->armStatus.eARMDataBufFlag)
+//            {
+//                memcpy(startPos, channelPackage, CHANNEL_PACKAGE_LENGTH);
+//            }
+//        }
+//    }
+//
+//    tMCUPtr->mcuStatus.isUploadReady = TRUE;
+//}
+
+/*
+ * ===================================================================
+ *     Method      : SwapARMDataBuffer (Module Process)
+ */
+/*!
+ *     @brief
+ *          This method is called to swap the arm's data. Decide either the
+ *          armLeftData or armRightData is the foreground buffer or background
+ *          buffer.
  *     @param
  *          void
  *     @return
  *          void
  */
 /* ===================================================================*/
-void CopyADCDataToMCUData()
+static void SwapARMDataBuffer(void)
 {
-    static uint8 ch_dat_cnt = 0;
+    extern TARMPtr tARMPtr;
 
-    tMCUPtr->mcuData.channelData[0][ch_dat_cnt] = tADCPtr[0]->adcData.channelData[0];
-    tMCUPtr->mcuData.channelData[1][ch_dat_cnt] = tADCPtr[0]->adcData.channelData[1];
-    tMCUPtr->mcuData.channelData[2][ch_dat_cnt] = tADCPtr[0]->adcData.channelData[2];
-    tMCUPtr->mcuData.channelData[3][ch_dat_cnt] = tADCPtr[0]->adcData.channelData[3];
-    tMCUPtr->mcuData.channelData[4][ch_dat_cnt] = tADCPtr[0]->adcData.channelData[4];
-    tMCUPtr->mcuData.channelData[5][ch_dat_cnt] = tADCPtr[0]->adcData.channelData[5];
-    tMCUPtr->mcuData.channelData[6][ch_dat_cnt] = tADCPtr[0]->adcData.channelData[6];
-    tMCUPtr->mcuData.channelData[7][ch_dat_cnt] = tADCPtr[0]->adcData.channelData[7];
+    if(!tARMPtr->foreBuffer && !tARMPtr->backBuffer)
+    {
+        tARMPtr->backBuffer = tARMPtr->armDataLeft.dataFrame;
+//        tARMPtr->armStatus.isForeBufferEmpty = FALSE;
+//        tARMPtr->armStatus.isForeBufferFull = FALSE;
+//        tARMPtr->armStatus.isBackBufferEmpty = TRUE;
+//        tARMPtr->armStatus.isForeBufferFull = FALSE;
+        tARMPtr->armStatus.foreBufferStatus = eIdle;
+        tARMPtr->armStatus.backBufferStatus = eEmpty;
+        tARMPtr->armStatus.isUploadReady = FALSE;
+    }
+    //else if(tARMPtr->armStatus.isForeBufferEmpty && tARMPtr->armStatus.isBackBufferFull)
+    else if(eEmpty == tARMPtr->armStatus.foreBufferStatus && eFull == tARMPtr->armStatus.backBufferStatus)
+    {
+        if(!tARMPtr->foreBuffer)
+        {
+            tARMPtr->foreBuffer = tARMPtr->armDataLeft.dataFrame;
+            tARMPtr->backBuffer = tARMPtr->armDataRight.dataFrame;
+        }
+        else
+        {
+            byte* temp;
 
-    ch_dat_cnt++;
-    ch_dat_cnt %= CHANNEL_DATA_COUNT;
+            temp = tARMPtr->foreBuffer;
+            tARMPtr->foreBuffer = tARMPtr->backBuffer;
+            tARMPtr->backBuffer = temp;
+        }
+//        tARMPtr->armStatus.isForeBufferEmpty = FALSE;
+//        tARMPtr->armStatus.isForeBufferFull = TRUE;
+//        tARMPtr->armStatus.isBackBufferEmpty = TRUE;
+//        tARMPtr->armStatus.isForeBufferFull = FALSE;
+        tARMPtr->armStatus.foreBufferStatus = eFull;
+        tARMPtr->armStatus.backBufferStatus = eEmpty;
+        tARMPtr->armStatus.isUploadReady = TRUE;
+    }
 }
-
 /* End Process */
 
 /*!

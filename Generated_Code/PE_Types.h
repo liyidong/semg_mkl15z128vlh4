@@ -6,7 +6,7 @@
 **     Component   : PE_Types
 **     Version     : Driver 01.01
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2013-12-12, 21:57, # CodeGen: 166
+**     Date/Time   : 2014-03-17, 16:28, # CodeGen: 197
 **     Abstract    :
 **         PE_Types.h - contains definitions of basic types,
 **         register access macros and hardware specific macros
@@ -174,22 +174,23 @@ typedef unsigned long int       uint32;
 ** is used internally as an index to the array of LDD device structures.
 ** ===========================================================================
 */
-#define PE_LDD_COMPONENT_SM_SPI1_ID              0x00U
-#define PE_LDD_COMPONENT_SS_SPI0_ID              0x01U
-#define PE_LDD_COMPONENT_IO2_ID                  0x02U
-#define PE_LDD_COMPONENT_BitIO_NOT_PWDN_ID       0x03U
-#define PE_LDD_COMPONENT_BitIO_NOT_RESET_ID      0x04U
-#define PE_LDD_COMPONENT_BitIO_START_ID          0x05U
-#define PE_LDD_COMPONENT_BitIO_DAISY_IN_ID       0x06U
-#define PE_LDD_COMPONENT_BitIO_UPRDY_ID          0x07U
-#define PE_LDD_COMPONENT_BitIO_CLKSEL_ID         0x08U
-#define PE_LDD_COMPONENT_EINT_NOT_DRDY_ID        0x09U
-#define PE_LDD_COMPONENT_EINT_SYNC_INT_ID        0x0AU
-#define PE_LDD_COMPONENT_DMA_CTRL_ID             0x0BU
-#define PE_LDD_COMPONENT_DMAT_M_SPI_TX_ID        0x0CU
-#define PE_LDD_COMPONENT_DMAT_M_SPI_RX_ID        0x0DU
-#define PE_LDD_COMPONENT_DMAT_S_SPI_TX_ID        0x0EU
-#define PE_LDD_COMPONENT_DMAT_S_SPI_RX_ID        0x0FU
+#define PE_LDD_COMPONENT_SM_SPI0_ID              0x00U
+#define PE_LDD_COMPONENT_SS_SPI1_ID              0x01U
+#define PE_LDD_COMPONENT_BitIO_AD_NOT_RESET0_ID  0x02U
+#define PE_LDD_COMPONENT_BitIO_AD_START0_ID      0x03U
+#define PE_LDD_COMPONENT_BitIO_UPRDY_ID          0x04U
+#define PE_LDD_COMPONENT_BitIO_AD_NOT_CS0_ID     0x05U
+#define PE_LDD_COMPONENT_EINT_AD_NOT_DRDY0_ID    0x06U
+#define PE_LDD_COMPONENT_EINT_SYNC_INT_ID        0x07U
+#define PE_LDD_COMPONENT_DMA_CTRL_ID             0x08U
+#define PE_LDD_COMPONENT_DMAT_M_SPI_TX_ID        0x09U
+#define PE_LDD_COMPONENT_DMAT_M_SPI_RX_ID        0x0AU
+#define PE_LDD_COMPONENT_DMAT_S_SPI_TX_ID        0x0BU
+#define PE_LDD_COMPONENT_DMAT_S_SPI_RX_ID        0x0CU
+#define PE_LDD_COMPONENT_BitIO_AD_NOT_CS1_ID     0x0DU
+#define PE_LDD_COMPONENT_BitIO_AD_NOT_RESET1_ID  0x0EU
+#define PE_LDD_COMPONENT_BitIO_AD_START1_ID      0x0FU
+#define PE_LDD_COMPONENT_EINT_AD_NOT_DRDY1_ID    0x10U
 
 /*
 ** ===================================================================

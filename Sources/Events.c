@@ -67,9 +67,9 @@ void Cpu_OnNMIINT(void)
 
 /*
  ** ===================================================================
- **     Event       :  SS_SPI0_OnBlockSent (module Events)
+ **     Event       :  SS_SPI1_OnBlockSent (module Events)
  **
- **     Component   :  SS_SPI0 [SPISlave_LDD]
+ **     Component   :  SS_SPI1 [SPISlave_LDD]
  */
 /*!
  **     @brief
@@ -82,7 +82,7 @@ void Cpu_OnNMIINT(void)
  **                           as the parameter of Init method.
  */
 /* ===================================================================*/
-void SS_SPI0_OnBlockSent(LDD_TUserData *UserDataPtr)
+void SS_SPI1_OnBlockSent(LDD_TUserData *UserDataPtr)
 {
     /* Write your code here ... */
     extern TMCUPtr tMCUPtr;
@@ -92,9 +92,9 @@ void SS_SPI0_OnBlockSent(LDD_TUserData *UserDataPtr)
 
 /*
  ** ===================================================================
- **     Event       :  SS_SPI0_OnBlockReceived (module Events)
+ **     Event       :  SS_SPI1_OnBlockReceived (module Events)
  **
- **     Component   :  SS_SPI0 [SPISlave_LDD]
+ **     Component   :  SS_SPI1 [SPISlave_LDD]
  */
 /*!
  **     @brief
@@ -107,7 +107,7 @@ void SS_SPI0_OnBlockSent(LDD_TUserData *UserDataPtr)
  **                           as the parameter of Init method.
  */
 /* ===================================================================*/
-void SS_SPI0_OnBlockReceived(LDD_TUserData *UserDataPtr)
+void SS_SPI1_OnBlockReceived(LDD_TUserData *UserDataPtr)
 {
     /* Write your code here ... */
     extern TMCUPtr tMCUPtr;
@@ -117,9 +117,9 @@ void SS_SPI0_OnBlockReceived(LDD_TUserData *UserDataPtr)
 
 /*
  ** ===================================================================
- **     Event       :  SM_SPI1_OnBlockSent (module Events)
+ **     Event       :  SM_SPI0_OnBlockSent (module Events)
  **
- **     Component   :  SM_SPI1 [SPIMaster_LDD]
+ **     Component   :  SM_SPI0 [SPIMaster_LDD]
  */
 /*!
  **     @brief
@@ -132,7 +132,7 @@ void SS_SPI0_OnBlockReceived(LDD_TUserData *UserDataPtr)
  **                           as the parameter of Init method.
  */
 /* ===================================================================*/
-void SM_SPI1_OnBlockSent(LDD_TUserData *UserDataPtr)
+void SM_SPI0_OnBlockSent(LDD_TUserData *UserDataPtr)
 {
     /* Write your code here ... */
     extern TMCUPtr tMCUPtr;
@@ -142,9 +142,9 @@ void SM_SPI1_OnBlockSent(LDD_TUserData *UserDataPtr)
 
 /*
  ** ===================================================================
- **     Event       :  SM_SPI1_OnBlockReceived (module Events)
+ **     Event       :  SM_SPI0_OnBlockReceived (module Events)
  **
- **     Component   :  SM_SPI1 [SPIMaster_LDD]
+ **     Component   :  SM_SPI0 [SPIMaster_LDD]
  */
 /*!
  **     @brief
@@ -157,7 +157,7 @@ void SM_SPI1_OnBlockSent(LDD_TUserData *UserDataPtr)
  **                           as the parameter of Init method.
  */
 /* ===================================================================*/
-void SM_SPI1_OnBlockReceived(LDD_TUserData *UserDataPtr)
+void SM_SPI0_OnBlockReceived(LDD_TUserData *UserDataPtr)
 {
     /* Write your code here ... */
     extern TMCUPtr tMCUPtr;
@@ -167,51 +167,9 @@ void SM_SPI1_OnBlockReceived(LDD_TUserData *UserDataPtr)
 
 /*
  ** ===================================================================
- **     Event       :  AS_UART2_OnBlockReceived (module Events)
+ **     Event       :  EINT_AD_NOT_DRDY0_OnInterrupt (module Events)
  **
- **     Component   :  AS_UART2 [Serial_LDD]
- */
-/*!
- **     @brief
- **         This event is called when the requested number of data is
- **         moved to the input buffer.
- **     @param
- **         UserDataPtr     - Pointer to the user or
- **                           RTOS specific data. This pointer is passed
- **                           as the parameter of Init method.
- */
-/* ===================================================================*/
-void AS_UART2_OnBlockReceived(LDD_TUserData *UserDataPtr)
-{
-    /* Write your code here ... */
-}
-
-/*
- ** ===================================================================
- **     Event       :  AS_UART2_OnBlockSent (module Events)
- **
- **     Component   :  AS_UART2 [Serial_LDD]
- */
-/*!
- **     @brief
- **         This event is called after the last character from the
- **         output buffer is moved to the transmitter.
- **     @param
- **         UserDataPtr     - Pointer to the user or
- **                           RTOS specific data. This pointer is passed
- **                           as the parameter of Init method.
- */
-/* ===================================================================*/
-void AS_UART2_OnBlockSent(LDD_TUserData *UserDataPtr)
-{
-    /* Write your code here ... */
-}
-
-/*
- ** ===================================================================
- **     Event       :  EINT_NOT_DRDY_OnInterrupt (module Events)
- **
- **     Component   :  EINT_NOT_DRDY [ExtInt_LDD]
+ **     Component   :  EINT_AD_NOT_DRDY0 [ExtInt_LDD]
  */
 /*!
  **     @brief
@@ -222,7 +180,7 @@ void AS_UART2_OnBlockSent(LDD_TUserData *UserDataPtr)
  **                           data structure pointer.
  */
 /* ===================================================================*/
-void EINT_NOT_DRDY_OnInterrupt(LDD_TUserData *UserDataPtr)
+void EINT_AD_NOT_DRDY0_OnInterrupt(LDD_TUserData *UserDataPtr)
 {
     /* Write your code here ... */
     extern TADCPtr tADCPtr[USING_ADC_COUNT];
@@ -324,9 +282,9 @@ void DMAT_M_SPI_RX_OnComplete(LDD_TUserData *UserDataPtr)
   /* Write your code here ... */
     extern TMCUPtr tMCUPtr;
 
-    SPI1RxDMADisable();
-//    SPI1DisableRxDMA();
-    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = TRUE;
+//    SPI0RxDMADisable();
+//    SPI0DisableRxDMA();
+    tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = TRUE;
 }
 
 /*
@@ -376,12 +334,20 @@ void DMAT_M_SPI_TX_OnComplete(LDD_TUserData *UserDataPtr)
 {
   /* Write your code here ... */
     extern TMCUPtr tMCUPtr;
+    extern TARMPtr tARMPtr;
 
-    SPI1TxDMADisable();
-//    SPI1DisableTxDMA();
-//    SPI1Disable();
+//    SPI0TxDMADisable();
+//    SPI0DisableTxDMA();
+//    SPI0Disable();
 
-    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = TRUE;
+    tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = TRUE;
+    if(tARMPtr->armStatus.isTransmittingData)
+    {
+//        tARMPtr->armStatus.isForeBufferEmpty = TRUE;
+//        tARMPtr->armStatus.isForeBufferFull = FALSE;
+        tARMPtr->armStatus.foreBufferStatus = eEmpty;
+        tARMPtr->armStatus.isTransmittingData = FALSE;
+    }
     //flagDataReady = FALSE;
 }
 
@@ -433,10 +399,10 @@ void DMAT_S_SPI_RX_OnComplete(LDD_TUserData *UserDataPtr)
   /* Write your code here ... */
     extern TMCUPtr tMCUPtr;
 
-    SPI0RxDMADisable();
-//    SPI0DisableRxDMA();
+//    SPI1RxDMADisable();
+//    SPI1DisableRxDMA();
 
-    tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = TRUE;
+    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = TRUE;
 }
 
 /*
@@ -487,14 +453,14 @@ void DMAT_S_SPI_TX_OnComplete(LDD_TUserData *UserDataPtr)
   /* Write your code here ... */
     extern TMCUPtr tMCUPtr;
 
-    SPI0TxDMADisable();
-//    SPI0RxDMADisable();
+//    SPI1TxDMADisable();
+//    SPI1RxDMADisable();
 
     IOUploadReadySetVal();
 
 //    flagUploadReady = FALSE;
 
-    tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = TRUE;
+    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = TRUE;
 
 //    EIntSyncInterruptEnable(NULL);
 }
@@ -520,6 +486,29 @@ void DMAT_S_SPI_TX_OnComplete(LDD_TUserData *UserDataPtr)
 void DMAT_S_SPI_TX_OnError(LDD_TUserData *UserDataPtr)
 {
   /* Write your code here ... */
+}
+
+/*
+** ===================================================================
+**     Event       :  EINT_AD_NOT_DRDY1_OnInterrupt (module Events)
+**
+**     Component   :  EINT_AD_NOT_DRDY1 [ExtInt_LDD]
+*/
+/*!
+**     @brief
+**         This event is called when an active signal edge/level has
+**         occurred.
+**     @param
+**         UserDataPtr     - Pointer to RTOS device
+**                           data structure pointer.
+*/
+/* ===================================================================*/
+void EINT_AD_NOT_DRDY1_OnInterrupt(LDD_TUserData *UserDataPtr)
+{
+  /* Write your code here ... */
+    extern TADCPtr tADCPtr[USING_ADC_COUNT];
+
+    tADCPtr[1]->adcStatus.isDataReady = TRUE;
 }
 
 /* END Events */
