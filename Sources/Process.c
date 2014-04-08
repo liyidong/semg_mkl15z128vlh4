@@ -14,7 +14,7 @@
  **     Settings    :
  **
  **     Contents    :
- **                 MainLoop - void MainLoop(void)
+ **                 MainLoop    - void MainLoop(void)
  **
  **     Mail        : pzdongdong@163.com
  **
@@ -42,18 +42,20 @@
 #include "string.h"
 
 static void Process(EADCFlag);
-static void ReadADCData(EADCFlag adcFlag);
-static void TransmitMCUData(void);
+//static void TransmitMCUData(void);
 static LDD_TError SplitRawData(TADCDataPtr adcDataPtr);
 static void CopyADCDataToMCUData(EADCFlag adcFlag);
 static void PackData(EADCFlag adcFlag);
-static void SwapARMDataBuffer(void);
+//static void SwapARMDataBuffer(void);
+static void ReadADCData(void);
 
 /*
  * ===================================================================
  * Global Variables
  * ===================================================================
  */
+static int chDataCnt[USING_ADC_COUNT] = {0};
+static uint8 overflowCnt = 0;
 
 /*
  * ===================================================================
@@ -71,35 +73,194 @@ static void SwapARMDataBuffer(void);
 void MainLoop(void)
 {
     extern TMCUPtr tMCUPtr;
+    extern volatile bool isStart;
+
+    tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = TRUE;
+    tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = TRUE;
+    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = TRUE;
+    tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = TRUE;
+
+//    SPI0_BR = (SPI_BR_SPPR(0x02) | SPI_BR_SPR(0x02));   /* Set baud rage register, 1M */
+    SPI0_BR = (SPI_BR_SPPR(0x01) | SPI_BR_SPR(0x00)); /* Set baud rate register,6M */
+//    SPI0_BR = (SPI_BR_SPPR(0x00) | SPI_BR_SPR(0x00)); /* Set baud rate register,12M */
 
     /* Enable PortA's interrupt. */
     EIntADNotReady0Enable(EINT_AD_NOT_DRDY0);
-    EIntADNotReady1Enable(EINT_AD_NOT_DRDY1);
+//    EIntADNotReady1Enable(EINT_AD_NOT_DRDY1);
     EIntSyncInterruptEnable(EINT_SYNC_INT);
     NVIC_ISER |= NVIC_ISER_SETENA(0x40000000);      /* Enable PortA's hardware interrupt */
 
-    ADCStartConvertByCommand(ADC0);
-    ADCStartConvertByCommand(ADC1);
+//    StartTaskTimer();
 
-    tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = TRUE;
-    tMCUPtr->mcuStatus.isSPI1RxDMATransCompleted = TRUE;
+    //ADCStartConvertByCommand(eADC0);
+    //ADCStartConvertByCommand(eADC1);
+    /* Start ADC's conversion at the same time by Pull the start pin high. */
+//    GPIOB_PDOR |= 0x06U;    /* B1, B2 */
+
+    while(!isStart);
 
     for(;;)
     {
-        SwapARMDataBuffer();
+//        SwapARMDataBuffer();    /* Swap the data buffer if needed. */
 
         /* If data of ADC is ready, read it. */
-        ReadADCData(ADC0);
-        ReadADCData(ADC1);
+        ReadADCData();
 
         /* Processing the Data. */
-        Process(ADC0);
-        Process(ADC1);
+        Process(eADC0);
+        Process(eADC1);
 
         /*  If the ARM requires data, transmit. */
-        TransmitMCUData();
+        //TransmitMCUData();
     }
 }
+
+/*
+ * ===================================================================
+ *     Method      : ReadADCData(Module Process)
+ */
+/*!
+ *     @brief
+ *          This method reads ADC's data when ADC's is ready to be read.
+ *          This method is called in function
+ *          EINT_AD_NOT_DRDY0_OnInterrupt or EINT_AD_NOT_DRDY0_OnInterrupt,
+ *          file Events.c
+ *     @param
+ *          adcFlag         - Show which ADC's data is processed.
+ *     @return
+ *          void
+ */
+/* ===================================================================*/
+static void ReadADCData(void)
+{
+    extern TADCPtr tADCPtr[USING_ADC_COUNT];
+    //EADCFlag adcFlag;
+
+    if(tADCPtr[eADC0]->adcStatus.isDataReady)// && tADCPtr[eADC1]->adcStatus.isDataReady)
+    {
+        EnableADCSPI(eADC0);
+        ADCReadContinuousData(tADCPtr[eADC0]->adcData.rawData, RAW_DATA_SIZE);
+        tMCUPtr->mcuStatus.isReceivingADCData = TRUE;
+//        tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = FALSE;
+//        tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
+        tADCPtr[eADC0]->adcStatus.adcDataStatus = eReceiving;
+        tADCPtr[eADC0]->adcStatus.transmitionContent = eData;
+
+//        while(!tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted);
+        DisableADCSPI(eADC0);
+
+        tMCUPtr->mcuStatus.isReceivingADCData = FALSE;
+        tADCPtr[eADC0]->adcStatus.isDataReady = FALSE;
+        tADCPtr[eADC0]->adcStatus.adcDataStatus = eReceived;
+        tADCPtr[eADC0]->adcStatus.transmitionContent = eNothing;
+
+        //Process(eADC0);
+
+        EnableADCSPI(eADC1);
+        ADCReadContinuousData(tADCPtr[eADC1]->adcData.rawData, RAW_DATA_SIZE);
+        tMCUPtr->mcuStatus.isReceivingADCData = TRUE;
+//        tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = FALSE;
+//        tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
+        tADCPtr[eADC1]->adcStatus.adcDataStatus = eReceiving;
+        tADCPtr[eADC1]->adcStatus.transmitionContent = eData;
+
+//        while(!tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted);
+        DisableADCSPI(eADC1);
+
+        tMCUPtr->mcuStatus.isReceivingADCData = FALSE;
+        tADCPtr[eADC1]->adcStatus.isDataReady = FALSE;
+        tADCPtr[eADC1]->adcStatus.adcDataStatus = eReceived;
+        tADCPtr[eADC1]->adcStatus.transmitionContent = eNothing;
+
+        //Process(eADC1);
+    }
+
+//    while(tADCPtr[eADC0]->adcStatus.isDataReady || tADCPtr[eADC1]->adcStatus.isDataReady)
+//    {
+//        adcFlag = (TRUE == tADCPtr[eADC0]->adcStatus.isDataReady) ? eADC0 : eADC1;
+//        EnableADCSPI(adcFlag);
+//        ADCReadContinuousData(tADCPtr[adcFlag]->adcData.rawData, RAW_DATA_SIZE);
+//        tMCUPtr->mcuStatus.isReceivingADCData = TRUE;
+//        tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = FALSE;
+//        tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
+//        tADCPtr[adcFlag]->adcStatus.adcDataStatus = eReceiving;
+//        tADCPtr[adcFlag]->adcStatus.transmitionContent = eData;
+//
+//        while(!tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted);
+//        DisableADCSPI(adcFlag);
+//
+//        tMCUPtr->mcuStatus.isReceivingADCData = FALSE;
+//        tADCPtr[adcFlag]->adcStatus.isDataReady = FALSE;
+//        tADCPtr[adcFlag]->adcStatus.adcDataStatus = eReceived;
+//        tADCPtr[adcFlag]->adcStatus.transmitionContent = eNothing;
+//
+//        Process(adcFlag);
+//    }
+}
+//void ReadADCData(EADCFlag adcFlag)
+//{
+//    extern TADCPtr tADCPtr[USING_ADC_COUNT];
+//    extern TMCUPtr tMCUPtr;
+////    EADCFlag _adcFlag;
+////////////////////////////////////////////////////////////////////////////////////////////
+//    if(!tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted)
+//    {
+//        SysTickWriteReloadValueReg(0x3B);
+//        SysTickEnable();
+//        return;
+//    }
+//    if(!tMCUPtr->mcuStatus.isReceivingADCData && eIdle == tADCPtr[adcFlag]->adcStatus.adcDataStatus)
+//    {
+//        EnableADCSPI(adcFlag);
+//        ADCReadContinuousData(tADCPtr[adcFlag]->adcData.rawData, RAW_DATA_SIZE);
+//        tMCUPtr->mcuStatus.isReceivingADCData = TRUE;
+//        tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = FALSE;
+//        tADCPtr[adcFlag]->adcStatus.adcDataStatus = eReceiving;
+//        tADCPtr[adcFlag]->adcStatus.transmitionContent = eData;
+//    }
+////////////////////////////////////////////////////////////////////////////////////////////
+////    if(tADCPtr[adcFlag]->adcStatus.isDataReady)
+////    {
+////        if(!tMCUPtr->mcuStatus.isReceivingADCData && tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted)
+////        {
+////            if(eIdle == tADCPtr[adcFlag]->adcStatus.adcDataStatus)
+////            {
+////                EnableADCSPI(adcFlag);
+////                ADCReadContinuousData(tADCPtr[adcFlag]->adcData.rawData, RAW_DATA_SIZE);
+////                tMCUPtr->mcuStatus.isReceivingADCData = TRUE;
+////                tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = FALSE;
+////                tADCPtr[adcFlag]->adcStatus.adcDataStatus = eReceiving;
+////                tADCPtr[adcFlag]->adcStatus.transmitionContent = eData;
+////            }
+////        }
+////        if(tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted)
+////        {
+////            DisableADCSPI(adcFlag);
+////            tADCPtr[adcFlag]->adcStatus.isDataReady = FALSE;
+////            tMCUPtr->mcuStatus.isReceivingADCData = FALSE;
+////            tADCPtr[adcFlag]->adcStatus.adcDataStatus = eReceived;
+////        }
+////      }
+////////////////////////////////////////////////////////////////////////////////////////////
+////    if(tADCPtr[eADC0]->adcStatus.isDataReady || tADCPtr[eADC1]->adcStatus.isDataReady)
+////    {
+////        _adcFlag = (TRUE == tADCPtr[eADC0]->adcStatus.isDataReady) ? eADC0 : eADC1;
+////        if(!tMCUPtr->mcuStatus.isReceivingADCData && tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted)
+////        {
+////            if(eIdle == tADCPtr[_adcFlag]->adcStatus.adcDataStatus)
+////            {
+////                EnableADCSPI(_adcFlag);
+////                ADCReadContinuousData(tADCPtr[_adcFlag]->adcData.rawData, RAW_DATA_SIZE);
+////                tMCUPtr->mcuStatus.isReceivingADCData = TRUE;
+////                tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = FALSE;
+////                tADCPtr[_adcFlag]->adcStatus.adcDataStatus = eReceiving;
+////                tADCPtr[_adcFlag]->adcStatus.transmitionContent = eData;
+////                tADCPtr[_adcFlag]->adcStatus.isDataReady = FALSE;
+////            }
+////        }
+////    }
+////////////////////////////////////////////////////////////////////////////////////////////
+//}
 
 /*
  * ===================================================================
@@ -116,45 +277,16 @@ void MainLoop(void)
 /* ===================================================================*/
 static void Process(EADCFlag adcFlag)
 {
-
-}
-
-/*
- * ===================================================================
- *     Method      : ReadADCData(Module Process)
- */
-/*!
- *     @brief
- *          This method reads ADC's data when ADC's is ready to be read.
- *     @param[in]
- *          adcFlag         - Show which ADC to be read.
- *     @return
- *          void
- */
-/* ===================================================================*/
-static void ReadADCData(EADCFlag adcFlag)
-{
     extern TADCPtr tADCPtr[USING_ADC_COUNT];
-    extern TMCUPtr tMCUPtr;
 
-    if(tADCPtr[adcFlag]->adcStatus.isDataReady)
+    if(eReceived == tADCPtr[adcFlag]->adcStatus.adcDataStatus)
     {
-        if(!tMCUPtr->mcuStatus.isReceivingADCData && tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted)
-        {
-            EnableADCSPI(adcFlag);
-            ADCReadContinuousData(tADCPtr[adcFlag]->adcData.rawData, RAW_DATA_SIZE);
-            tMCUPtr->mcuStatus.isReceivingADCData = TRUE;
-            tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = FALSE;
-        }
-        if(tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted)
-        {
-            DisableADCSPI(adcFlag);
-            tADCPtr[adcFlag]->adcStatus.isDataReady = FALSE;
-            tMCUPtr->mcuStatus.isReceivingADCData = FALSE;
-            SplitRawData(&(tADCPtr[adcFlag]->adcData));
-            CopyADCDataToMCUData(adcFlag);
-            PackData(adcFlag);
-        }
+        SplitRawData(&(tADCPtr[adcFlag]->adcData));
+        tADCPtr[adcFlag]->adcStatus.adcDataStatus = eIdle;
+
+        CopyADCDataToMCUData(adcFlag);
+
+        PackData(adcFlag);
     }
 }
 
@@ -171,20 +303,21 @@ static void ReadADCData(EADCFlag adcFlag)
  *          void
  */
 /* ===================================================================*/
-static void TransmitMCUData(void)
+void TransmitMCUData(void)
 {
     extern TMCUPtr tMCUPtr;
     extern TARMPtr tARMPtr;
 
     if(tARMPtr->armStatus.isRequiringData &&
-            tARMPtr->armStatus.isUploadReady &&
+            //tARMPtr->armStatus.isUploadReady &&
                 tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted)
     {
         tARMPtr->armStatus.isRequiringData = FALSE;
         tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = FALSE;
         IOUploadReadyClrVal();
-        SPI1SendData((LDD_DMA_TAddress)tARMPtr->foreBuffer, DATA_FRAME_LENGTH);
-        tARMPtr->armStatus.isTransmittingData = TRUE;
+        SPI1SendData((LDD_DMA_TAddress)tARMPtr->foreBuffer, DATA_FRAME_LENGTH + 1);
+        //tARMPtr->armStatus.isTransmittingData = TRUE;
+        tARMPtr->armStatus.transmitionContent = eData;
 //        tARMPtr->armStatus.isForeBufferEmpty = FALSE;
 //        tARMPtr->armStatus.isForeBufferFull = FALSE;
         tARMPtr->armStatus.foreBufferStatus = eRead;
@@ -253,7 +386,7 @@ static LDD_TError SplitRawData(TADCDataPtr adcDataPtr)
 
 /*
  * ===================================================================
- *     Method      : SplitRawData(Module Process)
+ *     Method      : CopyADCDataToMCUData(Module Process)
  */
 /*!
  *     @brief
@@ -291,19 +424,19 @@ static LDD_TError SplitRawData(TADCDataPtr adcDataPtr)
 static void CopyADCDataToMCUData(EADCFlag adcFlag)
 {
     extern TMCUPtr tMCUPtr;
-    static uint8 chDataCnt[USING_ADC_COUNT] = {0};
+//    static uint8 chDataCnt[USING_ADC_COUNT] = {0};
 
-    tMCUPtr->mcuData.channelData[adcFlag][0][chDataCnt[adcFlag]] = tADCPtr[0]->adcData.channelData[0];
-    tMCUPtr->mcuData.channelData[adcFlag][1][chDataCnt[adcFlag]] = tADCPtr[0]->adcData.channelData[1];
-    tMCUPtr->mcuData.channelData[adcFlag][2][chDataCnt[adcFlag]] = tADCPtr[0]->adcData.channelData[2];
-    tMCUPtr->mcuData.channelData[adcFlag][3][chDataCnt[adcFlag]] = tADCPtr[0]->adcData.channelData[3];
-    tMCUPtr->mcuData.channelData[adcFlag][4][chDataCnt[adcFlag]] = tADCPtr[0]->adcData.channelData[4];
-    tMCUPtr->mcuData.channelData[adcFlag][5][chDataCnt[adcFlag]] = tADCPtr[0]->adcData.channelData[5];
-    tMCUPtr->mcuData.channelData[adcFlag][6][chDataCnt[adcFlag]] = tADCPtr[0]->adcData.channelData[6];
-    tMCUPtr->mcuData.channelData[adcFlag][7][chDataCnt[adcFlag]] = tADCPtr[0]->adcData.channelData[7];
+    tMCUPtr->mcuData.channelData[adcFlag][0][chDataCnt[adcFlag]] = tADCPtr[adcFlag]->adcData.channelData[0];
+    tMCUPtr->mcuData.channelData[adcFlag][1][chDataCnt[adcFlag]] = tADCPtr[adcFlag]->adcData.channelData[1];
+    tMCUPtr->mcuData.channelData[adcFlag][2][chDataCnt[adcFlag]] = tADCPtr[adcFlag]->adcData.channelData[2];
+    tMCUPtr->mcuData.channelData[adcFlag][3][chDataCnt[adcFlag]] = tADCPtr[adcFlag]->adcData.channelData[3];
+    tMCUPtr->mcuData.channelData[adcFlag][4][chDataCnt[adcFlag]] = tADCPtr[adcFlag]->adcData.channelData[4];
+    tMCUPtr->mcuData.channelData[adcFlag][5][chDataCnt[adcFlag]] = tADCPtr[adcFlag]->adcData.channelData[5];
+    tMCUPtr->mcuData.channelData[adcFlag][6][chDataCnt[adcFlag]] = tADCPtr[adcFlag]->adcData.channelData[6];
+    tMCUPtr->mcuData.channelData[adcFlag][7][chDataCnt[adcFlag]] = tADCPtr[adcFlag]->adcData.channelData[7];
 
-    chDataCnt[adcFlag]++;
-    chDataCnt[adcFlag] %= CHANNEL_DATA_COUNT;
+//    chDataCnt[adcFlag]++;
+//    chDataCnt[adcFlag] %= CHANNEL_DATA_COUNT;
 }
 
 /*
@@ -324,17 +457,26 @@ static void PackData(EADCFlag adcFlag)
 {
     extern TMCUPtr tMCUPtr;
     extern TARMPtr tARMPtr;
-    static int chDataCnt[USING_ADC_COUNT] = {0};
+//    static int chDataCnt[USING_ADC_COUNT] = {0};
     int off;
+
+    if(eFull == tARMPtr->armStatus.backBufferStatus || eOverflow == tARMPtr->armStatus.backBufferStatus)
+    {
+        tARMPtr->armStatus.backBufferStatus = eOverflow;
+        overflowCnt++;
+        return;
+    }
 
     for(int channelNum = 0;  channelNum < USING_CHANNEL_COUNT; channelNum++)
     {
-        off = adcFlag * USING_CHANNEL_COUNT * CHANNEL_PACKAGE_LENGTH
-                      + 8 + 3
-                          + channelNum * CHANNEL_DATA_COUNT
-                              + chDataCnt[adcFlag];
+        off = 8 /* Head Bits in a pack, eg. 0xB7, MCU No., etc. */
+                + USING_CHANNEL_COUNT * CHANNEL_PACKAGE_LENGTH * adcFlag  /* The ADC0's data is in the front of ADC1's data. */
+                    + 3 * (channelNum + 1)  /* Every channel's data pack has a head of 3 bits. */
+                        + CHANNEL_DATA_COUNT * 2 * channelNum   /* every channel's data is 200 bits apart of the 3-bit head. */
+                            + chDataCnt[adcFlag] * 2;   /* every channel's data at on time is 2 bits. */
 
-        tARMPtr->backBuffer[off] = tMCUPtr->mcuData.channelData[adcFlag][channelNum][chDataCnt[adcFlag]];
+        tARMPtr->backBuffer[off] = tMCUPtr->mcuData.channelData[adcFlag][channelNum][chDataCnt[adcFlag]] >> 8 & 0xFFU;
+        tARMPtr->backBuffer[off + 1] = tMCUPtr->mcuData.channelData[adcFlag][channelNum][chDataCnt[adcFlag]] & 0xFFU;
     }
 
     chDataCnt[adcFlag]++;
@@ -407,47 +549,110 @@ static void PackData(EADCFlag adcFlag)
  *          void
  */
 /* ===================================================================*/
-static void SwapARMDataBuffer(void)
+void SwapARMDataBuffer(void)
 {
-    extern TARMPtr tARMPtr;
-
-    if(!tARMPtr->foreBuffer && !tARMPtr->backBuffer)
+    if(eNull == tARMPtr->armStatus.foreBufferStatus && eNull == tARMPtr->armStatus.backBufferStatus)
     {
+        tARMPtr->foreBuffer = tARMPtr->armDataRight.dataFrame;
         tARMPtr->backBuffer = tARMPtr->armDataLeft.dataFrame;
 //        tARMPtr->armStatus.isForeBufferEmpty = FALSE;
 //        tARMPtr->armStatus.isForeBufferFull = FALSE;
 //        tARMPtr->armStatus.isBackBufferEmpty = TRUE;
 //        tARMPtr->armStatus.isForeBufferFull = FALSE;
-        tARMPtr->armStatus.foreBufferStatus = eIdle;
+        tARMPtr->armStatus.foreBufferStatus = eEmpty;
         tARMPtr->armStatus.backBufferStatus = eEmpty;
         tARMPtr->armStatus.isUploadReady = FALSE;
-    }
-    //else if(tARMPtr->armStatus.isForeBufferEmpty && tARMPtr->armStatus.isBackBufferFull)
-    else if(eEmpty == tARMPtr->armStatus.foreBufferStatus && eFull == tARMPtr->armStatus.backBufferStatus)
-    {
-        if(!tARMPtr->foreBuffer)
-        {
-            tARMPtr->foreBuffer = tARMPtr->armDataLeft.dataFrame;
-            tARMPtr->backBuffer = tARMPtr->armDataRight.dataFrame;
-        }
-        else
-        {
-            byte* temp;
 
-            temp = tARMPtr->foreBuffer;
-            tARMPtr->foreBuffer = tARMPtr->backBuffer;
-            tARMPtr->backBuffer = temp;
+        tARMPtr->foreBuffer[6] = (tARMPtr->foreBuffer[6] & 0x01)
+                               | ((tARMPtr->armStatus.foreBufferStatus << 1) & 0x0EU);
+        if(eOverflow == tARMPtr->armStatus.foreBufferStatus)
+        {
+            tARMPtr->foreBuffer[7] = overflowCnt / 2;
         }
-//        tARMPtr->armStatus.isForeBufferEmpty = FALSE;
-//        tARMPtr->armStatus.isForeBufferFull = TRUE;
-//        tARMPtr->armStatus.isBackBufferEmpty = TRUE;
-//        tARMPtr->armStatus.isForeBufferFull = FALSE;
-        tARMPtr->armStatus.foreBufferStatus = eFull;
-        tARMPtr->armStatus.backBufferStatus = eEmpty;
-        tARMPtr->armStatus.isUploadReady = TRUE;
+        else if(eWrite == tARMPtr->armStatus.foreBufferStatus)
+        {
+            tARMPtr->foreBuffer[7] = CHANNEL_DATA_COUNT - chDataCnt[eADC1];
+        }
     }
+    else
+    {
+        //tARMPtr->backBuffer[7] = tARMPtr->armStatus.backBufferStatus;
+
+        byte* temp;
+        temp = tARMPtr->foreBuffer;
+        tARMPtr->foreBuffer = tARMPtr->backBuffer;
+        tARMPtr->backBuffer = temp;
+        tARMPtr->armStatus.foreBufferStatus = tARMPtr->armStatus.backBufferStatus;
+        tARMPtr->armStatus.backBufferStatus = eEmpty;
+        tARMPtr->armStatus.isUploadReady = FALSE;
+
+        tARMPtr->foreBuffer[6] = (tARMPtr->foreBuffer[6] & 0x01)
+                               | ((tARMPtr->armStatus.foreBufferStatus << 1) & 0x0EU);
+        if(eOverflow == tARMPtr->armStatus.foreBufferStatus)
+        {
+            tARMPtr->foreBuffer[7] = overflowCnt / 2;
+        }
+        else if(eWrite == tARMPtr->armStatus.foreBufferStatus)
+        {
+            tARMPtr->foreBuffer[7] = CHANNEL_DATA_COUNT - chDataCnt[eADC1];
+        }
+    }
+
+    chDataCnt[eADC0] = 0;
+    chDataCnt[eADC1] = 0;
+    overflowCnt = 0;
 }
-/* End Process */
+//static void SwapARMDataBuffer(void)
+//{
+//    extern TARMPtr tARMPtr;
+//
+//    //if(!tARMPtr->foreBuffer && !tARMPtr->backBuffer)
+//    if(eNull == tARMPtr->armStatus.foreBufferStatus && eNull == tARMPtr->armStatus.backBufferStatus)
+//    {
+//        tARMPtr->backBuffer = tARMPtr->armDataLeft.dataFrame;
+////        tARMPtr->armStatus.isForeBufferEmpty = FALSE;
+////        tARMPtr->armStatus.isForeBufferFull = FALSE;
+////        tARMPtr->armStatus.isBackBufferEmpty = TRUE;
+////        tARMPtr->armStatus.isForeBufferFull = FALSE;
+//        tARMPtr->armStatus.foreBufferStatus = eNull;
+//        tARMPtr->armStatus.backBufferStatus = eEmpty;
+//        tARMPtr->armStatus.isUploadReady = FALSE;
+//    }
+//    //else if(tARMPtr->armStatus.isForeBufferEmpty && tARMPtr->armStatus.isBackBufferFull)
+//    else if(eFull == tARMPtr->armStatus.backBufferStatus)
+//    {
+//        if(eNull == tARMPtr->armStatus.foreBufferStatus)
+//        {
+//            tARMPtr->foreBuffer = tARMPtr->backBuffer;
+//            tARMPtr->backBuffer = (tARMPtr->backBuffer == tARMPtr->armDataLeft.dataFrame) ? tARMPtr->armDataRight.dataFrame : tARMPtr->armDataLeft.dataFrame;
+////            tARMPtr->armStatus.isForeBufferEmpty = FALSE;
+////            tARMPtr->armStatus.isForeBufferFull = FALSE;
+////            tARMPtr->armStatus.isBackBufferEmpty = TRUE;
+////            tARMPtr->armStatus.isForeBufferFull = FALSE;
+//            tARMPtr->armStatus.foreBufferStatus = eFull;
+//            tARMPtr->armStatus.backBufferStatus = eEmpty;
+//            tARMPtr->armStatus.isUploadReady = TRUE;
+//        }
+//        if(eEmpty == tARMPtr->armStatus.foreBufferStatus)
+//        {
+//            byte* temp;
+//
+//            temp = tARMPtr->foreBuffer;
+//            tARMPtr->foreBuffer = tARMPtr->backBuffer;
+//            tARMPtr->backBuffer = temp;
+//
+////            tARMPtr->armStatus.isForeBufferEmpty = FALSE;
+////            tARMPtr->armStatus.isForeBufferFull = TRUE;
+////            tARMPtr->armStatus.isBackBufferEmpty = TRUE;
+////            tARMPtr->armStatus.isForeBufferFull = FALSE;
+//            tARMPtr->armStatus.foreBufferStatus = eFull;
+//            tARMPtr->armStatus.backBufferStatus = eEmpty;
+//            tARMPtr->armStatus.isUploadReady = TRUE;
+//        }
+//    }
+//}
+
+    /* End Process */
 
 /*!
  * @}

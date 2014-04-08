@@ -125,7 +125,7 @@ LDD_TError ADCDisable(EADCFlag adcFlag);
  */
 /*!
  *     @brief
- *          Configure the registers of ADC via SPI1.
+ *          Configure the registers of ADC via SPI0.
  *     @param[in]
  *          adcFlag         - Shows which ADC is selected.
  *                            Possible value: eADC0, eADC1.
@@ -160,7 +160,7 @@ LDD_TError ADCStartConvertByHardware(EADCFlag adcFlag);
 /*!
  *     @brief
  *          MCU sends START command to ADC, ADC starts to convert.
- *          This function starts ADC to convert via SPI1.
+ *          This function starts ADC to convert via SPI0.
  *          In this method, signal START must be low.
  *     @param[in]
  *          adcFlag         - Shows which ADC is selected.
@@ -196,7 +196,7 @@ LDD_TError ADCStopConvertByHardware(EADCFlag adcFlag);
 /*!
  *     @brief
  *          MCU sends STOP command to ADC, ADC stops to convert.
- *          This function stops ADC to convert via SPI1.
+ *          This function stops ADC to convert via SPI0.
  *          In this method, signal START must be low.
  *     @param[in]
  *          adcFlag         - Shows which ADC is selected.
@@ -231,7 +231,7 @@ void ADCResetByHardware(EADCFlag adcFlag);
 /*!
  *     @brief
  *          MCU sends RESET command to ADC, ADC resets.
- *          This function resets ADC via SPI1.
+ *          This function resets ADC via SPI0.
  *          Avoid sending any commands during reset.
  *     @param[in]
  *          adcFlag         - Shows which ADC is selected.
@@ -248,7 +248,7 @@ LDD_TError ADCResetByCommand(EADCFlag adcFlag);
  */
 /*!
  *     @brief
- *          Send command WAKEUP to ADC via SPI1 to wake up ADC
+ *          Send command WAKEUP to ADC via SPI0 to wake up ADC
  *          from low-power standby mode.
  *     @param[in]
  *          adcFlag         - Shows which ADC is selected.
@@ -265,7 +265,7 @@ LDD_TError ADCWakeUp(EADCFlag adcFlag);
  */
 /*!
  *     @brief
- *          Send command STANDBY via SPI1 to make ADC entering
+ *          Send command STANDBY via SPI0 to make ADC entering
  *          the low-power standby mode.
  *     @param[in]
  *          adcFlag         - Shows which ADC is selected.
@@ -282,7 +282,7 @@ LDD_TError ADCStandBy(EADCFlag adcFlag);
  */
 /*!
  *     @brief
- *          Send command RDATAC via SPI1 to make the conversion data
+ *          Send command RDATAC via SPI0 to make the conversion data
  *          of ADC can read continuously without command RDATA.
  *     @param[in]
  *          adcFlag         - Shows which ADC is selected.
@@ -299,7 +299,7 @@ LDD_TError ADCReadDataContinuous(EADCFlag adcFlag);
  */
 /*!
  *     @brief
- *          Send command SDATAC to ADC via SPI1 to stop ADC's RDATAC mode.
+ *          Send command SDATAC to ADC via SPI0 to stop ADC's RDATAC mode.
  *     @param[in]
  *          adcFlag         - Shows which ADC is selected.
  *                            Possible value: eADC0, eADC1.
@@ -315,7 +315,7 @@ LDD_TError ADCStopReadDataContinuous(EADCFlag adcFlag);
  */
 /*!
  *     @brief
- *          Send command to ADC via SPI1. Please use ADCReadRegister and
+ *          Send command to ADC via SPI0. Please use ADCReadRegister and
  *          ADCWriteRegister, but not this function, to read and write ADC's register!
  *     @param[in]
  *          adcFlag         - Shows which ADC is selected.
@@ -343,7 +343,7 @@ LDD_TError ADCSendCommand(EADCFlag adcFlag, byte* cmd);
  */
 /*!
  *     @brief
- *          Read data from register of ADC via SPI1.
+ *          Read data from register of ADC via SPI0.
  *          The data returned in dat[0] and dat[1] are useless. The real data
  *          starts from dat[2]!
  *     @param[in]
@@ -372,7 +372,7 @@ LDD_TError ADCReadRegister(byte regAddr, byte* dat, uint8 n);
  */
 /*!
  *     @brief
- *          Write data to register of ADC via SPI1.
+ *          Write data to register of ADC via SPI0.
  *     @param[in]
  *          regAddr         - The first address of register(s) to be written.
  *     @param[in]
@@ -399,7 +399,7 @@ LDD_TError ADCWriteRegister(byte regAddr, byte* dat, uint8 n);
  */
 /*!
  *     @brief
- *          Read conversion data from ADC in RDATAC mode via SPI1.
+ *          Read conversion data from ADC in RDATAC mode via SPI0.
  *     @param[out]
  *          dat             - Pointer to buffer where received data in.
  *     @param[in]
@@ -424,7 +424,7 @@ LDD_TError ADCReadContinuousData(byte* dat, uint8 n);
  */
 /*!
  *     @brief
- *          Read conversion data from ADC in RDATA mode via SPI1.
+ *          Read conversion data from ADC in RDATA mode via SPI0.
  *          The data returned in dat[0] is useless. The real data
  *          starts from dat[1]!
  *     @param[out]
@@ -460,6 +460,24 @@ LDD_TError ADCReadData(byte* dat, uint8 n);
  */
 /* ===================================================================*/
 void ADCDataInit(TADCPtr userDataPtr);
+
+/*
+ * ===================================================================
+ *     Method      : ReadADCData(Module Process)
+ */
+/*!
+ *     @brief
+ *          This method reads ADC's data when ADC's is ready to be read.
+ *          This method is called in function
+ *          EINT_AD_NOT_DRDY0_OnInterrupt or EINT_AD_NOT_DRDY0_OnInterrupt,
+ *          file Events.c
+ *     @param
+ *          void
+ *     @return
+ *          void
+ */
+/* ===================================================================*/
+//void ReadADCData(void);
 
 /*
  * ===================================================================

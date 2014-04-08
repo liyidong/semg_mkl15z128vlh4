@@ -4,9 +4,9 @@
 **     Project     : ProcessorExpert
 **     Processor   : MKL15Z128VLH4
 **     Component   : Init_SysTick
-**     Version     : Component 01.002, Driver 01.02, CPU db: 3.00.000
+**     Version     : Component 01.003, Driver 01.03, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2013-07-26, 21:49, # CodeGen: 82
+**     Date/Time   : 2014-03-28, 16:12, # CodeGen: 227
 **     Abstract    :
 **          This file implements the SysTick (SysTick) module initialization
 **          according to the Peripheral Initialization settings, and
@@ -15,8 +15,8 @@
 **          Component name                                 : SysTick
 **          Device                                         : SysTick
 **          Settings                                       : 
-**            Clock source                                 : Processor clock
-**            Reload value                                 : 0
+**            Clock source                                 : External clock
+**            Reload value                                 : 000000
 **            Counter period                               : STOP
 **          Interrupts                                     : 
 **            Interrupt                                    : INT_SysTick
@@ -38,7 +38,7 @@
 ** ###################################################################*/
 /*!
 ** @file SysTick.c
-** @version 01.02
+** @version 01.03
 ** @brief
 **          This file implements the SysTick (SysTick) module initialization
 **          according to the Peripheral Initialization settings, and
@@ -81,9 +81,31 @@ void SysTick_Init(void)
   SYST_RVR = SysTick_RVR_RELOAD(0x00);                                   
   /* SYST_CVR: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,CURRENT=0 */
   SYST_CVR = SysTick_CVR_CURRENT(0x00);                                   
-  /* SYST_CSR: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,COUNTFLAG=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,CLKSOURCE=1,TICKINT=1,ENABLE=0 */
-  SYST_CSR = (SysTick_CSR_CLKSOURCE_MASK | SysTick_CSR_TICKINT_MASK);                                   
+  /* SYST_CSR: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,COUNTFLAG=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,CLKSOURCE=0,TICKINT=1,ENABLE=0 */
+  SYST_CSR = SysTick_CSR_TICKINT_MASK;                                   
 }
+
+/*
+** ###################################################################
+**
+**  The interrupt service routine(s) must be implemented
+**  by user in one of the following user modules.
+**
+**  If the "Generate ISR" option is enabled, Processor Expert generates
+**  ISR templates in the CPU event module.
+**
+**  User modules:
+**      ProcessorExpert.c
+**      Events.c
+**
+** ###################################################################
+PE_ISR(SysTick_Interrupt)
+{
+// NOTE: The routine should include actions to clear the appropriate
+//       interrupt flags.
+//
+}
+*/
 
 
 /* END SysTick. */
@@ -93,7 +115,7 @@ void SysTick_Init(void)
 /*
 ** ###################################################################
 **
-**     This file was created by Processor Expert 10.2 [05.07]
+**     This file was created by Processor Expert 10.3 [05.08]
 **     for the Freescale Kinetis series of microcontrollers.
 **
 ** ###################################################################

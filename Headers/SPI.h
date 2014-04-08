@@ -19,7 +19,8 @@
  **                        - SPI1ReceiveData(LDD_DMA_TAddress destAddr, LDD_DMA_TByteCount sendByteCount);
  **        SendData        - SPI0SendData(LDD_DMA_TAddress srcAddr, LDD_DMA_TByteCount receiveByteCount);
  **                        - SPI1SendData(LDD_DMA_TAddress srcAddr, LDD_DMA_TByteCount receiveByteCount);
- **        ReceiveSendData - SPI0ReceiveSendData(LDD_DMA_TAddress srcAddr, LDD_DMA_TAddress destAddr,
+ **        ReceiveSendData - SPI0ReceiveSendData(ESPIMode mode,
+ **                                              LDD_DMA_TAddress srcAddr, LDD_DMA_TAddress destAddr,
  **                                              LDD_DMA_TByteCount receiveByteCount, LDD_DMA_TByteCount sendByteCount);
  **                        - SPI1ReceiveSendData(LDD_DMA_TAddress srcAddr, LDD_DMA_TAddress destAddr,
  **                                              LDD_DMA_TByteCount receiveByteCount, LDD_DMA_TByteCount sendByteCount);
@@ -45,6 +46,8 @@
 /* MODULE SPI */
 
 /* {Default RTOS Adapter} No RTOS includes */
+
+#include "Macros.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -112,6 +115,8 @@ LDD_TError SPI0SendData(LDD_DMA_TAddress srcAddr, LDD_DMA_TByteCount sendByteCou
  *          This method packs a serious operations of receiving & sending data via
  *          SPI0. Receive & send data from SPI0 directly with it.
  *     @param[in]
+ *          mode            - The SPI mode, polling, interrupt or DMA.
+ *     @param[in]
  *          srcAddr         - The address of source buffer.
  *     @param[out]
  *          destAddr        - The address of destination buffer.
@@ -131,7 +136,7 @@ LDD_TError SPI0SendData(LDD_DMA_TAddress srcAddr, LDD_DMA_TByteCount sendByteCou
  *                              - etc.         - See PE_Error.h.
  */
 /* ===================================================================*/
-LDD_TError SPI0ReceiveSendData(LDD_DMA_TAddress srcAddr, LDD_DMA_TAddress destAddr, LDD_DMA_TByteCount receiveByteCount, LDD_DMA_TByteCount sendByteCount);
+LDD_TError SPI0ReceiveSendData(ESPIMode mode, LDD_DMA_TAddress srcAddr, LDD_DMA_TAddress destAddr, LDD_DMA_TByteCount receiveByteCount, LDD_DMA_TByteCount sendByteCount);
 
 /*
  * ===================================================================

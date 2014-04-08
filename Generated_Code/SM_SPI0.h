@@ -6,7 +6,7 @@
 **     Component   : SPIMaster_LDD
 **     Version     : Component 01.109, Driver 01.02, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2014-03-17, 13:36, # CodeGen: 187
+**     Date/Time   : 2014-04-01, 13:58, # CodeGen: 239
 **     Abstract    :
 **         This component "SPIMaster_LDD" implements MASTER part of synchronous
 **         serial master-slave communication.
@@ -60,10 +60,16 @@
 **            Clock configuration 6                        : This component disabled
 **            Clock configuration 7                        : This component disabled
 **     Contents    :
-**         Init    - LDD_TDeviceData* SM_SPI0_Init(LDD_TUserData *UserDataPtr);
-**         Enable  - LDD_TError SM_SPI0_Enable(LDD_TDeviceData *DeviceDataPtr);
-**         Disable - LDD_TError SM_SPI0_Disable(LDD_TDeviceData *DeviceDataPtr);
-**         Main    - void SM_SPI0_Main(LDD_TDeviceData *DeviceDataPtr);
+**         Init                   - LDD_TDeviceData* SM_SPI0_Init(LDD_TUserData *UserDataPtr);
+**         Enable                 - LDD_TError SM_SPI0_Enable(LDD_TDeviceData *DeviceDataPtr);
+**         Disable                - LDD_TError SM_SPI0_Disable(LDD_TDeviceData *DeviceDataPtr);
+**         SendBlock              - LDD_TError SM_SPI0_SendBlock(LDD_TDeviceData *DeviceDataPtr, LDD_TData...
+**         ReceiveBlock           - LDD_TError SM_SPI0_ReceiveBlock(LDD_TDeviceData *DeviceDataPtr, LDD_TData...
+**         GetSentDataNum         - uint16_t SM_SPI0_GetSentDataNum(LDD_TDeviceData *DeviceDataPtr);
+**         GetReceivedDataNum     - uint16_t SM_SPI0_GetReceivedDataNum(LDD_TDeviceData *DeviceDataPtr);
+**         GetBlockSentStatus     - bool SM_SPI0_GetBlockSentStatus(LDD_TDeviceData *DeviceDataPtr);
+**         GetBlockReceivedStatus - bool SM_SPI0_GetBlockReceivedStatus(LDD_TDeviceData *DeviceDataPtr);
+**         Main                   - void SM_SPI0_Main(LDD_TDeviceData *DeviceDataPtr);
 **
 **     Copyright : 1997 - 2013 Freescale Semiconductor, Inc. All Rights Reserved.
 **     SOURCE DISTRIBUTION PERMISSIBLE as directed in End User License Agreement.
@@ -110,6 +116,12 @@ extern "C" {
 #define SM_SPI0_Init_METHOD_ENABLED    /*!< Init method of the component SM_SPI0 is enabled (generated) */
 #define SM_SPI0_Enable_METHOD_ENABLED  /*!< Enable method of the component SM_SPI0 is enabled (generated) */
 #define SM_SPI0_Disable_METHOD_ENABLED /*!< Disable method of the component SM_SPI0 is enabled (generated) */
+#define SM_SPI0_SendBlock_METHOD_ENABLED /*!< SendBlock method of the component SM_SPI0 is enabled (generated) */
+#define SM_SPI0_ReceiveBlock_METHOD_ENABLED /*!< ReceiveBlock method of the component SM_SPI0 is enabled (generated) */
+#define SM_SPI0_GetSentDataNum_METHOD_ENABLED /*!< GetSentDataNum method of the component SM_SPI0 is enabled (generated) */
+#define SM_SPI0_GetReceivedDataNum_METHOD_ENABLED /*!< GetReceivedDataNum method of the component SM_SPI0 is enabled (generated) */
+#define SM_SPI0_GetBlockSentStatus_METHOD_ENABLED /*!< GetBlockSentStatus method of the component SM_SPI0 is enabled (generated) */
+#define SM_SPI0_GetBlockReceivedStatus_METHOD_ENABLED /*!< GetBlockReceivedStatus method of the component SM_SPI0 is enabled (generated) */
 #define SM_SPI0_Main_METHOD_ENABLED    /*!< Main method of the component SM_SPI0 is enabled (generated) */
 
 /* Events configuration constants - generated for all enabled component's events */
@@ -189,6 +201,148 @@ LDD_TError SM_SPI0_Enable(LDD_TDeviceData *DeviceDataPtr);
 */
 /* ===================================================================*/
 LDD_TError SM_SPI0_Disable(LDD_TDeviceData *DeviceDataPtr);
+
+/*
+** ===================================================================
+**     Method      :  SM_SPI0_ReceiveBlock (component SPIMaster_LDD)
+*/
+/*!
+**     @brief
+**         This method specifies the number of data to receive. The
+**         method returns ERR_BUSY until the specified number of
+**         characters is received. The method <CancelBlockReception>
+**         can be used to cancel a running receive operation.
+**     @param
+**         DeviceDataPtr   - Device data structure
+**                           pointer returned by <Init> method.
+**     @param
+**         BufferPtr       - Pointer to A buffer where
+**                           received characters will be stored.
+**     @param
+**         Size            - Size of the block
+**     @return
+**                         - Error code, possible codes:
+**                           ERR_OK - OK
+**                           ERR_SPEED - This device does not work in
+**                           the active clock configuration
+**                           ERR_DISABLED - Component is disabled
+**                           ERR_BUSY - The previous receive request is
+**                           pending
+*/
+/* ===================================================================*/
+LDD_TError SM_SPI0_ReceiveBlock(LDD_TDeviceData *DeviceDataPtr, LDD_TData *BufferPtr, uint16_t Size);
+
+/*
+** ===================================================================
+**     Method      :  SM_SPI0_SendBlock (component SPIMaster_LDD)
+*/
+/*!
+**     @brief
+**         This method sends a block of characters. The method returns
+**         ERR_BUSY when the previous block transmission is not
+**         completed. The method <CancelBlockTransmission> can be used
+**         to cancel a transmit operation.
+**     @param
+**         DeviceDataPtr   - Device data structure
+**                           pointer returned by <Init> method.
+**     @param
+**         BufferPtr       - Pointer to the block of data
+**                           to send.
+**     @param
+**         Size            - Number of characters in the buffer.
+**     @return
+**                         - Error code, possible codes:
+**                           ERR_OK - OK
+**                           ERR_SPEED - This device does not work in
+**                           the active clock configuration
+**                           ERR_DISABLED - Component is disabled
+**                           ERR_BUSY - The previous transmit request is
+**                           pending
+*/
+/* ===================================================================*/
+LDD_TError SM_SPI0_SendBlock(LDD_TDeviceData *DeviceDataPtr, LDD_TData *BufferPtr, uint16_t Size);
+
+/*
+** ===================================================================
+**     Method      :  SM_SPI0_GetReceivedDataNum (component SPIMaster_LDD)
+*/
+/*!
+**     @brief
+**         Returns the number of received characters in the receive
+**         buffer. This method is available only if the ReceiveBlock
+**         method is enabled.
+**     @param
+**         DeviceDataPtr   - Device data structure
+**                           pointer returned by <Init> method.
+**     @return
+**                         - The number of characters in the input
+**                           buffer.
+*/
+/* ===================================================================*/
+uint16_t SM_SPI0_GetReceivedDataNum(LDD_TDeviceData *DeviceDataPtr);
+
+/*
+** ===================================================================
+**     Method      :  SM_SPI0_GetSentDataNum (component SPIMaster_LDD)
+*/
+/*!
+**     @brief
+**         Returns the number of sent characters. This method is
+**         available only if method SendBlock is enabled.
+**     @param
+**         DeviceDataPtr   - Device data structure
+**                           pointer returned by <Init> method.
+**     @return
+**                         - The number of characters in the output
+**                           buffer.
+*/
+/* ===================================================================*/
+uint16_t SM_SPI0_GetSentDataNum(LDD_TDeviceData *DeviceDataPtr);
+
+/*
+** ===================================================================
+**     Method      :  SM_SPI0_GetBlockSentStatus (component SPIMaster_LDD)
+*/
+/*!
+**     @brief
+**         This method returns whether the transmitter is finished
+**         transmitting all data block. The status flag is accumulated,
+**         after calling this method the status is returned and cleared
+**         (set to "false" state). This method is available only if
+**         method SendBlock is enabled.
+**     @param
+**         DeviceDataPtr   - Device data structure
+**                           pointer returned by <Init> method.
+**     @return
+**                         - Return value:
+**                           true - Data block is completely transmitted
+**                           false - Data block isn't completely
+**                           transmitted.
+*/
+/* ===================================================================*/
+bool SM_SPI0_GetBlockSentStatus(LDD_TDeviceData *DeviceDataPtr);
+
+/*
+** ===================================================================
+**     Method      :  SM_SPI0_GetBlockReceivedStatus (component SPIMaster_LDD)
+*/
+/*!
+**     @brief
+**         This method returns whether the receiver is finished
+**         reception of all data block. The status flag is accumulated,
+**         after calling this method the status is returned and cleared
+**         (set to "false" state). This method is available only if
+**         method ReceiveBlock is enabled.
+**     @param
+**         DeviceDataPtr   - Device data structure
+**                           pointer returned by <Init> method.
+**     @return
+**                         - Return value:
+**                           true - Data block is completely received
+**                           false - Data block isn't completely received
+*/
+/* ===================================================================*/
+bool SM_SPI0_GetBlockReceivedStatus(LDD_TDeviceData *DeviceDataPtr);
 
 /*
 ** ===================================================================

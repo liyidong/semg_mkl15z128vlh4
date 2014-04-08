@@ -17,7 +17,7 @@
 **
 **     Copyright : 1997 - 2013 Freescale Semiconductor, Inc. All Rights Reserved.
 **     SOURCE DISTRIBUTION PERMISSIBLE as directed in End User License Agreement.
-**     
+**
 **     http      : www.freescale.com
 **     mail      : support@freescale.com
 ** ###################################################################*/
@@ -26,11 +26,11 @@
 ** @version 01.04
 ** @brief
 **
-*/         
+*/
 /*!
 **  @addtogroup Cpu_module Cpu module documentation
 **  @{
-*/         
+*/
 
 /* MODULE Cpu. */
 
@@ -62,7 +62,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 /* Global variables */
 volatile uint8_t SR_reg;               /* Current value of the FAULTMASK register */
@@ -74,7 +74,7 @@ volatile uint8_t SR_lock = 0x00U;      /* Lock */
 **     Method      :  Cpu_Cpu_ivINT_PORTA (component MKL15Z128LH4)
 **
 **     Description :
-**         This ISR services the ivINT_PORTA interrupt shared by several 
+**         This ISR services the ivINT_PORTA interrupt shared by several
 **         components.
 **         This method is internal. It is used by Processor Expert only.
 ** ===================================================================
@@ -82,8 +82,8 @@ volatile uint8_t SR_lock = 0x00U;      /* Lock */
 PE_ISR(Cpu_ivINT_PORTA)
 {
   EINT_AD_NOT_DRDY0_Interrupt();       /* Call the service routine */
+//  EINT_AD_NOT_DRDY1_Interrupt();       /* Call the service routine */
   EINT_SYNC_INT_Interrupt();           /* Call the service routine */
-  EINT_AD_NOT_DRDY1_Interrupt();       /* Call the service routine */
 }
 
 /*
@@ -700,7 +700,7 @@ void __init_hardware(void)
   SCB_VTOR = (uint32_t)(&__vect_table); /* Set the interrupt vector table position */
   /* Disable the WDOG module */
   /* SIM_COPC: ??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,COPT=0,COPCLKS=0,COPW=0 */
-  SIM_COPC = SIM_COPC_COPT(0x00);                                   
+  SIM_COPC = SIM_COPC_COPT(0x00);
 
   /* System clock initialization */
   /* SIM_CLKDIV1: OUTDIV1=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,OUTDIV4=3,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0,??=0 */
@@ -728,36 +728,36 @@ void __init_hardware(void)
                SIM_SOPT2_TPMSRC(0x01)
               ));                      /* Set the TPM clock */
   /* PORTA_PCR18: ISF=0,MUX=0 */
-  PORTA_PCR18 &= (uint32_t)~(uint32_t)((PORT_PCR_ISF_MASK | PORT_PCR_MUX(0x07)));                                   
+  PORTA_PCR18 &= (uint32_t)~(uint32_t)((PORT_PCR_ISF_MASK | PORT_PCR_MUX(0x07)));
   /* PORTA_PCR19: ISF=0,MUX=0 */
-  PORTA_PCR19 &= (uint32_t)~(uint32_t)((PORT_PCR_ISF_MASK | PORT_PCR_MUX(0x07)));                                   
+  PORTA_PCR19 &= (uint32_t)~(uint32_t)((PORT_PCR_ISF_MASK | PORT_PCR_MUX(0x07)));
   /* Switch to FBE Mode */
   /* MCG_C2: LOCRE0=0,??=0,RANGE0=2,HGO0=0,EREFS0=1,LP=0,IRCS=0 */
-  MCG_C2 = (MCG_C2_RANGE0(0x02) | MCG_C2_EREFS0_MASK);                                   
+  MCG_C2 = (MCG_C2_RANGE0(0x02) | MCG_C2_EREFS0_MASK);
   /* OSC0_CR: ERCLKEN=1,??=0,EREFSTEN=0,??=0,SC2P=1,SC4P=0,SC8P=0,SC16P=1 */
-  OSC0_CR = (OSC_CR_ERCLKEN_MASK | OSC_CR_SC2P_MASK | OSC_CR_SC16P_MASK);                                   
+  OSC0_CR = (OSC_CR_ERCLKEN_MASK | OSC_CR_SC2P_MASK | OSC_CR_SC16P_MASK);
   /* MCG_C1: CLKS=2,FRDIV=3,IREFS=0,IRCLKEN=1,IREFSTEN=0 */
-  MCG_C1 = (MCG_C1_CLKS(0x02) | MCG_C1_FRDIV(0x03) | MCG_C1_IRCLKEN_MASK);                                   
+  MCG_C1 = (MCG_C1_CLKS(0x02) | MCG_C1_FRDIV(0x03) | MCG_C1_IRCLKEN_MASK);
   /* MCG_C4: DMX32=0,DRST_DRS=0 */
-  MCG_C4 &= (uint8_t)~(uint8_t)((MCG_C4_DMX32_MASK | MCG_C4_DRST_DRS(0x03)));                                   
+  MCG_C4 &= (uint8_t)~(uint8_t)((MCG_C4_DMX32_MASK | MCG_C4_DRST_DRS(0x03)));
   /* MCG_C5: ??=0,PLLCLKEN0=0,PLLSTEN0=0,PRDIV0=1 */
-  MCG_C5 = MCG_C5_PRDIV0(0x01);                                   
+  MCG_C5 = MCG_C5_PRDIV0(0x01);
   /* MCG_C6: LOLIE0=0,PLLS=0,CME0=0,VDIV0=0 */
-  MCG_C6 = MCG_C6_VDIV0(0x00);                                   
+  MCG_C6 = MCG_C6_VDIV0(0x00);
   while((MCG_S & MCG_S_IREFST_MASK) != 0x00U) { /* Check that the source of the FLL reference clock is the external reference clock. */
   }
   while((MCG_S & 0x0CU) != 0x08U) {    /* Wait until external reference clock is selected as MCG output */
   }
   /* Switch to PBE Mode */
   /* MCG_C6: LOLIE0=0,PLLS=1,CME0=0,VDIV0=0 */
-  MCG_C6 = (MCG_C6_PLLS_MASK | MCG_C6_VDIV0(0x00));                                   
+  MCG_C6 = (MCG_C6_PLLS_MASK | MCG_C6_VDIV0(0x00));
   while((MCG_S & 0x0CU) != 0x08U) {    /* Wait until external reference clock is selected as MCG output */
   }
   while((MCG_S & MCG_S_LOCK0_MASK) == 0x00U) { /* Wait until locked */
   }
   /* Switch to PEE Mode */
   /* MCG_C1: CLKS=0,FRDIV=3,IREFS=0,IRCLKEN=1,IREFSTEN=0 */
-  MCG_C1 = (MCG_C1_CLKS(0x00) | MCG_C1_FRDIV(0x03) | MCG_C1_IRCLKEN_MASK);                                   
+  MCG_C1 = (MCG_C1_CLKS(0x00) | MCG_C1_FRDIV(0x03) | MCG_C1_IRCLKEN_MASK);
   while((MCG_S & 0x0CU) != 0x0CU) {    /* Wait until output of the PLL is selected */
   }
   /*** End of PE initialization code after reset ***/
@@ -773,8 +773,8 @@ void __init_hardware(void)
 **     Method      :  PE_low_level_init (component MKL15Z128LH4)
 **
 **     Description :
-**         Initializes beans and provides common register initialization. 
-**         The method is called automatically as a part of the 
+**         Initializes beans and provides common register initialization.
+**         The method is called automatically as a part of the
 **         application initialization code.
 **         This method is internal. It is used by Processor Expert only.
 ** ===================================================================
@@ -790,15 +790,15 @@ void PE_low_level_init(void)
                 PORT_PCR_ISF_MASK
                )) | (uint32_t)(
                 PORT_PCR_MUX(0x07)
-               ));                                  
+               ));
         /* Initialization of the RCM module */
   /* RCM_RPFW: RSTFLTSEL=0 */
-  RCM_RPFW &= (uint8_t)~(uint8_t)(RCM_RPFW_RSTFLTSEL(0x1F));                                   
+  RCM_RPFW &= (uint8_t)~(uint8_t)(RCM_RPFW_RSTFLTSEL(0x1F));
   /* RCM_RPFC: RSTFLTSS=0,RSTFLTSRW=0 */
   RCM_RPFC &= (uint8_t)~(uint8_t)(
                RCM_RPFC_RSTFLTSS_MASK |
                RCM_RPFC_RSTFLTSRW(0x03)
-              );                                   
+              );
         /* Initialization of the FTFL_FlashConfig module */
       /* Initialization of the PMC module */
   /* PMC_LVDSC1: LVDACK=1,LVDIE=0,LVDRE=1,LVDV=0 */
@@ -808,35 +808,35 @@ void PE_low_level_init(void)
                )) | (uint8_t)(
                 PMC_LVDSC1_LVDACK_MASK |
                 PMC_LVDSC1_LVDRE_MASK
-               ));                                  
+               ));
   /* PMC_LVDSC2: LVWACK=1,LVWIE=0,LVWV=0 */
   PMC_LVDSC2 = (uint8_t)((PMC_LVDSC2 & (uint8_t)~(uint8_t)(
                 PMC_LVDSC2_LVWIE_MASK |
                 PMC_LVDSC2_LVWV(0x03)
                )) | (uint8_t)(
                 PMC_LVDSC2_LVWACK_MASK
-               ));                                  
+               ));
   /* PMC_REGSC: BGEN=0,ACKISO=0,BGBE=0 */
   PMC_REGSC &= (uint8_t)~(uint8_t)(
                 PMC_REGSC_BGEN_MASK |
                 PMC_REGSC_ACKISO_MASK |
                 PMC_REGSC_BGBE_MASK
-               );                                   
+               );
   /* SMC_PMPROT: ??=0,??=0,AVLP=0,??=0,ALLS=0,??=0,AVLLS=0,??=0 */
   SMC_PMPROT = 0x00U;                  /* Setup Power mode protection register */
   /* Common initialization of the CPU registers */
   /* SCB_SHPR3: PRI_15=0 */
-  SCB_SHPR3 &= (uint32_t)~(uint32_t)(SCB_SHPR3_PRI_15(0xFF));                                   
+  SCB_SHPR3 &= (uint32_t)~(uint32_t)(SCB_SHPR3_PRI_15(0xFF));
   /* GPIOA_PDDR: PDD&=~0x26 */
-  GPIOA_PDDR &= (uint32_t)~(uint32_t)(GPIO_PDDR_PDD(0x26));                                   
+  GPIOA_PDDR &= (uint32_t)~(uint32_t)(GPIO_PDDR_PDD(0x26));
   /* PORTA_PCR20: ISF=0,MUX=7 */
   PORTA_PCR20 = (uint32_t)((PORTA_PCR20 & (uint32_t)~(uint32_t)(
                  PORT_PCR_ISF_MASK
                 )) | (uint32_t)(
                  PORT_PCR_MUX(0x07)
-                ));                                  
+                ));
   /* NVIC_IPR1: PRI_6=0 */
-  NVIC_IPR1 &= (uint32_t)~(uint32_t)(NVIC_IP_PRI_6(0xFF));                                   
+  NVIC_IPR1 &= (uint32_t)~(uint32_t)(NVIC_IP_PRI_6(0xFF));
   /* ### Init_SysTick "SysTick" init code ... */
   /* ### Call "SysTick_Init();" init method in a user code, i.e. in the main code */
 
@@ -883,7 +883,7 @@ void PE_low_level_init(void)
 
 #ifdef __cplusplus
 }  /* extern "C" */
-#endif 
+#endif
 
 /*!
 ** @}

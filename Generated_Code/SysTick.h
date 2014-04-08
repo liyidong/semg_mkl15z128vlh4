@@ -4,9 +4,9 @@
 **     Project     : ProcessorExpert
 **     Processor   : MKL15Z128VLH4
 **     Component   : Init_SysTick
-**     Version     : Component 01.002, Driver 01.02, CPU db: 3.00.000
+**     Version     : Component 01.003, Driver 01.03, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2013-07-26, 21:49, # CodeGen: 82
+**     Date/Time   : 2014-03-28, 16:12, # CodeGen: 227
 **     Abstract    :
 **          This file implements the SysTick (SysTick) module initialization
 **          according to the Peripheral Initialization settings, and
@@ -15,8 +15,8 @@
 **          Component name                                 : SysTick
 **          Device                                         : SysTick
 **          Settings                                       : 
-**            Clock source                                 : Processor clock
-**            Reload value                                 : 0
+**            Clock source                                 : External clock
+**            Reload value                                 : 000000
 **            Counter period                               : STOP
 **          Interrupts                                     : 
 **            Interrupt                                    : INT_SysTick
@@ -38,7 +38,7 @@
 ** ###################################################################*/
 /*!
 ** @file SysTick.h
-** @version 01.02
+** @version 01.03
 ** @brief
 **          This file implements the SysTick (SysTick) module initialization
 **          according to the Peripheral Initialization settings, and
@@ -96,7 +96,7 @@ PE_ISR(SysTick_Interrupt);
 /*
 ** ###################################################################
 **
-**     This file was created by Processor Expert 10.2 [05.07]
+**     This file was created by Processor Expert 10.3 [05.08]
 **     for the Freescale Kinetis series of microcontrollers.
 **
 ** ###################################################################

@@ -6,7 +6,7 @@
 **     Component   : ExtInt_LDD
 **     Version     : Component 02.156, Driver 01.02, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2014-03-19, 16:12, # CodeGen: 212
+**     Date/Time   : 2014-03-27, 22:12, # CodeGen: 223
 **     Abstract    :
 **         This component, "ExtInt_LDD", provide a low level API
 **         for unified access of external interrupts handling
@@ -19,7 +19,7 @@
 **          Pin signal                                     : AD_NOT_DRDY1
 **          Generate interrupt on                          : falling edge
 **          Interrupt                                      : INT_PORTA
-**          Interrupt priority                             : low priority
+**          Interrupt priority                             : medium priority
 **          Initialization                                 :
 **            Enabled in init. code                        : no
 **            Auto initialization                          : no
@@ -109,10 +109,10 @@ LDD_TDeviceData* EINT_AD_NOT_DRDY1_Init(LDD_TUserData *UserDataPtr)
   /* PORTA_PCR5: ISF=0,IRQC=0x0A,MUX=1 */
   PORTA_PCR5 = (uint32_t)((PORTA_PCR5 & (uint32_t)~(uint32_t)(
                 PORT_PCR_ISF_MASK |
-                PORT_PCR_IRQC(0x05) |
+                //PORT_PCR_IRQC(0x05) |
                 PORT_PCR_MUX(0x06)
                )) | (uint32_t)(
-                PORT_PCR_IRQC(0x0A) |
+                //PORT_PCR_IRQC(0x0A) |
                 PORT_PCR_MUX(0x01)
                ));
   /* NVIC_IPR7: PRI_30=0x80 */

@@ -79,10 +79,6 @@ extern const uint8 MCU_NUMBER;                                 /*!< The number o
      * @{
      */
 #define USING_ADC_COUNT 2U                                     /*!< The count of ADC used. */
-#define ADC0            0                                      /*!< ADC number. */
-#if USING_ADC_COUNT == 2
-#define ADC1            1                                      /*!< ADC number. */
-#endif
 #if USING_ADS1198
 #define REGISTER_COUNT 26U                                     /*!< Count of registers in ADS1198. */
 #define CHANNEL_COUNT 0x08U                                    /*!< Count of ADC's channel. */
@@ -124,9 +120,9 @@ extern const uint8 SPI0_RX_DMA_CHANNEL;
  * The length of channel package.
  *
    @verbatim
-   ----------------------------------------------------------------
-   |0x11|channel_num|channel_state|channel_data*CHANNEL_DATA_COUNT|
-   ----------------------------------------------------------------
+   -----------------------------------------------------------------
+   |0x11|channel_num|channel_status|channel_data*CHANNEL_DATA_COUNT|
+   -----------------------------------------------------------------
    channel_num: 0x00-0xff
    channel_num = MCU_NUMBER * USING_CHANNEL_COUNT * USING_ADC_COUNT + ADC_NUMBER * USING_CHANNEL_COUNT + i
    @endverbatim
@@ -138,10 +134,16 @@ extern const byte CHANNEL_PACKAGE_HEAD_BIT;                    /*!< The head bit
  * The length of data frame.
  *
    @verbatim
-   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-   |0xb7|MCU_NUMBER|channel_package_length_high|channel_package_length_low|time_stamp_high|time_stamp_low|state_high_|state_low|channel_package*USING_CHANNEL_COUNT*USING_ADC_COUNT|0xed|
-   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   |0xb7|MCU_NUMBER|channel_package_length_high|channel_package_length_low|time_stamp_high|time_stamp_low|status_high_|status_low|channel_package*USING_CHANNEL_COUNT*USING_ADC_COUNT|0xed|
+   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
    MCU_NUMBER: 0-7
+   status_high: [7] - x
+                [6] - x
+                [5] - x
+                [4:2] - Buffer Status(empty, write, full or overflow)
+                [1] - Buffer Label(left buffer or right buffer)
+   status_low: [7-0] - Overflow Count
    @endverbatim
  */
 #if USING_ADC_COUNT == 1U
@@ -267,8 +269,12 @@ extern const uint8 ADC_REG_WCT2;
      * @addtogroup EnumGrp Enum Group
      * @{
      */
-typedef enum ADC_FLAG{eADC0 = 0, eADC1 = 1} EADCFlag;                       /*!< The value of flag to mark ADC. */
-typedef enum ARM_DATA_BUF_FLAG{eIdle = -1, eEmpty = 0, eRead = 1, eWrite = 2, eFull = 1} EARMDataBufferFlag;      /*!< The value of flag to mark which buffer's data transmitting to ARM. */
+typedef enum ARM_DATA_BUFFER{eLeftBuffer = 0, eRightBuffer = 1} EARMDataBuffer;                                     /*!< The value of flag to mark the name of the arm data buffer. */
+typedef enum ADC_DATA_STATUS_FLAG{eIdle = -1, eReceiving = 0, eReceived = 1} EADCDataStatusFlag;                    /*!< The value of flag to mark the status of receiving ADC data. */
+typedef enum ADC_FLAG{eADC0 = 0, eADC1 = 1} EADCFlag;                                                               /*!< The value of flag to mark ADC. */
+typedef enum ARM_DATA_BUF_FLAG{eNull = -1, eEmpty = 0, eRead = 1, eWrite = 2, eFull = 3, eOverflow = 4} EARMDataBufferFlag;        /*!< The value of flag to mark which buffer's data transmitting to ARM. */
+typedef enum TRANSMITION_CONTENT_FLAG{eNothing = -1, eCommand = 0, eData = 1} ETransmitionContent;                  /*!< The value of flag to mark what content is being transmitted. */
+typedef enum SPI_MODE{ePoll = 0, eInterrupt = 1, eDMA = 2} ESPIMode;                                                /*!< The value of flag to mark what SPI mode is used. */
     /*!
      * @}
      */
@@ -277,32 +283,32 @@ typedef enum ARM_DATA_BUF_FLAG{eIdle = -1, eEmpty = 0, eRead = 1, eWrite = 2, eF
      * @addtogroup StrcGrp Structure Group
      * @{
      */
-        /*!
-         * @addtogroup AdcStrc ADC Structure
-         * @{
-         */
+            /*!
+             * @addtogroup AdcStrc ADC Structure
+             * @{
+             */
 /*!
  * A structure of channel data from ADC.
  *
-   @verbatim
-   ---------------------------------------------------------------------------------------------------------
-   |  Head   |   LOFF_STATP    |   LOFF_STATN    |GPIO[4:7]|                  CH[1-8] Data                 |
-   ---------------------------------------------------------------------------------------------------------
-   | 1 1 0 0 | x x x x x x x x | x x x x x x x x | x x x x | CH1 | CH2 | CH3 | CH4 | CH5 | CH6 | CH7 | CH8 |
-   ---------------------------------------------------------------------------------------------------------
-   |                        3Bytes                         |                  8*2=16Bytes                  |
-   ---------------------------------------------------------------------------------------------------------
+    @verbatim
+    ---------------------------------------------------------------------------------------------------------
+    |  Head   |   LOFF_STATP    |   LOFF_STATN    |GPIO[4:7]|                  CH[1-8] Data                 |
+    ---------------------------------------------------------------------------------------------------------
+    | 1 1 0 0 | x x x x x x x x | x x x x x x x x | x x x x | CH1 | CH2 | CH3 | CH4 | CH5 | CH6 | CH7 | CH8 |
+    ---------------------------------------------------------------------------------------------------------
+    |                        3Bytes                         |                  8*2=16Bytes                  |
+    ---------------------------------------------------------------------------------------------------------
 
-   -----------------------------------------------------------------
-   | M |                       CHn Data                        | L |
-   -----------------------------------------------------------------
-   |1 5|1 4|1 3|1 2|1 1|1 0| 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
-   -----------------------------------------------------------------
-   | x | x | x | x | x | x | x | x | x | x | x | x | x | x | x | x |
-   -----------------------------------------------------------------
-   |             1Byte             |             1Byte             |
-   -----------------------------------------------------------------
-   @endverbatim
+    -----------------------------------------------------------------
+    | M |                       CHn Data                        | L |
+    -----------------------------------------------------------------
+    |1 5|1 4|1 3|1 2|1 1|1 0| 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+    -----------------------------------------------------------------
+    | x | x | x | x | x | x | x | x | x | x | x | x | x | x | x | x |
+    -----------------------------------------------------------------
+    |             1Byte             |             1Byte             |
+    -----------------------------------------------------------------
+    @endverbatim
  */
 struct TADCData
 {
@@ -317,8 +323,8 @@ typedef struct TADCData TADCData;
 typedef struct TADCData* TADCDataPtr;
 
 /*!
- * A structure of ADC's setting.
- */
+* A structure of ADC's setting.
+*/
 struct TADCSetting
 {
     volatile bool isChannelEnabled[CHANNEL_COUNT];             /*!< Flag of whether channel is enabled. */
@@ -327,18 +333,20 @@ typedef struct TADCSetting TADCSetting;
 typedef struct TADCSetting* TADCSettingPtr;
 
 /*!
- * A structure of ADC's status.
- */
+* A structure of ADC's status.
+*/
 struct TADCStatus
 {
-    volatile bool isDataReady;                                 /*!< Flag of whether ADC' data is ready. */
+    volatile bool isDataReady;                                  /*!< Flag of whether ADC' data is ready. */
+    volatile ETransmitionContent transmitionContent;            /*!< Flag of what content is being transmitted. */
+    volatile EADCDataStatusFlag adcDataStatus;                  /*!< Flag of whether the ADC data is received. */
 };
 typedef struct TADCStatus TADCStatus;
 typedef struct TADCStatus* TADCStatusPtr;
 
 /*!
- * A structure of ADC device.
- */
+* A structure of ADC device.
+*/
 struct TADC
 {
     TADCStatus adcStatus;
@@ -347,10 +355,9 @@ struct TADC
 };
 typedef struct TADC TADC;
 typedef struct TADC* TADCPtr;
-        /*!
-         * @}
-         */
-
+/*!
+ * @}
+ */
         /*!
          * @addtogroup McuStrc MCU Structure
          * @{
@@ -451,6 +458,7 @@ struct TARMStatus
     volatile bool isBackBufferEmpty;                            /*!< Flag of is the background buffer empty. TRUE: Cannot swap, can be written. */
     volatile bool isBackBufferFull;                             /*!< Flag of is the background buffer full. TRUE: Cannot be written, can swap*/
     volatile bool isTransmittingData;                           /*!< Flag of whether the data is being transmitted, difference from commands or others being transmitted. */
+    volatile ETransmitionContent transmitionContent;            /*!< Flag of what content is being transmitted. */
     volatile EARMDataBufferFlag foreBufferStatus;               /*!< Flag of foreground buffer status. */
     volatile EARMDataBufferFlag backBufferStatus;               /*!< Flag of background buffer status. */
 

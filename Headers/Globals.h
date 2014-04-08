@@ -51,11 +51,11 @@ extern "C"
      * @{
      */
 TADC tADC[USING_ADC_COUNT];             /*!< The structure of ADC device. */
-TADCPtr tADCPtr[USING_ADC_COUNT];       /*!< The pointer to structure of ADC device. */
+TADCPtr tADCPtr[USING_ADC_COUNT];       /*!< The pointer to the structure of ADC device. */
 TMCU tMCU;                              /*!< The structure of MCU device. */
-TMCUPtr tMCUPtr;                        /*!< The pointer to structure of MCU device. */
+TMCUPtr tMCUPtr;                        /*!< The pointer to the structure of MCU device. */
 TARM tARM;                              /*!< The structure of ARM device. */
-TARMPtr tARMPtr;                        /*!< The pointer to structure of ARM device. */
+TARMPtr tARMPtr;                        /*!< The pointer to the structure of ARM device. */
     /*!
      * @}
      */

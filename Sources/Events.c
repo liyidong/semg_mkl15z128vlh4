@@ -41,11 +41,14 @@ extern "C"
 
 /* User includes (#include below this line is not maintained by Processor Expert) */
 
+extern void SwapARMDataBuffer(void);
+extern void TransmitMCUData(void);
 /*
  * ===================================================================
  * Global Variables
  * ===================================================================
  */
+volatile bool isStart = FALSE;
 
 /*
  ** ===================================================================
@@ -223,6 +226,14 @@ void EINT_SYNC_INT_OnInterrupt(LDD_TUserData *UserDataPtr)
 //    uploadBufferPtr = (uploadBufferPtr == msg) ? msg2 : msg;
 
     tARMPtr->armStatus.isRequiringData = TRUE;
+    SwapARMDataBuffer();
+    TransmitMCUData();
+
+    if(!isStart)
+    {
+        isStart = TRUE;
+        GPIOB_PDOR |= 0x06U;    /* B1, B2, start 2 ADCs. */
+    }
 }
 
 /*
@@ -253,8 +264,8 @@ PE_ISR(SysTick_Interrupt)
     extern TMCUPtr tMCUPtr;
 
     tMCUPtr->mcuStatus.isDelayed = TRUE;
-    SysTickDisable();
     SysTickClearCountFlag();
+    SysTick_OnInterrupt();
 }
 
 /*
@@ -280,6 +291,7 @@ PE_ISR(SysTick_Interrupt)
 void DMAT_M_SPI_RX_OnComplete(LDD_TUserData *UserDataPtr)
 {
   /* Write your code here ... */
+    extern TADCPtr tADCPtr[USING_ADC_COUNT];
     extern TMCUPtr tMCUPtr;
 
 //    SPI0RxDMADisable();
@@ -334,20 +346,12 @@ void DMAT_M_SPI_TX_OnComplete(LDD_TUserData *UserDataPtr)
 {
   /* Write your code here ... */
     extern TMCUPtr tMCUPtr;
-    extern TARMPtr tARMPtr;
 
 //    SPI0TxDMADisable();
 //    SPI0DisableTxDMA();
 //    SPI0Disable();
 
     tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = TRUE;
-    if(tARMPtr->armStatus.isTransmittingData)
-    {
-//        tARMPtr->armStatus.isForeBufferEmpty = TRUE;
-//        tARMPtr->armStatus.isForeBufferFull = FALSE;
-        tARMPtr->armStatus.foreBufferStatus = eEmpty;
-        tARMPtr->armStatus.isTransmittingData = FALSE;
-    }
     //flagDataReady = FALSE;
 }
 
@@ -461,6 +465,13 @@ void DMAT_S_SPI_TX_OnComplete(LDD_TUserData *UserDataPtr)
 //    flagUploadReady = FALSE;
 
     tMCUPtr->mcuStatus.isSPI1TxDMATransCompleted = TRUE;
+    if(eData == tARMPtr->armStatus.transmitionContent)
+    {
+//        tARMPtr->armStatus.isForeBufferEmpty = TRUE;
+//        tARMPtr->armStatus.isForeBufferFull = FALSE;
+        tARMPtr->armStatus.foreBufferStatus = eEmpty;
+        tARMPtr->armStatus.isTransmittingData = FALSE;
+    }
 
 //    EIntSyncInterruptEnable(NULL);
 }

@@ -143,6 +143,7 @@ static void UARTInit(void);
 /* ===================================================================*/
 void UserInit(void)
 {
+//    InitTask();         /* Initialize task list. */
 #if DEBUG
     printf("|-+UserDataInit begins...\n");
 #endif
@@ -151,9 +152,9 @@ void UserInit(void)
     printf("| -UserDataInit finished.\n");
     printf("|-+OnChipInit begins...\n");
 #endif
-    __DI();             /* Disable Interrupts. */
+    __DI();
     OnChipInit();       /* Initialize on-chip devices. */
-    __EI();             /* Enable Interrupts. */
+    __EI();
 #if DEBUG
     printf("| -OnChipInit finished.\n");
     printf("|-+PeripheralInit begins...\n");
@@ -259,9 +260,9 @@ static void ARMDataInit(TARMDataPtr userDataPtr)
     tARM.armStatus.isForeBufferFull = FALSE;
     tARM.armStatus.isBackBufferEmpty = FALSE;
     tARM.armStatus.isBackBufferFull = FALSE;
-    tARM.armStatus.isTransmittingData = FALSE;
-    tARM.armStatus.backBufferStatus = eIdle;
-    tARM.armStatus.foreBufferStatus = eIdle;
+    tARM.armStatus.transmitionContent = eNothing;
+    tARM.armStatus.backBufferStatus = eNull;
+    tARM.armStatus.foreBufferStatus = eNull;
     tARM.foreBuffer = NULL;
     tARM.backBuffer = NULL;
 
@@ -271,7 +272,7 @@ static void ARMDataInit(TARMDataPtr userDataPtr)
     tARM.armDataLeft.dataFrame[3] = 0xB0U;                                      /* Data length low bits */
     tARM.armDataLeft.dataFrame[4] = 0x00U;                                      /* Time stamp high bits */
     tARM.armDataLeft.dataFrame[5] = 0x00U;                                      /* Time stamp low bits */
-    tARM.armDataLeft.dataFrame[6] = 0x00U;                                      /* Status high bits */
+    tARM.armDataLeft.dataFrame[6] = 0x01U & eLeftBuffer;                        /* Status high bits */
     tARM.armDataLeft.dataFrame[7] = 0x00U;                                      /* Status low bits */
 
     for(int i = 0; i < USING_CHANNEL_COUNT * USING_ADC_COUNT; i++)
@@ -290,14 +291,14 @@ static void ARMDataInit(TARMDataPtr userDataPtr)
     tARM.armDataRight.dataFrame[3] = 0xB0U;                                      /* Data length low bits */
     tARM.armDataRight.dataFrame[4] = 0x00U;                                      /* Time stamp high bits */
     tARM.armDataRight.dataFrame[5] = 0x00U;                                      /* Time stamp low bits */
-    tARM.armDataRight.dataFrame[6] = 0x00U;                                      /* Status high bits */
+    tARM.armDataRight.dataFrame[6] = 0x01U & eRightBuffer;                       /* Status high bits */
     tARM.armDataRight.dataFrame[7] = 0x00U;                                      /* Status low bits */
 
     for(int i = 0; i < USING_CHANNEL_COUNT * USING_ADC_COUNT; i++)
     {
         int off = i * CHANNEL_PACKAGE_LENGTH;
         tARM.armDataRight.dataFrame[8 + off] = CHANNEL_PACKAGE_HEAD_BIT;                   /* Channel package head bit */
-        tARM.armDataRight.dataFrame[9 + off] = i;                                          /* Channel number */
+        tARM.armDataRight.dataFrame[9 + off] = MCU_NUMBER * USING_ADC_COUNT + i;           /* Channel number */
         tARM.armDataRight.dataFrame[10 + off] = 0x00U;                                     /* Channel package status */
     }
 
@@ -375,9 +376,9 @@ static void PeripheralInit(void)
     printf("| |-+ADCInit begins...\n");
 #endif
     /* Initialize ADC. */
-    ADCInit(ADC0);
+    ADCInit(eADC0);
 #if USING_ADC_COUNT == 2
-    ADCInit(ADC1);
+    ADCInit(eADC1);
 #endif
 #if DEBUG
     printf("| | -ADCInit finished.\n");
@@ -476,15 +477,15 @@ static void SPIInit(void)
 #if USING_SPI0
     SPI0 = SPI0Init(NULL);      /* Initialize SPI0 in slave mode, transmitter data to ARM. */
     SPI0Enable();
-    SPI0EnableRxDMA();
-    SPI0EnableTxDMA();
+//    SPI0EnableRxDMA();
+//    SPI0EnableTxDMA();
 #endif
 
 #if USING_SPI1
     SPI1 = SPI1Init(NULL);      /* Initialize SPI1 in master mode, read ADC data. */
     SPI1Enable();
-    SPI1EnableRxDMA();
-    SPI1EnableTxDMA();
+//    SPI1EnableRxDMA();
+//    SPI1EnableTxDMA();
 #endif
 }
 
@@ -512,19 +513,19 @@ static void DMAInit(void)
 
 #if USING_SPI0_DMA
     SPI0_TX_DMA = SPI0TxDMAInit(NULL);
-    SPI0TxDMADisable();
+//    SPI0TxDMADisable();
     SPI0TxDMAAllocateChannel();
     SPI0_RX_DMA = SPI0RxDMAInit(NULL);
-    SPI0RxDMADisable();
+//    SPI0RxDMADisable();
     SPI0RxDMAAllocateChannel();
 #endif
 
 #if USING_SPI1_DMA
     SPI1_TX_DMA = SPI1TxDMAInit(NULL);
-    SPI1TxDMADisable();
+//    SPI1TxDMADisable();
     SPI1TxDMAAllocateChannel();
     SPI1_RX_DMA = SPI1RxDMAInit(NULL);
-    SPI1RxDMADisable();
+//    SPI1RxDMADisable();
     SPI1RxDMAAllocateChannel();
 #endif
 }

@@ -6,7 +6,7 @@
 **     Component   : ExtInt_LDD
 **     Version     : Component 02.156, Driver 01.02, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2014-03-19, 14:18, # CodeGen: 209
+**     Date/Time   : 2014-04-08, 18:09, # CodeGen: 246
 **     Abstract    :
 **         This component, "ExtInt_LDD", provide a low level API 
 **         for unified access of external interrupts handling
@@ -17,9 +17,9 @@
 **          Component name                                 : EINT_SYNC_INT
 **          Pin                                            : TSI0_CH3/PTA2/UART0_TX/TPM2_CH1
 **          Pin signal                                     : SYNC_INT
-**          Generate interrupt on                          : falling edge
+**          Generate interrupt on                          : rising edge
 **          Interrupt                                      : INT_PORTA
-**          Interrupt priority                             : low priority
+**          Interrupt priority                             : medium priority
 **          Initialization                                 : 
 **            Enabled in init. code                        : no
 **            Auto initialization                          : no

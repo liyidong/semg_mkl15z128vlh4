@@ -5,7 +5,7 @@
 **     Processor   : MKL15Z128VLH4
 **     Version     : Component 01.000, Driver 01.04, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2014-03-19, 10:55, # CodeGen: 204
+**     Date/Time   : 2014-03-27, 22:11, # CodeGen: 222
 **     Abstract    :
 **
 **     Settings    :
@@ -82,8 +82,8 @@
     (tIsrFunc)&Cpu_ivINT_Reserved13,   /* 0x0D  0x00000034   -   ivINT_Reserved13              unused by PE */
     (tIsrFunc)&Cpu_ivINT_PendableSrvReq, /* 0x0E  0x00000038   -   ivINT_PendableSrvReq          unused by PE */
     (tIsrFunc)&SysTick_Interrupt,      /* 0x0F  0x0000003C   0   ivINT_SysTick                 used by PE */
-    (tIsrFunc)&DMA_CTRL_Channel0Interrupt, /* 0x10  0x00000040   2   ivINT_DMA0                    used by PE */
-    (tIsrFunc)&DMA_CTRL_Channel1Interrupt, /* 0x11  0x00000044   2   ivINT_DMA1                    used by PE */
+    (tIsrFunc)&DMA_CTRL_Channel0Interrupt, /* 0x10  0x00000040   1   ivINT_DMA0                    used by PE */
+    (tIsrFunc)&DMA_CTRL_Channel1Interrupt, /* 0x11  0x00000044   1   ivINT_DMA1                    used by PE */
     (tIsrFunc)&DMA_CTRL_Channel2Interrupt, /* 0x12  0x00000048   2   ivINT_DMA2                    used by PE */
     (tIsrFunc)&DMA_CTRL_Channel3Interrupt, /* 0x13  0x0000004C   2   ivINT_DMA3                    used by PE */
     (tIsrFunc)&Cpu_ivINT_Reserved20,   /* 0x14  0x00000050   -   ivINT_Reserved20              unused by PE */

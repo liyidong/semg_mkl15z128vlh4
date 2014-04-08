@@ -6,7 +6,7 @@
 **     Component   : DMA_LDD
 **     Version     : Component 01.065, Driver 01.07, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2014-03-17, 13:36, # CodeGen: 187
+**     Date/Time   : 2014-03-24, 15:03, # CodeGen: 216
 **     Abstract    :
 **          This embedded component implements initialization
 **          and runtime handling of an on-chip DMA controller.
@@ -20,25 +20,25 @@
 **              Channel arbitration type                   : Round robin
 **              Interrupt service                          : Enabled
 **                Transfer complete interrupt              : INT_DMA0
-**                Transfer complete interrupt priority     : medium priority
+**                Transfer complete interrupt priority     : high priority
 **            Settings of DMA channel                      : DMA_Channel1
 **              Channel                                    : DMA_Channel1
 **              Channel arbitration type                   : Round robin
 **              Interrupt service                          : Enabled
 **                Transfer complete interrupt              : INT_DMA1
-**                Transfer complete interrupt priority     : medium priority
+**                Transfer complete interrupt priority     : high priority
 **            Settings of DMA channel                      : DMA_Channel2
 **              Channel                                    : DMA_Channel2
 **              Channel arbitration type                   : Round robin
 **              Interrupt service                          : Enabled
 **                Transfer complete interrupt              : INT_DMA2
-**                Transfer complete interrupt priority     : medium priority
+**                Transfer complete interrupt priority     : low priority
 **            Settings of DMA channel                      : DMA_Channel3
 **              Channel                                    : DMA_Channel3
 **              Channel arbitration type                   : Round robin
 **              Interrupt service                          : Enabled
 **                Transfer complete interrupt              : INT_DMA3
-**                Transfer complete interrupt priority     : medium priority
+**                Transfer complete interrupt priority     : low priority
 **          Initialization                                 : 
 **            Enabled in init. code                        : no
 **            Auto initialization                          : no

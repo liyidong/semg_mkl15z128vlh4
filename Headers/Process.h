@@ -15,9 +15,6 @@
  **
  **     Contents    :
  **         Process         - void Process(void);
- **         SplitRawData    - LDD_TError SplitRawData(TADCDataPtr adcDataPtr);
- **         ReadADCData     - void ReadADCData(EADCFlag adcFlag);
- **         TransmitMCUData - void TransmitMCUData(void);
  **
  **     Mail      	: pzdongdong@163.com
  **
@@ -62,6 +59,38 @@ extern "C"
  */
 /* ===================================================================*/
 void MainLoop(void);
+
+/*
+ * ===================================================================
+ *     Method      : SwapARMDataBuffer (Module Process)
+ */
+/*!
+ *     @brief
+ *          This method is called to swap the arm's data. Decide either the
+ *          armLeftData or armRightData is the foreground buffer or background
+ *          buffer.
+ *     @param
+ *          void
+ *     @return
+ *          void
+ */
+/* ===================================================================*/
+void SwapARMDataBuffer(void);
+
+/*
+ * ===================================================================
+ *     Method      : TransmitADCData(Module Process)
+ */
+/*!
+ *     @brief
+ *          This method transmit MCU's data to ARM when is required.
+ *     @param
+ *          void
+ *     @return
+ *          void
+ */
+/* ===================================================================*/
+void TransmitMCUData(void);
 
     /* END Process. */
 

@@ -6,7 +6,7 @@
 **     Component   : ExtInt_LDD
 **     Version     : Component 02.156, Driver 01.02, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2014-03-19, 14:18, # CodeGen: 209
+**     Date/Time   : 2014-04-08, 18:09, # CodeGen: 246
 **     Abstract    :
 **         This component, "ExtInt_LDD", provide a low level API
 **         for unified access of external interrupts handling
@@ -17,9 +17,9 @@
 **          Component name                                 : EINT_SYNC_INT
 **          Pin                                            : TSI0_CH3/PTA2/UART0_TX/TPM2_CH1
 **          Pin signal                                     : SYNC_INT
-**          Generate interrupt on                          : falling edge
+**          Generate interrupt on                          : rising edge
 **          Interrupt                                      : INT_PORTA
-**          Interrupt priority                             : low priority
+**          Interrupt priority                             : medium priority
 **          Initialization                                 :
 **            Enabled in init. code                        : no
 **            Auto initialization                          : no
@@ -106,13 +106,13 @@ LDD_TDeviceData* EINT_SYNC_INT_Init(LDD_TUserData *UserDataPtr)
   /* Clear interrupt status flag */
   PORTA_ISFR = PORT_ISFR_ISF(0x04);
   /* Initialization of Port Control registers */
-  /* PORTA_PCR2: ISF=0,IRQC=0x0A,MUX=1 */
+  /* PORTA_PCR2: ISF=0,IRQC=9,MUX=1 */
   PORTA_PCR2 = (uint32_t)((PORTA_PCR2 & (uint32_t)~(uint32_t)(
                 PORT_PCR_ISF_MASK |
-                PORT_PCR_IRQC(0x05) |
+                PORT_PCR_IRQC(0x06) |
                 PORT_PCR_MUX(0x06)
                )) | (uint32_t)(
-                PORT_PCR_IRQC(0x0A) |
+                PORT_PCR_IRQC(0x09) |
                 PORT_PCR_MUX(0x01)
                ));
   /* NVIC_IPR7: PRI_30=0x80 */
@@ -121,8 +121,8 @@ LDD_TDeviceData* EINT_SYNC_INT_Init(LDD_TUserData *UserDataPtr)
               )) | (uint32_t)(
                NVIC_IP_PRI_30(0x80)
               ));
-  ///* NVIC_ISER: SETENA|=0x40000000 */
-  //NVIC_ISER |= NVIC_ISER_SETENA(0x40000000);
+  /* NVIC_ISER: SETENA|=0x40000000 */
+//  NVIC_ISER |= NVIC_ISER_SETENA(0x40000000);
   /* Registration of the device structure */
   PE_LDD_RegisterDeviceStructure(PE_LDD_COMPONENT_EINT_SYNC_INT_ID,DeviceDataPrv);
   return ((LDD_TDeviceData *)DeviceDataPrv);
@@ -149,7 +149,7 @@ void EINT_SYNC_INT_Enable(LDD_TDeviceData *DeviceDataPtr)
   (void)DeviceDataPtr;                 /* Parameter is not used, suppress unused argument warning */
   PORT_PDD_ClearPinInterruptFlag(PORTA_BASE_PTR, EINT_SYNC_INT_PIN_INDEX);
   PORT_PDD_SetPinInterruptConfiguration(PORTA_BASE_PTR,
-    EINT_SYNC_INT_PIN_INDEX, PORT_PDD_INTERRUPT_ON_FALLING);
+    EINT_SYNC_INT_PIN_INDEX, PORT_PDD_INTERRUPT_ON_RISING);
   DeviceDataPrv->UserEnabled = TRUE;   /* Set device as Enabled */
 }
 
