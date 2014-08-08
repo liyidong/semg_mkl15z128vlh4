@@ -16,6 +16,8 @@
 -fdata-sections
 -Wall
 -std=gnu99
+-fsigned-char
+-funsigned-bitfields
 -c
 -fmessage-length=0
 -specs=ewl_c.specs

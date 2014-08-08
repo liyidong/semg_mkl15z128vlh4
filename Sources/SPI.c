@@ -190,21 +190,19 @@ LDD_TError SPI0SendData(LDD_DMA_TAddress srcAddr, LDD_DMA_TByteCount sendByteCou
 /* ===================================================================*/
 LDD_TError SPI0ReceiveSendData(ESPIMode mode, LDD_DMA_TAddress srcAddr, LDD_DMA_TAddress destAddr, LDD_DMA_TByteCount receiveByteCount, LDD_DMA_TByteCount sendByteCount)
 {
-    if(ePoll == mode)
+    switch(mode)
     {
+    case ePoll:
         SPI0Receive(destAddr, receiveByteCount);
         SPI0Send(srcAddr, sendByteCount);
         while(!SPI0ReceiveStatus() || !SPI0SendStatus())
         {
             SPI0Poll();
         }
-    }
-    else if(eInterrupt == mode)
-    {
-
-    }
-    else if(eDMA == mode)
-    {
+        break;
+    case eInterrupt:
+        break;
+    case eDMA:
 //        SPI0RxDMASetSourceAddress((LDD_DMA_TAddress)(&SPI0_D));
 
         SPI0RxDMASetDestinationAddress((LDD_DMA_TAddress)destAddr);
@@ -225,6 +223,7 @@ LDD_TError SPI0ReceiveSendData(ESPIMode mode, LDD_DMA_TAddress srcAddr, LDD_DMA_
         SPI0EnableTxDMA();
         SPI0RxDMAEnable();
         SPI0TxDMAEnable();
+        break;
     }
 
     return ERR_OK;
@@ -311,6 +310,24 @@ LDD_TError SPI1SendData(LDD_DMA_TAddress srcAddr, LDD_DMA_TByteCount sendByteCou
 
 //    dummy = (byte*)malloc(sendByteCount);
 
+    //extern TMCUPtr tMCUPtr;
+
+//    SPI1TxDMADisable();
+//    SPI1DisableTxDMA();
+
+    //if(tMCUPtr->mcuStatus.isSPI1TxDMAChannelError)
+    //{
+    __DI();
+    DMA_CTRL_Init(NULL);
+    //SPI1TxDMADisable();
+    //SPI1DisableTxDMA();
+    //SPI1Disable();
+    SPI1Init(NULL);
+    __EI();
+    //tMCUPtr->mcuStatus.isSPI1TxDMAChannelError = FALSE;
+    //}
+    DMAControllerEnable();
+    SPI1TxDMAAllocateChannel();
 //    SPI1RxDMASetSourceAddress((LDD_DMA_TAddress)(&SPI1_D));
 //    SPI1RxDMASetDestinationAddress((LDD_DMA_TAddress)dummy);
 //    SPI1RxDMASetByteCount((LDD_DMA_TByteCount)sendByteCount);
@@ -325,7 +342,7 @@ LDD_TError SPI1SendData(LDD_DMA_TAddress srcAddr, LDD_DMA_TByteCount sendByteCou
     SPI1EnableTxDMA();
     SPI1RxDMADisable();
     SPI1TxDMAEnable();
-//    SPI1Enable();
+    SPI1Enable();
 
 //    free(dummy);
 

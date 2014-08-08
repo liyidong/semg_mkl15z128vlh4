@@ -337,7 +337,7 @@ typedef struct TADCSetting* TADCSettingPtr;
 */
 struct TADCStatus
 {
-    volatile bool isDataReady;                                  /*!< Flag of whether ADC' data is ready. */
+    volatile bool isDataReady  : 1;                                  /*!< Flag of whether ADC' data is ready. */
     volatile ETransmitionContent transmitionContent;            /*!< Flag of what content is being transmitted. */
     volatile EADCDataStatusFlag adcDataStatus;                  /*!< Flag of whether the ADC data is received. */
 };
@@ -388,18 +388,22 @@ typedef struct TMCUSetting* TMCUSettingPtr;
  */
 struct TMCUStatus
 {
-    volatile bool isReceivingADCData;                           /*!< Flag of whether MCU is receiving data from ADC. */
-    volatile bool isMasterReceived;                             /*!< Flag of whether Master SPI finishing reception. */
-    volatile bool isMasterSent;                                 /*!< Flag of whether Master SPI finishing transmission. */
-    volatile bool isSlaveReceived;                              /*!< Flag of whether Slave SPI finishing reception. */
-    volatile bool isSlaveSent;                                  /*!< Flag of whether Slave SPI finishing transmission. */
-    volatile bool isUartReceived;                               /*!< Flag of whether UART finishing reception. */
-    volatile bool isUartSent;                                   /*!< Flag of whether UART finishing transmission. */
-    volatile bool isSPI0TxDMATransCompleted;                    /*!< Flag of whether SPI0 DMA transmission is completed. */
-    volatile bool isSPI0RxDMATransCompleted;                    /*!< Flag of whether SPI0 DMA reception is completed. */
-    volatile bool isSPI1TxDMATransCompleted;                    /*!< Flag of whether SPI1 DMA transmission is completed. */
-    volatile bool isSPI1RxDMATransCompleted;                    /*!< Flag of whether SPI1 DMA reception is completed. */
-    volatile bool isDelayed;                                    /*!< Flag of whether delayed, used in delay functions. */
+    volatile bool isReceivingADCData : 1;                           /*!< Flag of whether MCU is receiving data from ADC. */
+    volatile bool isMasterReceived : 1;                             /*!< Flag of whether Master SPI finishing reception. */
+    volatile bool isMasterSent : 1;                                 /*!< Flag of whether Master SPI finishing transmission. */
+    volatile bool isSlaveReceived : 1;                              /*!< Flag of whether Slave SPI finishing reception. */
+    volatile bool isSlaveSent : 1;                                  /*!< Flag of whether Slave SPI finishing transmission. */
+    volatile bool isUartReceived : 1;                               /*!< Flag of whether UART finishing reception. */
+    volatile bool isUartSent : 1;                                   /*!< Flag of whether UART finishing transmission. */
+    volatile bool isSPI0TxDMAChannelError : 1;                      /*!< Flag of whether DMA Channel for SPI0 transmission goes wrong. */
+    volatile bool isSPI0RxDMAChannelError : 1;                      /*!< Flag of whether DMA Channel for SPI0 reception goes wrong. */
+    volatile bool isSPI1TxDMAChannelError : 1;                      /*!< Flag of whether DMA Channel for SPI1 transmission goes wrong. */
+    volatile bool isSPI1RxDMAChannelError : 1;                      /*!< Flag of whether DMA Channel for SPI0 reception goes wrong. */
+    volatile bool isSPI0TxDMATransCompleted : 1;                    /*!< Flag of whether SPI0 DMA transmission is completed. */
+    volatile bool isSPI0RxDMATransCompleted : 1;                    /*!< Flag of whether SPI0 DMA reception is completed. */
+    volatile bool isSPI1TxDMATransCompleted : 1;                    /*!< Flag of whether SPI1 DMA transmission is completed. */
+    volatile bool isSPI1RxDMATransCompleted : 1;                    /*!< Flag of whether SPI1 DMA reception is completed. */
+    volatile bool isDelayed : 1;                                    /*!< Flag of whether delayed, used in delay functions. */
 };
 typedef struct TMCUStatus TMCUStatus;
 typedef struct TMCUStatus* TMCUStatusPtr;
@@ -451,13 +455,13 @@ typedef struct TARMSetting* TARMSettingPtr;
  */
 struct TARMStatus
 {
-    volatile bool isRequiringData;                              /*!< Flag of whether arm requires data. */
-    volatile bool isUploadReady;                                /*!< Flag of whether data is ready for uploading to ARM. */
-    volatile bool isForeBufferEmpty;                            /*!< Flag of is the foreground buffer empty. TRUE: Cannot be read, can swap. */
-    volatile bool isForeBufferFull;                             /*!< Flag of is the foreground buffer full. TRUE: Cannot swap, can be read. */
-    volatile bool isBackBufferEmpty;                            /*!< Flag of is the background buffer empty. TRUE: Cannot swap, can be written. */
-    volatile bool isBackBufferFull;                             /*!< Flag of is the background buffer full. TRUE: Cannot be written, can swap*/
-    volatile bool isTransmittingData;                           /*!< Flag of whether the data is being transmitted, difference from commands or others being transmitted. */
+    volatile bool isRequiringData : 1;                              /*!< Flag of whether arm requires data. */
+    volatile bool isUploadReady : 1;                                /*!< Flag of whether data is ready for uploading to ARM. */
+    volatile bool isForeBufferEmpty : 1;                            /*!< Flag of is the foreground buffer empty. TRUE: Cannot be read, can swap. */
+    volatile bool isForeBufferFull : 1;                             /*!< Flag of is the foreground buffer full. TRUE: Cannot swap, can be read. */
+    volatile bool isBackBufferEmpty : 1;                            /*!< Flag of is the background buffer empty. TRUE: Cannot swap, can be written. */
+    volatile bool isBackBufferFull : 1;                             /*!< Flag of is the background buffer full. TRUE: Cannot be written, can swap*/
+    volatile bool isTransmittingData : 1;                           /*!< Flag of whether the data is being transmitted, difference from commands or others being transmitted. */
     volatile ETransmitionContent transmitionContent;            /*!< Flag of what content is being transmitted. */
     volatile EARMDataBufferFlag foreBufferStatus;               /*!< Flag of foreground buffer status. */
     volatile EARMDataBufferFlag backBufferStatus;               /*!< Flag of background buffer status. */

@@ -14,21 +14,21 @@
 **          Component name                                 : SS_SPI1
 **          Device                                         : SPI1
 **          Interrupt service/event                        : Disabled
-**          Settings                                       : 
+**          Settings                                       :
 **            Input pin                                    : Enabled
 **              Pin                                        : ADC0_SE7b/PTD6/LLWU_P15/SPI1_MOSI/UART0_RX/SPI1_MISO
 **              Pin signal                                 : SPI1_IN
 **            Output pin                                   : Enabled
 **              Pin                                        : PTD7/SPI1_MISO/UART0_TX/SPI1_MOSI
 **              Pin signal                                 : SPI1_OUT
-**            Clock pin                                    : 
+**            Clock pin                                    :
 **              Pin                                        : ADC0_SE6b/PTD5/SPI1_SCK/UART2_TX/TPM0_CH5
 **              Pin signal                                 : SPI1_SCK
-**            Slave select                                 : 
+**            Slave select                                 :
 **              Pin                                        : PTD4/LLWU_P14/SPI1_PCS0/UART2_RX/TPM0_CH4
 **              Pin signal                                 : SPI1_CS
 **              Active level                               : Low
-**            Attribute set                                : 
+**            Attribute set                                :
 **              Width                                      : 8 bits
 **              MSB first                                  : yes
 **              Clock polarity                             : Low
@@ -40,10 +40,10 @@
 **            HW output buffer size                        : 1
 **            HW output watermark                          : 1
 **            Transmitter DMA                              : Disabled
-**          Initialization                                 : 
+**          Initialization                                 :
 **            Enabled in init. code                        : no
 **            Auto initialization                          : no
-**            Event mask                                   : 
+**            Event mask                                   :
 **              OnBlockSent                                : Disabled
 **              OnBlockReceived                            : Disabled
 **              OnError                                    : Disabled
@@ -55,7 +55,7 @@
 **
 **     Copyright : 1997 - 2013 Freescale Semiconductor, Inc. All Rights Reserved.
 **     SOURCE DISTRIBUTION PERMISSIBLE as directed in End User License Agreement.
-**     
+**
 **     http      : www.freescale.com
 **     mail      : support@freescale.com
 ** ###################################################################*/
@@ -65,11 +65,11 @@
 ** @brief
 **         This component "SPISlave_LDD" implements SLAVE part of synchronous
 **         serial master-slave communication.
-*/         
+*/
 /*!
 **  @addtogroup SS_SPI1_module SS_SPI1 module documentation
 **  @{
-*/         
+*/
 
 /* MODULE SS_SPI1. */
 /*lint -save  -e926 -e927 -e928 -e929 Disable MISRA rule (11.4) checking. */
@@ -79,7 +79,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 #define AVAILABLE_EVENTS_MASK 0x00U
 
@@ -111,7 +111,7 @@ static void HWEnDi(LDD_TDeviceData *DeviceDataPtr);
 **         If the "Enable in init. code" is set to "yes" value then the
 **         device is also enabled(see the description of the Enable()
 **         method). In this case the Enable() method is not necessary
-**         and needn't to be generated. 
+**         and needn't to be generated.
 **         This method can be called only once. Before the second call
 **         of Init() the Deinit() must be called first.
 **     @param
@@ -133,7 +133,7 @@ LDD_TDeviceData* SS_SPI1_Init(LDD_TUserData *UserDataPtr)
   DeviceDataPrv->EnUser = FALSE;       /* Disable device */
   DeviceDataPrv->ErrFlag = 0x00U;      /* Clear error flags */
   /* SIM_SCGC4: SPI1=1 */
-  SIM_SCGC4 |= SIM_SCGC4_SPI1_MASK;                                   
+  SIM_SCGC4 |= SIM_SCGC4_SPI1_MASK;
   /* SPI1_C1: SPIE=0,SPE=0,SPTIE=0,MSTR=0,CPOL=0,CPHA=1,SSOE=0,LSBFE=0 */
   SPI1_C1 = SPI_C1_CPHA_MASK;          /* Clear control register */
   /* PORTD_PCR6: ISF=0,MUX=2 */
@@ -142,28 +142,30 @@ LDD_TDeviceData* SS_SPI1_Init(LDD_TUserData *UserDataPtr)
                 PORT_PCR_MUX(0x05)
                )) | (uint32_t)(
                 PORT_PCR_MUX(0x02)
-               ));                                  
+               ));
   /* PORTD_PCR7: ISF=0,MUX=2 */
   PORTD_PCR7 = (uint32_t)((PORTD_PCR7 & (uint32_t)~(uint32_t)(
                 PORT_PCR_ISF_MASK |
                 PORT_PCR_MUX(0x05)
                )) | (uint32_t)(
                 PORT_PCR_MUX(0x02)
-               ));                                  
+               ));
   /* PORTD_PCR5: ISF=0,MUX=2 */
   PORTD_PCR5 = (uint32_t)((PORTD_PCR5 & (uint32_t)~(uint32_t)(
                 PORT_PCR_ISF_MASK |
                 PORT_PCR_MUX(0x05)
                )) | (uint32_t)(
                 PORT_PCR_MUX(0x02)
-               ));                                  
-  /* PORTD_PCR4: ISF=0,MUX=2 */
+               ));
+  /* PORTD_PCR4: ISF=0,MUX=2,PE=1 */
   PORTD_PCR4 = (uint32_t)((PORTD_PCR4 & (uint32_t)~(uint32_t)(
                 PORT_PCR_ISF_MASK |
                 PORT_PCR_MUX(0x05)
                )) | (uint32_t)(
                 PORT_PCR_MUX(0x02)
-               ));                                  
+               )) | (uint32_t)(
+                PORT_PCR_PE_MASK
+               );
   /* SPI1_C1: SPIE=0,SPE=0,SPTIE=0,MSTR=0,CPOL=0,CPHA=1,SSOE=0,LSBFE=0 */
   SPI1_C1 = SPI_C1_CPHA_MASK;          /* Set Configuration register */
   /* SPI1_C2: SPMIE=0,??=0,TXDMAE=0,MODFEN=0,BIDIROE=0,RXDMAE=0,SPISWAI=0,SPC0=0 */
@@ -245,7 +247,7 @@ LDD_TError SS_SPI1_Disable(LDD_TDeviceData *DeviceDataPtr)
 **         called if Receive/SendBlock was invoked before in order to
 **         run the reception/transmission. The end of the
 **         receiving/transmitting is indicated by OnBlockSent or
-**         OnBlockReceived event. 
+**         OnBlockReceived event.
 **     @param
 **         DeviceDataPtr   - Device data structure
 **                           pointer returned by <Init> method.
@@ -266,8 +268,8 @@ void SS_SPI1_Main(LDD_TDeviceData *DeviceDataPtr)
 **     Method      :  HWEnDi (component SPISlave_LDD)
 **
 **     Description :
-**         Enables or disables the peripheral(s) associated with the 
-**         component. The method is called automatically as a part of the 
+**         Enables or disables the peripheral(s) associated with the
+**         component. The method is called automatically as a part of the
 **         Enable and Disable methods and several internal methods.
 **         This method is internal. It is used by Processor Expert only.
 ** ===================================================================
@@ -288,7 +290,7 @@ static void HWEnDi(LDD_TDeviceData *DeviceDataPtr)
 
 #ifdef __cplusplus
 }  /* extern "C" */
-#endif 
+#endif
 
 /*!
 ** @}

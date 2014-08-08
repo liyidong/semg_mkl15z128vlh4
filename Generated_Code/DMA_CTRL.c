@@ -39,10 +39,10 @@
 **              Interrupt service                          : Enabled
 **                Transfer complete interrupt              : INT_DMA3
 **                Transfer complete interrupt priority     : low priority
-**          Initialization                                 : 
+**          Initialization                                 :
 **            Enabled in init. code                        : no
 **            Auto initialization                          : no
-**          CPU clock/configuration selection              : 
+**          CPU clock/configuration selection              :
 **            Clock configuration 0                        : This component enabled
 **            Clock configuration 1                        : This component disabled
 **            Clock configuration 2                        : This component disabled
@@ -65,7 +65,7 @@
 **
 **     Copyright : 1997 - 2013 Freescale Semiconductor, Inc. All Rights Reserved.
 **     SOURCE DISTRIBUTION PERMISSIBLE as directed in End User License Agreement.
-**     
+**
 **     http      : www.freescale.com
 **     mail      : support@freescale.com
 ** ###################################################################*/
@@ -75,11 +75,11 @@
 ** @brief
 **          This embedded component implements initialization
 **          and runtime handling of an on-chip DMA controller.
-*/         
+*/
 /*!
 **  @addtogroup DMA_CTRL_module DMA_CTRL module documentation
 **  @{
-*/         
+*/
 
 /* MODULE DMA_CTRL. */
 
@@ -126,7 +126,7 @@ static bool VerifyDescriptor(LDD_DMA_TTransferDescriptor *DescriptorPtr);
 **     @brief
 **         Initializes the device according to design-time
 **         configuration properties. Allocates memory for the device
-**         data structure. 
+**         data structure.
 **         If the <Enable in init. code> is set to "yes" then the
 **         device is also enabled (see the description of the Enable
 **         method).
@@ -137,7 +137,7 @@ static bool VerifyDescriptor(LDD_DMA_TTransferDescriptor *DescriptorPtr);
 **                           RTOS specific data. This pointer will be
 **                           passed as an event or callback parameter.
 **     @return
-**                         - Pointer to the device data structure. 
+**                         - Pointer to the device data structure.
 */
 /* ===================================================================*/
 LDD_TDeviceData* DMA_CTRL_Init(LDD_TUserData *UserDataPtr)
@@ -152,9 +152,9 @@ LDD_TDeviceData* DMA_CTRL_Init(LDD_TUserData *UserDataPtr)
   DeviceDataPtr->UserDataPtr = UserDataPtr; /* Store the RTOS device structure */
   /* Enable device clock gate */
   /* SIM_SCGC7: DMA=1 */
-  SIM_SCGC7 |= SIM_SCGC7_DMA_MASK;                                   
+  SIM_SCGC7 |= SIM_SCGC7_DMA_MASK;
   /* SIM_SCGC6: DMAMUX=1 */
-  SIM_SCGC6 |= SIM_SCGC6_DMAMUX_MASK;                                   
+  SIM_SCGC6 |= SIM_SCGC6_DMAMUX_MASK;
   /* Transfer compete interrupt vector(s) allocation */
   /* {Default RTOS Adapter} Set interrupt vector: IVT is static, ISR parameter is passed by the global variable */
   INT_DMA0__DEFAULT_RTOS_ISRPARAM = DeviceDataPtr;
@@ -164,9 +164,9 @@ LDD_TDeviceData* DMA_CTRL_Init(LDD_TUserData *UserDataPtr)
                NVIC_IP_PRI_0(0xBF)
               )) | (uint32_t)(
                NVIC_IP_PRI_0(0x40)
-              ));                                  
+              ));
   /* NVIC_ISER: SETENA|=1 */
-  NVIC_ISER |= NVIC_ISER_SETENA(0x01);                                   
+  NVIC_ISER |= NVIC_ISER_SETENA(0x01);
   /* Transfer compete interrupt vector(s) allocation */
   /* {Default RTOS Adapter} Set interrupt vector: IVT is static, ISR parameter is passed by the global variable */
   INT_DMA1__DEFAULT_RTOS_ISRPARAM = DeviceDataPtr;
@@ -176,9 +176,9 @@ LDD_TDeviceData* DMA_CTRL_Init(LDD_TUserData *UserDataPtr)
                NVIC_IP_PRI_1(0xBF)
               )) | (uint32_t)(
                NVIC_IP_PRI_1(0x40)
-              ));                                  
+              ));
   /* NVIC_ISER: SETENA|=2 */
-  NVIC_ISER |= NVIC_ISER_SETENA(0x02);                                   
+  NVIC_ISER |= NVIC_ISER_SETENA(0x02);
   /* Transfer compete interrupt vector(s) allocation */
   /* {Default RTOS Adapter} Set interrupt vector: IVT is static, ISR parameter is passed by the global variable */
   INT_DMA2__DEFAULT_RTOS_ISRPARAM = DeviceDataPtr;
@@ -188,9 +188,9 @@ LDD_TDeviceData* DMA_CTRL_Init(LDD_TUserData *UserDataPtr)
                NVIC_IP_PRI_2(0x7F)
               )) | (uint32_t)(
                NVIC_IP_PRI_2(0x80)
-              ));                                  
+              ));
   /* NVIC_ISER: SETENA|=4 */
-  NVIC_ISER |= NVIC_ISER_SETENA(0x04);                                   
+  NVIC_ISER |= NVIC_ISER_SETENA(0x04);
   /* Transfer compete interrupt vector(s) allocation */
   /* {Default RTOS Adapter} Set interrupt vector: IVT is static, ISR parameter is passed by the global variable */
   INT_DMA3__DEFAULT_RTOS_ISRPARAM = DeviceDataPtr;
@@ -200,9 +200,9 @@ LDD_TDeviceData* DMA_CTRL_Init(LDD_TUserData *UserDataPtr)
                NVIC_IP_PRI_3(0x7F)
               )) | (uint32_t)(
                NVIC_IP_PRI_3(0x80)
-              ));                                  
+              ));
   /* NVIC_ISER: SETENA|=8 */
-  NVIC_ISER |= NVIC_ISER_SETENA(0x08);                                   
+  NVIC_ISER |= NVIC_ISER_SETENA(0x08);
   for (i = 0U; i < DMA_CTRL_DMA_CHANNELS_NUMBER; i++) {
     DMA_PDD_WriteControlReg(DMA_BASE_PTR, i, 0U); /* Clear control register. Disable all interrupts and HW requests. */
     DMA_PDD_ClearInterruptFlags(DMA_BASE_PTR, i, DMA_PDD_TRANSFER_COMPLETE_FLAG); /* Clear request interrupt flags */
@@ -255,7 +255,7 @@ void DMA_CTRL_Deinit(LDD_TDeviceData *DeviceDataPtr)
   /* {Default RTOS Adapter} Driver memory deallocation: Dynamic allocation is simulated, no deallocation code is generated */
   /* Disable device clock gate */
   /* SIM_SCGC7: DMA=0 */
-  SIM_SCGC7 &= (uint32_t)~(uint32_t)(SIM_SCGC7_DMA_MASK);                                   
+  SIM_SCGC7 &= (uint32_t)~(uint32_t)(SIM_SCGC7_DMA_MASK);
 }
 
 /*
@@ -780,7 +780,7 @@ LDD_TError DMA_CTRL_SetChannelByteCount(LDD_TDeviceData *DeviceDataPtr, LDD_DMA_
      property to the "yes" value in the "Configuration inspector" */
   if (ByteCount > DMA_CTRL_MAX_BYTE_COUNT) { /* Test if ByteCount is in correct range. */
     return ERR_PARAM_DATA;
-  }   
+  }
   /* New transfer descriptor consistency test - this test can be disabled by setting the "Ignore range checking"
      property to the "yes" value in the "Configuration inspector" */
   LocalByteCount = DescriptorPtr->ByteCount; /* Save actual byte count. */
@@ -798,9 +798,9 @@ LDD_TError DMA_CTRL_SetChannelByteCount(LDD_TDeviceData *DeviceDataPtr, LDD_DMA_
 **     Method      :  VerifyDescriptor (component DMA_LDD)
 **
 **     Description :
-**         The method verifies a transfer descriptor of allocated channel 
-**         defined by the pointer to its address. Returns TRUE if the 
-**         channel's transfer descriptor is correct, FALSE if 
+**         The method verifies a transfer descriptor of allocated channel
+**         defined by the pointer to its address. Returns TRUE if the
+**         channel's transfer descriptor is correct, FALSE if
 **         inconsistency is detected.
 **         This method is internal. It is used by Processor Expert only.
 ** ===================================================================
@@ -864,9 +864,9 @@ static bool VerifyDescriptor(LDD_DMA_TTransferDescriptor *DescriptorPtr)
 **     Method      :  GetChannelNumber (component DMA_LDD)
 **
 **     Description :
-**         The method returns TRUE if some channel is allocated for the 
-**         given descriptor, false if it is not. Number of allocated 
-**         channel is returned indirectly into the ChannelNumber 
+**         The method returns TRUE if some channel is allocated for the
+**         given descriptor, false if it is not. Number of allocated
+**         channel is returned indirectly into the ChannelNumber
 **         parameter.
 **         This method is internal. It is used by Processor Expert only.
 ** ===================================================================
@@ -887,9 +887,9 @@ bool ChannelFound = FALSE;
 **     Method      :  GetRecord (component DMA_LDD)
 **
 **     Description :
-**         The method returns TRUE if some channel is allocated for the 
-**         given descriptor, false if it is not. Pointer to the 
-**         descriptor record of allocated channel is returned indirectly 
+**         The method returns TRUE if some channel is allocated for the
+**         given descriptor, false if it is not. Pointer to the
+**         descriptor record of allocated channel is returned indirectly
 **         into the DescriptorRecordPtr parameter.
 **         This method is internal. It is used by Processor Expert only.
 ** ===================================================================

@@ -64,7 +64,7 @@ const uint32 MAX_DELAY_MS_EXTERNAL_CLOCK = 5592;                           /*!< 
     #endif  /* #if PROCESSOR_CLOCK_48MHZ */
 const uint32 SYSTICK_USE_PROCESSOR_CLOCK = 0x01U;                          /*!< SysTick uses processor clock, equlas to SysTick_PDD_CORE_CLOCK. */
 const uint32 SYSTICK_USE_EXTERNAL_CLOCK = 0x0U;                            /*!< SysTick uses external clock. equals to SysTick_PDD_CORE_CLOCK_DIV16.*/
-const uint8 MCU_NUMBER = 0x00;                                             /*!< The number of MCU. */
+const uint8 MCU_NUMBER = 0x05U;                                             /*!< The number of MCU. */
 #endif  /* #if USING_MKL15Z128VLH4 */
     /*!
      * @}

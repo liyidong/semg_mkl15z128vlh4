@@ -497,6 +497,9 @@ void DMAT_S_SPI_TX_OnComplete(LDD_TUserData *UserDataPtr)
 void DMAT_S_SPI_TX_OnError(LDD_TUserData *UserDataPtr)
 {
   /* Write your code here ... */
+    extern TMCUPtr tMCUPtr;
+
+    //tMCUPtr->mcuStatus.isSPI1TxDMAChannelError = TRUE;
 }
 
 /*

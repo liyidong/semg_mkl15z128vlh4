@@ -6,21 +6,21 @@
 **     Component   : ExtInt_LDD
 **     Version     : Component 02.156, Driver 01.02, CPU db: 3.00.000
 **     Compiler    : GNU C Compiler
-**     Date/Time   : 2014-04-08, 18:09, # CodeGen: 246
+**     Date/Time   : 2014-08-05, 15:23, # CodeGen: 262
 **     Abstract    :
-**         This component, "ExtInt_LDD", provide a low level API
+**         This component, "ExtInt_LDD", provide a low level API 
 **         for unified access of external interrupts handling
 **         across various device designs.
-**         The component uses one pin which generates interrupt on
+**         The component uses one pin which generates interrupt on 
 **         selected edge.
 **     Settings    :
 **          Component name                                 : EINT_SYNC_INT
 **          Pin                                            : TSI0_CH3/PTA2/UART0_TX/TPM2_CH1
 **          Pin signal                                     : SYNC_INT
-**          Generate interrupt on                          : rising edge
+**          Generate interrupt on                          : both edges
 **          Interrupt                                      : INT_PORTA
 **          Interrupt priority                             : medium priority
-**          Initialization                                 :
+**          Initialization                                 : 
 **            Enabled in init. code                        : no
 **            Auto initialization                          : no
 **          Threshold level                                : 0
@@ -31,7 +31,7 @@
 **
 **     Copyright : 1997 - 2013 Freescale Semiconductor, Inc. All Rights Reserved.
 **     SOURCE DISTRIBUTION PERMISSIBLE as directed in End User License Agreement.
-**
+**     
 **     http      : www.freescale.com
 **     mail      : support@freescale.com
 ** ###################################################################*/
@@ -39,16 +39,16 @@
 ** @file EINT_SYNC_INT.c
 ** @version 01.02
 ** @brief
-**         This component, "ExtInt_LDD", provide a low level API
+**         This component, "ExtInt_LDD", provide a low level API 
 **         for unified access of external interrupts handling
 **         across various device designs.
-**         The component uses one pin which generates interrupt on
+**         The component uses one pin which generates interrupt on 
 **         selected edge.
-*/
+*/         
 /*!
 **  @addtogroup EINT_SYNC_INT_module EINT_SYNC_INT module documentation
 **  @{
-*/
+*/         
 
 /* MODULE EINT_SYNC_INT. */
 
@@ -58,7 +58,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif 
 
 typedef struct {
   bool UserEnabled;                    /* Enable/disable device flag */
@@ -104,25 +104,25 @@ LDD_TDeviceData* EINT_SYNC_INT_Init(LDD_TUserData *UserDataPtr)
   /* {Default RTOS Adapter} Set interrupt vector: IVT is static, ISR parameter is passed by the global variable */
   INT_PORTA__DEFAULT_RTOS_ISRPARAM = DeviceDataPrv;
   /* Clear interrupt status flag */
-  PORTA_ISFR = PORT_ISFR_ISF(0x04);
+  PORTA_ISFR = PORT_ISFR_ISF(0x04);                                   
   /* Initialization of Port Control registers */
-  /* PORTA_PCR2: ISF=0,IRQC=9,MUX=1 */
+  /* PORTA_PCR2: ISF=0,IRQC=0x0B,MUX=1 */
   PORTA_PCR2 = (uint32_t)((PORTA_PCR2 & (uint32_t)~(uint32_t)(
                 PORT_PCR_ISF_MASK |
-                PORT_PCR_IRQC(0x06) |
+                PORT_PCR_IRQC(0x04) |
                 PORT_PCR_MUX(0x06)
                )) | (uint32_t)(
-                PORT_PCR_IRQC(0x09) |
+                PORT_PCR_IRQC(0x0B) |
                 PORT_PCR_MUX(0x01)
-               ));
+               ));                                  
   /* NVIC_IPR7: PRI_30=0x80 */
   NVIC_IPR7 = (uint32_t)((NVIC_IPR7 & (uint32_t)~(uint32_t)(
                NVIC_IP_PRI_30(0x7F)
               )) | (uint32_t)(
                NVIC_IP_PRI_30(0x80)
-              ));
+              ));                                  
   /* NVIC_ISER: SETENA|=0x40000000 */
-//  NVIC_ISER |= NVIC_ISER_SETENA(0x40000000);
+  NVIC_ISER |= NVIC_ISER_SETENA(0x40000000);                                   
   /* Registration of the device structure */
   PE_LDD_RegisterDeviceStructure(PE_LDD_COMPONENT_EINT_SYNC_INT_ID,DeviceDataPrv);
   return ((LDD_TDeviceData *)DeviceDataPrv);
@@ -149,7 +149,7 @@ void EINT_SYNC_INT_Enable(LDD_TDeviceData *DeviceDataPtr)
   (void)DeviceDataPtr;                 /* Parameter is not used, suppress unused argument warning */
   PORT_PDD_ClearPinInterruptFlag(PORTA_BASE_PTR, EINT_SYNC_INT_PIN_INDEX);
   PORT_PDD_SetPinInterruptConfiguration(PORTA_BASE_PTR,
-    EINT_SYNC_INT_PIN_INDEX, PORT_PDD_INTERRUPT_ON_RISING);
+    EINT_SYNC_INT_PIN_INDEX, PORT_PDD_INTERRUPT_ON_RISING_FALLING);
   DeviceDataPrv->UserEnabled = TRUE;   /* Set device as Enabled */
 }
 
@@ -208,7 +208,7 @@ void EINT_SYNC_INT_Interrupt(void)
 
 #ifdef __cplusplus
 }  /* extern "C" */
-#endif
+#endif 
 
 /*!
 ** @}

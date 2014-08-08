@@ -218,6 +218,10 @@ static void MCUDataInit(TMCUDataPtr userDataPtr)
     tMCU.mcuStatus.isMasterSent = FALSE;
     tMCU.mcuStatus.isSlaveReceived = FALSE;
     tMCU.mcuStatus.isSlaveSent = FALSE;
+    tMCU.mcuStatus.isSPI0RxDMAChannelError = FALSE;
+    tMCU.mcuStatus.isSPI0TxDMAChannelError = FALSE;
+    tMCU.mcuStatus.isSPI1RxDMAChannelError = FALSE;
+    tMCU.mcuStatus.isSPI1TxDMAChannelError = FALSE;
     tMCU.mcuStatus.isSPI0RxDMATransCompleted = FALSE;
     tMCU.mcuStatus.isSPI0TxDMATransCompleted = FALSE;
     tMCU.mcuStatus.isSPI1RxDMATransCompleted = FALSE;
@@ -278,9 +282,9 @@ static void ARMDataInit(TARMDataPtr userDataPtr)
     for(int i = 0; i < USING_CHANNEL_COUNT * USING_ADC_COUNT; i++)
     {
         int off = i * CHANNEL_PACKAGE_LENGTH;
-        tARM.armDataLeft.dataFrame[8 + off] = CHANNEL_PACKAGE_HEAD_BIT;                   /* Channel package head bit */
-        tARM.armDataLeft.dataFrame[9 + off] = i;                                          /* Channel number */
-        tARM.armDataLeft.dataFrame[10 + off] = 0x00U;                                     /* Channel package status */
+        tARM.armDataLeft.dataFrame[8 + off] = CHANNEL_PACKAGE_HEAD_BIT;          /* Channel package head bit */
+        tARM.armDataLeft.dataFrame[9 + off] = MCU_NUMBER * USING_CHANNEL_COUNT * USING_ADC_COUNT + i;   /* Channel number */
+        tARM.armDataLeft.dataFrame[10 + off] = 0x00U;                            /* Channel package status */
     }
 
     tARM.armDataLeft.dataFrame[DATA_FRAME_LENGTH - 1] = DATA_FRAME_TAIL_BIT;
@@ -298,7 +302,7 @@ static void ARMDataInit(TARMDataPtr userDataPtr)
     {
         int off = i * CHANNEL_PACKAGE_LENGTH;
         tARM.armDataRight.dataFrame[8 + off] = CHANNEL_PACKAGE_HEAD_BIT;                   /* Channel package head bit */
-        tARM.armDataRight.dataFrame[9 + off] = MCU_NUMBER * USING_ADC_COUNT + i;           /* Channel number */
+        tARM.armDataRight.dataFrame[9 + off] = MCU_NUMBER * USING_CHANNEL_COUNT * USING_ADC_COUNT + i;  /* Channel number */
         tARM.armDataRight.dataFrame[10 + off] = 0x00U;                                     /* Channel package status */
     }
 

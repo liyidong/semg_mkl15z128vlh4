@@ -48,9 +48,9 @@ Sources/Events.o: ../Sources/Events.c \
  E:/workspace/semg_mkl15z128vlh4/Generated_Code/EINT_AD_NOT_DRDY1.h \
  D:/Programs_x64/Freescale/CW\ MCU\ v10.5/MCU/ProcessorExpert/lib/Kinetis/pdd/inc/SysTick_PDD.h \
  E:/workspace/semg_mkl15z128vlh4/Headers/SPI.h \
- E:/workspace/semg_mkl15z128vlh4/Headers/MyHeaders.h \
- E:/workspace/semg_mkl15z128vlh4/Headers/Settings.h \
  E:/workspace/semg_mkl15z128vlh4/Headers/Macros.h \
+ E:/workspace/semg_mkl15z128vlh4/Headers/Settings.h \
+ E:/workspace/semg_mkl15z128vlh4/Headers/MyHeaders.h \
  E:/workspace/semg_mkl15z128vlh4/Headers/Globals.h \
  E:/workspace/semg_mkl15z128vlh4/Headers/Aliases.h \
  E:/workspace/semg_mkl15z128vlh4/Headers/ADC.h \
@@ -158,11 +158,11 @@ D:/Programs_x64/Freescale/CW\ MCU\ v10.5/MCU/ProcessorExpert/lib/Kinetis/pdd/inc
 
 E:/workspace/semg_mkl15z128vlh4/Headers/SPI.h:
 
-E:/workspace/semg_mkl15z128vlh4/Headers/MyHeaders.h:
+E:/workspace/semg_mkl15z128vlh4/Headers/Macros.h:
 
 E:/workspace/semg_mkl15z128vlh4/Headers/Settings.h:
 
-E:/workspace/semg_mkl15z128vlh4/Headers/Macros.h:
+E:/workspace/semg_mkl15z128vlh4/Headers/MyHeaders.h:
 
 E:/workspace/semg_mkl15z128vlh4/Headers/Globals.h:
 

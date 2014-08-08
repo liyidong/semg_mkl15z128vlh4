@@ -214,7 +214,7 @@ LDD_TError ADCConfigure(EADCFlag adcFlag)
 #elif TEST_ADC == 1
     regVal[1] = 0x00U;  /* Test ADC with internal signals. */
 #endif
-    regVal[2] = 0x80U;  /* CONFIG3 */
+    regVal[2] = 0x80U;  /* CONFIG3 10001100*/
     regVal[3] = 0x00U;  /* LOFF */
 #if TEST_ADC == 0
     regVal[4] = 0x10U;  /* CH1SET */
@@ -255,17 +255,17 @@ LDD_TError ADCConfigure(EADCFlag adcFlag)
     tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = FALSE;
     DelaySomeMs(1);
     DisableADCSPI(adcFlag);         /* De-select ADC. */
-    for(int i = 0; i < 25; i++)
-    {
-        regVal[i] = 0xFF;
-    }
-
-    EnableADCSPI(adcFlag);
-    ADCReadRegister(cmd, regVal, 25);
-    while(!tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted || !tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted);
-    tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
-    tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = FALSE;
-    DisableADCSPI(adcFlag);
+//    for(int i = 0; i < 25; i++)
+//    {
+//        regVal[i] = 0xFF;
+//    }
+//
+//    EnableADCSPI(adcFlag);
+//    ADCReadRegister(cmd, regVal, 25);
+//    while(!tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted || !tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted);
+//    tMCUPtr->mcuStatus.isSPI0TxDMATransCompleted = FALSE;
+//    tMCUPtr->mcuStatus.isSPI0RxDMATransCompleted = FALSE;
+//    DisableADCSPI(adcFlag);
 //    for(;;);
 //#if DEBUG
 //    DelaySomeMs(100);
